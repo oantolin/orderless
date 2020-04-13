@@ -32,10 +32,12 @@
 ;; documentation.
 ;;
 ;; By default the space key is bound to `minibuffer-complete-word' in
-;; `minibuffer-local-map', which interferes with this completion
-;; method. So, if you use it, you should also rebind SPC to
-;; `self-insert-command':
+;; `minibuffer-local-map', which isn't useful with this completion
+;; method. So, if you use it, you should also unbind SPC.
 ;;
+;; So to test this completion you can use the following configuration:
+;;
+;; (setq completion-styles '(orderless))
 ;; (define-key minibuffer-local-map (kbd "SPC") #'self-insert-command)
 
 ;;; Code:

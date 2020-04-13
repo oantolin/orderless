@@ -1,0 +1,27 @@
+* Warning                            
+
+This package is experminental! It probably has many bugs, and reports
+of them are greatly appreciated.
+
+* Overview
+
+This package provides an =orderless= completion style that divides 
+the pattern into space-separated chunks, treats each on as a       
+regexp, and matches canidates that match all of the regexps in any 
+order.                                                             
+
+Completion styles are used as entries in the variables             
+=completion-styles= and =completion-category-overrides=, see their 
+documentation.
+
+By default the space key is bound to =minibuffer-complete-word= in
+=minibuffer-local-map=, which isn't useful with this completion method.
+So, if you use it, you should probably unbind SPC.
+
+So to test this completion method you can use the following
+configuration:
+
+#+begin_src emacs-lisp
+(setq completion-styles '(orderless))
+(define-key minibuffer-local-map (kbd "SPC") nil)
+#+end_src
