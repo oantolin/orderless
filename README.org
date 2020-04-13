@@ -1,7 +1,9 @@
 * Warning                            
 
 This package is experminental! It probably has many bugs, and reports
-of them are greatly appreciated.
+of them are greatly appreciated. In fact, the current purpose of this
+package isn't really to implement usable out of order completion, but
+to figure out how to do that.
 
 * Overview
 
