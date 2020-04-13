@@ -1,4 +1,4 @@
-* Warning                            
+* Warning
 
 This package is experminental! It probably has many bugs, and reports
 of them are greatly appreciated. In fact, the current purpose of this
@@ -7,13 +7,13 @@ to figure out how to do that.
 
 * Overview
 
-This package provides an =orderless= completion style that divides 
-the pattern into space-separated chunks, treats each on as a       
-regexp, and matches canidates that match all of the regexps in any 
-order.                                                             
+This package provides an =orderless= completion style that divides
+the pattern into space-separated chunks, treats each on as a
+regexp, and matches canidates that match all of the regexps in any
+order.
 
-Completion styles are used as entries in the variables             
-=completion-styles= and =completion-category-overrides=, see their 
+Completion styles are used as entries in the variables
+=completion-styles= and =completion-category-overrides=, see their
 documentation.
 
 By default the space key is bound to =minibuffer-complete-word= in
