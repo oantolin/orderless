@@ -43,8 +43,10 @@
 ;;; Code:
 
 (defun orderless-all-completions (string table pred point)
-  (let ((all (all-completions "" table pred))
-        (regexps (split-string string)))
+  (let* ((lim (car (completion-boundaries string table pred "")))
+         (prefix (substring string 0 lim))
+         (all (all-completions prefix table pred))
+         (regexps (split-string (substring string lim))))
     (when minibuffer-completing-file-name
       (setq all (completion-pcm--filename-try-filter all)))
     (condition-case err
@@ -54,12 +56,15 @@
                  collect candidate)
       (invalid-regexp nil))))
 
-(defun orderless-try-completion (string table pred point  &optional _metadata)
-  (let ((all (orderless-all-completions string table pred point)))
-    (cond
-     ((null all) nil)
-     ((null (cdr all)) (cons (car all) (length (car all))))
-     (t (cons string (length string))))))
+(defun orderless-try-completion (string table pred point &optional _metadata)
+  (let* ((lim (car (completion-boundaries string table pred "")))
+         (prefix (substring string 0 lim))
+         (all (orderless-all-completions string table pred point)))
+    (cl-flet ((point-at-end (str) (cons str (length str))))
+      (cond
+       ((null all) nil)
+       ((null (cdr all)) (point-at-end (concat prefix (car all))))
+       (t (point-at-end string))))))
 
 (push '(orderless
         orderless-try-completion orderless-all-completions
