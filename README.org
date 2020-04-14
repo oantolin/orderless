@@ -15,7 +15,7 @@ Completion styles are used as entries in the variables
 documentation.
 
 By default the space key is bound to =minibuffer-complete-word= in
-=minibuffer-local-map=, which isn't useful with this completion method.
+=minibuffer-local-completion-map=, which isn't useful with this completion method.
 So, if you use it, you should probably unbind SPC.
 
 So to test this completion method you can put =orderless.el= somewhere
@@ -24,5 +24,5 @@ on your =load-path=, and use the following configuration:
 #+begin_src emacs-lisp
 (require 'orderless)
 (setq completion-styles '(orderless))
-(define-key minibuffer-local-map (kbd "SPC") nil)
+(define-key minibuffer-local-completion-map (kbd "SPC") nil)
 #+end_src
