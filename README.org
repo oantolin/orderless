@@ -1,7 +1,7 @@
 * Warning
 
 This package is experminental! It probably has many bugs, and reports
-of them are greatly appreciated. Consider a proof of concept.
+of them are greatly appreciated. Consider it a proof of concept.
 
 * Overview
 
