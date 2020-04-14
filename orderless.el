@@ -53,12 +53,13 @@
     (when minibuffer-completing-file-name
       (setq all (completion-pcm--filename-try-filter all)))
     (condition-case nil
-        (nconc
-         (cl-loop for candidate in all
-                  when (cl-loop for regexp in regexps
-                                always (string-match-p regexp candidate))
-                  collect candidate)
-         (length prefix))
+        (progn
+          (setq all
+                (cl-loop for candidate in all
+                         when (cl-loop for regexp in regexps
+                                       always (string-match-p regexp candidate))
+                         collect candidate))
+          (when all (nconc all (length prefix))))
       (invalid-regexp nil))))
 
 (defun orderless-try-completion (string table pred point &optional _metadata)
