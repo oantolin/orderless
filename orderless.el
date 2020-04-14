@@ -74,7 +74,8 @@
 (cl-pushnew '(orderless
               orderless-try-completion orderless-all-completions
               "Completion of multiple regexps, in any order.")
-            completion-styles-alist)
+            completion-styles-alist
+            :test #'equal)
 
 (provide 'orderless)
 ;;; orderless.el ends here
