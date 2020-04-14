@@ -55,8 +55,8 @@
     t))
 
 (defun orderless-all-completions (string table pred _point)
-  (let* ((lim (car (completion-boundaries string table pred "")))
-         (prefix (substring string 0 lim))
+  (let* ((limit (car (completion-boundaries string table pred "")))
+         (prefix (substring string 0 limit))
          (all (all-completions prefix table pred))
          (regexps (save-match-data (split-string (substring string limit)))))
     (when minibuffer-completing-file-name
@@ -75,8 +75,8 @@
       (invalid-regexp nil))))
 
 (defun orderless-try-completion (string table pred point &optional _metadata)
-  (let* ((lim (car (completion-boundaries string table pred "")))
-         (prefix (substring string 0 lim))
+  (let* ((limit (car (completion-boundaries string table pred "")))
+         (prefix (substring string 0 limit))
          (all (orderless-all-completions string table pred point)))
     (cl-flet ((measured (string) (cons string (length string))))
       (cond
