@@ -45,14 +45,14 @@
 
 ;;; Code:
 
-(defun orderless-all-completions (string table pred point)
+(defun orderless-all-completions (string table pred _point)
   (let* ((lim (car (completion-boundaries string table pred "")))
          (prefix (substring string 0 lim))
          (all (all-completions prefix table pred))
          (regexps (split-string (substring string lim))))
     (when minibuffer-completing-file-name
       (setq all (completion-pcm--filename-try-filter all)))
-    (condition-case err
+    (condition-case nil
         (nconc
          (cl-loop for candidate in all
                   when (cl-loop for regexp in regexps
