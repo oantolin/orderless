@@ -65,7 +65,8 @@
         (progn
           (setq all
            (save-match-data
-             (cl-loop for candidate in all
+             (cl-loop for original in all
+                      for candidate = (copy-sequence original)
                       when (cl-loop for regexp in regexps
                                     always (orderless-highlight-match
                                             regexp candidate))
