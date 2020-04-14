@@ -1,9 +1,7 @@
 * Warning
 
 This package is experminental! It probably has many bugs, and reports
-of them are greatly appreciated. In fact, the current purpose of this
-package isn't really to implement usable out of order completion, but
-to figure out how to do that.
+of them are greatly appreciated. Consider a proof of concept.
 
 * Overview
 
@@ -20,10 +18,11 @@ By default the space key is bound to =minibuffer-complete-word= in
 =minibuffer-local-map=, which isn't useful with this completion method.
 So, if you use it, you should probably unbind SPC.
 
-So to test this completion method you can use the following
-configuration:
+So to test this completion method you can put =orderless.el= somewhere
+on your =load-path=, and use the following configuration:
 
 #+begin_src emacs-lisp
+(require 'orderless)
 (setq completion-styles '(orderless))
 (define-key minibuffer-local-map (kbd "SPC") nil)
 #+end_src
