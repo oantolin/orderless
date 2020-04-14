@@ -58,7 +58,7 @@
   (let* ((lim (car (completion-boundaries string table pred "")))
          (prefix (substring string 0 lim))
          (all (all-completions prefix table pred))
-         (regexps (split-string (substring string lim))))
+         (regexps (save-match-data (split-string (substring string limit)))))
     (when minibuffer-completing-file-name
       (setq all (completion-pcm--filename-try-filter all)))
     (condition-case nil
