@@ -4,6 +4,9 @@
 
 ;; Author: Omar Antolín Camarena <omar@matem.unam.mx>
 ;; Keywords: extensions
+;; Version: 0.1
+;; Homepage: https://github.com/oantolin/orderless
+;; Package-Requires: ((emacs "24.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -68,10 +71,10 @@
        ((atom (cdr all)) (measured (concat prefix (car all))))
        (t (measured string))))))
 
-(push '(orderless
-        orderless-try-completion orderless-all-completions
-        "Completion of multiple regexps, in any order.")
-      completion-styles-alist)
+(cl-pushnew '(orderless
+              orderless-try-completion orderless-all-completions
+              "Completion of multiple regexps, in any order.")
+            completion-styles-alist)
 
 (provide 'orderless)
 ;;; orderless.el ends here
