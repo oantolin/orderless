@@ -45,6 +45,15 @@
 
 ;;; Code:
 
+(defun orderless-highlight-match (regexp string)
+  (when (string-match regexp string)
+    (font-lock-prepend-text-property
+     (match-beginning 0)
+     (match-end 0)
+     'face 'completions-common-part
+     string)
+    t))
+
 (defun orderless-all-completions (string table pred _point)
   (let* ((lim (car (completion-boundaries string table pred "")))
          (prefix (substring string 0 lim))
@@ -55,10 +64,12 @@
     (condition-case nil
         (progn
           (setq all
-                (cl-loop for candidate in all
-                         when (cl-loop for regexp in regexps
-                                       always (string-match-p regexp candidate))
-                         collect candidate))
+           (save-match-data
+             (cl-loop for candidate in all
+                      when (cl-loop for regexp in regexps
+                                    always (orderless-highlight-match
+                                            regexp candidate))
+                      collect candidate)))
           (when all (nconc all (length prefix))))
       (invalid-regexp nil))))
 
