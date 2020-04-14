@@ -50,21 +50,23 @@
     (when minibuffer-completing-file-name
       (setq all (completion-pcm--filename-try-filter all)))
     (condition-case err
-        (cl-loop for candidate in all
-                 when (cl-loop for regexp in regexps
-                               always (string-match-p regexp candidate))
-                 collect candidate)
+        (nconc
+         (cl-loop for candidate in all
+                  when (cl-loop for regexp in regexps
+                                always (string-match-p regexp candidate))
+                  collect candidate)
+         (length prefix))
       (invalid-regexp nil))))
 
 (defun orderless-try-completion (string table pred point &optional _metadata)
   (let* ((lim (car (completion-boundaries string table pred "")))
          (prefix (substring string 0 lim))
          (all (orderless-all-completions string table pred point)))
-    (cl-flet ((point-at-end (str) (cons str (length str))))
+    (cl-flet ((measured (string) (cons string (length string))))
       (cond
        ((null all) nil)
-       ((null (cdr all)) (point-at-end (concat prefix (car all))))
-       (t (point-at-end string))))))
+       ((atom (cdr all)) (measured (concat prefix (car all))))
+       (t (measured string))))))
 
 (push '(orderless
         orderless-try-completion orderless-all-completions
