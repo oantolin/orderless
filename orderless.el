@@ -55,24 +55,24 @@
     t))
 
 (defun orderless-all-completions (string table pred _point)
-  (let* ((limit (car (completion-boundaries string table pred "")))
-         (prefix (substring string 0 limit))
-         (all (all-completions prefix table pred))
-         (regexps (save-match-data (split-string (substring string limit)))))
-    (when minibuffer-completing-file-name
-      (setq all (completion-pcm--filename-try-filter all)))
-    (condition-case nil
-        (progn
-          (setq all
-           (save-match-data
-             (cl-loop for original in all
-                      for candidate = (copy-sequence original)
-                      when (cl-loop for regexp in regexps
-                                    always (orderless-highlight-match
-                                            regexp candidate))
-                      collect candidate)))
-          (when all (nconc all (length prefix))))
-      (invalid-regexp nil))))
+  (save-match-data
+    (let* ((limit (car (completion-boundaries string table pred "")))
+           (prefix (substring string 0 limit))
+           (all (all-completions prefix table pred))
+           (regexps (split-string (substring string limit))))
+      (when minibuffer-completing-file-name
+        (setq all (completion-pcm--filename-try-filter all)))
+      (condition-case nil
+          (progn
+            (setq all
+                  (cl-loop for original in all
+                           for candidate = (copy-sequence original)
+                           when (cl-loop for regexp in regexps
+                                         always (orderless-highlight-match
+                                                 regexp candidate))
+                           collect candidate))
+            (when all (nconc all (length prefix))))
+        (invalid-regexp nil)))))
 
 (defun orderless-try-completion (string table pred point &optional _metadata)
   (let* ((limit (car (completion-boundaries string table pred "")))
