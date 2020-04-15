@@ -45,14 +45,40 @@
 
 ;;; Code:
 
-(defun orderless--highlight-match (regexp string)
-  ;; only call this when the match has already been checked!
-  (string-match regexp string)
-  (font-lock-prepend-text-property
-   (match-beginning 0)
-   (match-end 0)
-   'face 'completions-common-part
-   string))
+(require 'cl-lib)
+
+(defgroup orderless nil
+  "Completion method that matches space-separated regexps in any order."
+  :group 'completion)
+
+(defface orderless-match-face-0 '((t :background "#5ada88"))
+  "Face for maches of components numbered 0 mod 4."
+  :group 'orderless)
+
+(defface orderless-match-face-1 '((t :background "#d5baff"))
+  "Face for maches of components numbered 1 mod 4."
+  :group 'orderless)
+
+(defface orderless-match-face-2 '((t :background "#6aaeff"))
+  "Face for maches of components numbered 2 mod 4."
+  :group 'orderless)
+
+(defface orderless-match-face-3 '((t :background "#ff8892"))
+  "Face for maches of components numbered 3 mod 4."
+  :group 'orderless)
+
+(let ((faces [orderless-match-face-0
+              orderless-match-face-1
+              orderless-match-face-2
+              orderless-match-face-3]))
+  (defun orderless--highlight-match (regexp string face)
+    ;; only call this when the match has already been checked!
+    (string-match regexp string)
+    (font-lock-prepend-text-property
+     (match-beginning 0)
+     (match-end 0)
+     'face (aref faces (mod face 4))
+     string)))
 
 (defun orderless-all-completions (string table pred _point)
   (save-match-data
@@ -71,9 +97,9 @@
                                     always (string-match-p regexp original))
                            collect      ; it's a match, copy and highlight
                            (cl-loop with candidate = (copy-sequence original)
-                                    for regexp in regexps do
+                                    for regexp in regexps and face from 0 do
                                     (orderless--highlight-match
-                                     regexp candidate)
+                                     regexp candidate face)
                                     finally (return candidate))))
             (when all (nconc all (length prefix))))
         (invalid-regexp nil)))))
