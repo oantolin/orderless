@@ -45,14 +45,14 @@
 
 ;;; Code:
 
-(defun orderless-highlight-match (regexp string)
-  (when (string-match regexp string)
-    (font-lock-prepend-text-property
-     (match-beginning 0)
-     (match-end 0)
-     'face 'completions-common-part
-     string)
-    t))
+(defun orderless--highlight-match (regexp string)
+  ;; only call this when the match has already been checked!
+  (string-match regexp string)
+  (font-lock-prepend-text-property
+   (match-beginning 0)
+   (match-end 0)
+   'face 'completions-common-part
+   string))
 
 (defun orderless-all-completions (string table pred _point)
   (save-match-data
@@ -66,11 +66,15 @@
           (progn
             (setq all
                   (cl-loop for original in all
-                           for candidate = (copy-sequence original)
-                           when (cl-loop for regexp in regexps
-                                         always (orderless-highlight-match
-                                                 regexp candidate))
-                           collect candidate))
+                           when
+                           (cl-loop for regexp in regexps
+                                    always (string-match-p regexp original))
+                           collect      ; it's a match, copy and highlight
+                           (cl-loop with candidate = (copy-sequence original)
+                                    for regexp in regexps do
+                                    (orderless--highlight-match
+                                     regexp candidate)
+                                    finally (return candidate))))
             (when all (nconc all (length prefix))))
         (invalid-regexp nil)))))
 
