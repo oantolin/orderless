@@ -1,8 +1,3 @@
-* Warning
-
-This package is experimental! It probably has many bugs, and reports
-of them are greatly appreciated. Consider it a proof of concept.
-
 * Overview
 
 This package provides an =orderless= completion style that divides
@@ -14,15 +9,12 @@ Completion styles are used as entries in the variables
 =completion-styles= and =completion-category-overrides=, see their
 documentation.
 
-By default the space key is bound to =minibuffer-complete-word= in
-=minibuffer-local-completion-map=, which isn't useful with this completion method.
-So, if you use it, you should probably unbind SPC.
-
 So to test this completion method you can put =orderless.el= somewhere
 on your =load-path=, and use the following configuration:
 
 #+begin_src emacs-lisp
 (require 'orderless)
 (setq completion-styles '(orderless))
-(define-key minibuffer-local-completion-map (kbd "SPC") nil)
 #+end_src
+
+Bug reports are highly welcome and appreciated!
