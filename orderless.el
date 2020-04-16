@@ -36,7 +36,7 @@
 ;;
 ;; By default the space key is bound to `minibuffer-complete-word' in
 ;; `minibuffer-local-map', which isn't useful with this completion
-;; method. So, if you use it, you should also unbind SPC.
+;; method.  So, if you use it, you should also unbind SPC.
 ;;
 ;; So to test this completion you can use the following configuration:
 ;;
@@ -97,7 +97,8 @@ component regexps."
               orderless-match-face-2
               orderless-match-face-3]))
   (defun orderless--highlight-match (regexp string face)
-    ;; only call this when the match has already been checked!
+    "Highlight REGEXP match in STRING with the face numbered FACE.
+Warning: only call this function when you know REGEXP matches STRING!"
     (string-match regexp string)
     (font-lock-prepend-text-property
      (match-beginning 0)
@@ -106,6 +107,9 @@ component regexps."
      string)))
 
 (defun orderless-all-completions (string table pred _point)
+  "Split STRING into components and find entries TABLE matching all.
+The predicate PRED is used to constrain the entries in TABLE.
+This function is part of the `orderless' completion style."
   (save-match-data
     (let* ((limit (car (completion-boundaries string table pred "")))
            (prefix (substring string 0 limit))
@@ -132,6 +136,13 @@ component regexps."
         (invalid-regexp nil)))))
 
 (defun orderless-try-completion (string table pred point &optional _metadata)
+  "Complete STRING to unique matching entry in TABLE.
+This uses `orderless-all-completions' to find matches for STRING
+in TABLE among entries satisfying PRED (that function ignores
+POINT).  If there is only one match, it completes to that match.
+If there are no matches, it returns nil.  In any other case it
+\"completes\" STRING to itself.  This function is part of the
+`orderless' completion style."
   (let* ((limit (car (completion-boundaries string table pred "")))
          (prefix (substring string 0 limit))
          (all (orderless-all-completions string table pred point)))
