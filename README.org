@@ -40,3 +40,34 @@ The portions of a candidate matching each component get highlighted in
 one of four faces, =orderless-math-face-?= where =?= is a number from 0
 to 3. If the pattern has more than four components, the faces get
 reused cyclically.
+
+* Related packages
+
+The well-known and hugely powerful completion frameworks [[https://github.com/abo-abo/swiper][Ivy]] and [[https://github.com/emacs-helm/helm][Helm]]
+also provide for matching space-separated component regexps in any
+order. In Ivy, this is done with the =ivy--regex-ignore-order= matcher.
+In Helm, it is the default, called "multi pattern matching".
+
+This package is significantly smaller than either of those because it
+solely provides a completion style, meant to be used with the built-in
+Icomplete completion UI, while both of those provide their own
+completion UI (and many other cool features!).
+
+It is worth pointing out that Helm does provide its multi pattern
+matching as a completion style which could be used with Icomplete! So,
+Icomplete users could, instead of using this package, instead install
+Helm and configure Icomplete to use it as follows:
+
+#+begin_src emacs-lisp
+  (require 'helm)
+  (setq completion-styles '(helm))
+  (icomplete-mode)
+#+end_src
+
+(Of course, if you install Helm, you probably might as well use the
+Helm UI in =helm-mode= rather than using Icomplete.)
+
+The combination of [[https://github.com/raxod502/selectrum][Selectrum]] and [[https://github.com/raxod502/prescient.el][prescient.el]] also provides matching
+of space-separated components in any order, but the components are
+matched as either literal strings or initialisms rather than as
+regexps.
