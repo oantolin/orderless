@@ -2,7 +2,7 @@
 
 This package provides an =orderless= completion style that divides the
 pattern into space-separated components, treats each one as a regexp,
-and matches canidates that match all of the component regexps in any
+and matches candidates that match all of the component regexps in any
 order.
 
 Completion styles are used as entries in the variables
