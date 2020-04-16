@@ -73,6 +73,6 @@ Helm and configure Icomplete to use it as follows:
 Helm UI in =helm-mode= rather than using Icomplete.)
 
 The combination of [[https://github.com/raxod502/selectrum][Selectrum]] and [[https://github.com/raxod502/prescient.el][prescient.el]] also provides matching
-of space-separated components in any order, but the components are
-matched as either literal strings or initialisms rather than as
-regexps.
+of space-separated components in any order, but each component can be
+matched not only as a regexp, but also a literal string or an
+initialism, so the set of candidates returned may be larger.
