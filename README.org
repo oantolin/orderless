@@ -1,8 +1,8 @@
 * Overview
 
-This package provides an =orderless= completion style that divides
-the pattern into space-separated chunks, treats each on as a
-regexp, and matches canidates that match all of the regexps in any
+This package provides an =orderless= completion style that divides the
+pattern into space-separated components, treats each one as a regexp,
+and matches canidates that match all of the component regexps in any
 order.
 
 Completion styles are used as entries in the variables
@@ -18,3 +18,25 @@ on your =load-path=, and use the following configuration:
 #+end_src
 
 Bug reports are highly welcome and appreciated!
+
+* Customization
+
+** Component separator regexp
+
+The regexp components by default are space-separated, but this is
+controlled by the variable =orderless-regexp-separator=, which should be
+set to a regexp that matches the desired component separator. The
+default value matches a sequence of spaces. It may be useful to add
+hypens or slashes (or both), to match symbols or file paths,
+respectively.
+
+If you are implementing a command for which you know you want a
+different separator for the components, bind
+=orderless-regexp-separator= in a =let= form.
+
+** Faces for component matches 
+
+The portions of a candidate matching each component get highlighted in
+one of four faces, =orderless-math-face-?= where =?= is a number from 0
+to 3. If the pattern has more than four components, the faces get
+reused cyclically.
