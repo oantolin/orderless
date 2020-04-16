@@ -67,6 +67,15 @@
   "Face for maches of components numbered 3 mod 4."
   :group 'orderless)
 
+(defcustom orderless-regexp-separator " +"
+  "Regexp to match component separators for orderless completion.
+This is passed to `split-string' to divide the pattern into
+component regexps."
+  :type '(choice (const :tag "Spaces" " +")
+                 (const :tag "Spaces, hyphen or slash" " +\\|[-/]")
+                 (regexp :tag "Custom regexp"))
+  :group 'orderless)
+
 (let ((faces [orderless-match-face-0
               orderless-match-face-1
               orderless-match-face-2
@@ -85,7 +94,9 @@
     (let* ((limit (car (completion-boundaries string table pred "")))
            (prefix (substring string 0 limit))
            (all (all-completions prefix table pred))
-           (regexps (split-string (substring string limit))))
+           (regexps (split-string (substring string limit)
+                                  orderless-regexp-separator
+                                  t)))
       (when minibuffer-completing-file-name
         (setq all (completion-pcm--filename-try-filter all)))
       (condition-case nil
