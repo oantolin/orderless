@@ -23,25 +23,25 @@
 
 ;;; Commentary:
 
-;; Warning: this package is experminental!
-;;
 ;; This package provides an `orderless' completion style that divides
-;; the pattern into space-separated chunks, treats each on as a
-;; regexp, and matches canidates that match all of the regexps in any
-;; order.
+;; the pattern into components chunks (space-separated by default),
+;; treats each on as a regexp, and matches candidates that match all of
+;; the regexps in any order.
 ;;
 ;; Completion styles are used as entries in the variables
 ;; `completion-styles' and `completion-category-overrides', see their
 ;; documentation.
 ;;
-;; By default the space key is bound to `minibuffer-complete-word' in
-;; `minibuffer-local-map', which isn't useful with this completion
-;; method.  So, if you use it, you should also unbind SPC.
-;;
-;; So to test this completion you can use the following configuration:
+;; To use this completion style you can use the following minimal
+;; configuration:
 ;;
 ;; (setq completion-styles '(orderless))
-;; (define-key minibuffer-local-map (kbd "SPC") #'self-insert-command)
+;;
+;; You can customize the `orderless-regexp-separator' to decide how
+;; the input pattern is split into component regexps.  The default
+;; splits on spaces.  You might want to add hyphens and slashes, for
+;; example, to ease completion of symbols and file paths,
+;; respectively.
 
 ;;; Code:
 
