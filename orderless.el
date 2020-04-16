@@ -51,40 +51,20 @@
   "Completion method that matches space-separated regexps in any order."
   :group 'completion)
 
-(defface orderless-match-face-0
-  '((((class color) (min-colors 88) (background dark))
-     :foreground "#4ae8fc" :weight bold)
-    (((class color) (min-colors 88) (background light))
-     :foreground "#185870" :weight bold)
-    (t :foreground "cyan" :weight bold))
-  "Face for matches of components numbered 0 mod 4."
+(defface orderless-match-face-0 '((t :background "#5ada88"))
+  "Face for maches of components numbered 0 mod 4."
   :group 'orderless)
 
-(defface orderless-match-face-1
-  '((((class color) (min-colors 88) (background dark))
-     :foreground "#ed92f8" :weight bold)
-    (((class color) (min-colors 88) (background light))
-     :foreground "#8f0075" :weight bold)
-    (t :foreground "magenta" :weight bold))
-  "Face for matches of components numbered 1 mod 4."
+(defface orderless-match-face-1 '((t :background "#d5baff"))
+  "Face for maches of components numbered 1 mod 4."
   :group 'orderless)
 
-(defface orderless-match-face-2
-  '((((class color) (min-colors 88) (background dark))
-     :foreground "#72a4ff" :weight bold)
-    (((class color) (min-colors 88) (background light))
-     :foreground "#223fbf" :weight bold)
-    (t :foreground "blue" :weight bold))
-  "Face for matches of components numbered 2 mod 4."
+(defface orderless-match-face-2 '((t :background "#6aaeff"))
+  "Face for maches of components numbered 2 mod 4."
   :group 'orderless)
 
-(defface orderless-match-face-3
-  '((((class color) (min-colors 88) (background dark))
-     :foreground "#58dd13" :weight bold)
-    (((class color) (min-colors 88) (background light))
-     :foreground "#4a5700" :weight bold)
-    (t :foreground "green" :weight bold))
-  "Face for matches of components numbered 3 mod 4."
+(defface orderless-match-face-3 '((t :background "#ff8892"))
+  "Face for maches of components numbered 3 mod 4."
   :group 'orderless)
 
 (defcustom orderless-regexp-separator " +"
