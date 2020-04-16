@@ -52,38 +52,34 @@
   :group 'completion)
 
 (defface orderless-match-face-0
-  '((((class color) (min-colors 88) (background dark))
-     (:foreground "#72a4ff" :weight bold))
-    (((class color) (min-colors 88) (background light))
-     (:foreground "#223fbf" :weight bold))
-    (t :foreground "blue" :weight bold))
+  '((default :weight bold)
+    (((class color) (min-colors 88) (background dark)) :foreground "#72a4ff")
+    (((class color) (min-colors 88) (background light)) :foreground "#223fbf")
+    (t :foreground "blue"))
   "Face for matches of components numbered 0 mod 4."
   :group 'orderless)
 
 (defface orderless-match-face-1
-  '((((class color) (min-colors 88) (background dark))
-     (:foreground "#ed92f8" :weight bold))
-    (((class color) (min-colors 88) (background light))
-     (:foreground "#8f0075" :weight bold))
-    (t :foreground "magenta" :weight bold))
+  '((default :weight bold)
+    (((class color) (min-colors 88) (background dark)) :foreground "#ed92f8")
+    (((class color) (min-colors 88) (background light)) :foreground "#8f0075")
+    (t :foreground "magenta"))
   "Face for matches of components numbered 1 mod 4."
   :group 'orderless)
 
 (defface orderless-match-face-2
-  '((((class color) (min-colors 88) (background dark))
-     (:foreground "#90d800" :weight bold))
-    (((class color) (min-colors 88) (background light))
-     (:foreground "#145a00" :weight bold))
-    (t :foreground "green" :weight bold))
+  '((default :weight bold)
+    (((class color) (min-colors 88) (background dark)) :foreground "#90d800")
+    (((class color) (min-colors 88) (background light)) :foreground "#145a00")
+    (t :foreground "green"))
   "Face for matches of components numbered 2 mod 4."
   :group 'orderless)
 
 (defface orderless-match-face-3
-  '((((class color) (min-colors 88) (background dark))
-     (:foreground "#f0ce43" :weight bold))
-    (((class color) (min-colors 88) (background light))
-     (:foreground "#804000" :weight bold))
-    (t :foreground "yellow" :weight bold))
+  '((default :weight bold)
+    (((class color) (min-colors 88) (background dark)) :foreground "#f0ce43")
+    (((class color) (min-colors 88) (background light)) :foreground "#804000")
+    (t :foreground "yellow"))
   "Face for matches of components numbered 3 mod 4."
   :group 'orderless)
 
