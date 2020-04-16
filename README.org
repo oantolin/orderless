@@ -20,7 +20,6 @@ on your =load-path=, and use the following configuration:
 Bug reports are highly welcome and appreciated!
 
 * Customization
-
 ** Component separator regexp
 
 The regexp components by default are space-separated, but this is
@@ -37,9 +36,15 @@ different separator for the components, bind
 ** Faces for component matches 
 
 The portions of a candidate matching each component get highlighted in
-one of four faces, =orderless-math-face-?= where =?= is a number from 0
+one of four faces, =orderless-match-face-?= where =?= is a number from 0
 to 3. If the pattern has more than four components, the faces get
 reused cyclically.
+
+If your =completion-styles= has more than one entry (as is usual, I
+believe), remember than Emacs tries each completion style in turn and
+uses the first one returning matches. You will only see these
+particular faces when the =orderless= completion is the one that ends up
+being used, of course.
 
 * Related packages
 
