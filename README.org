@@ -33,6 +33,16 @@ If you are implementing a command for which you know you want a
 different separator for the components, bind
 =orderless-regexp-separator= in a =let= form.
 
+The package also provides a command
+=orderless-temporarily-change-separator= to change it for the rest of
+the current completion session. If you want to use it, bind it to a
+key in a keymap that will be active during your completion session:
+
+- Icomplete users should bind it in =icomplete-minibuffer-map=.
+- Users of the default completion should bind it in both
+  =minibuffer-local-completion-map= and
+  =minibuffer-local-filename-completion-map=.
+
 ** Faces for component matches 
 
 The portions of a candidate matching each component get highlighted in
