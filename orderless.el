@@ -146,11 +146,12 @@ If there are no matches, it returns nil.  In any other case it
   (let* ((limit (car (completion-boundaries string table pred "")))
          (prefix (substring string 0 limit))
          (all (orderless-all-completions string table pred point)))
-    (cl-flet ((measured (string) (cons string (length string))))
-      (cond
-       ((null all) nil)
-       ((atom (cdr all)) (measured (concat prefix (car all))))
-       (t (measured string))))))
+    (cond
+     ((null all) nil)
+     ((atom (cdr all))
+      (let ((full (concat prefix (car all))))
+        (cons full (length full))))
+     (t (cons string point)))))
 
 (cl-pushnew '(orderless
               orderless-try-completion orderless-all-completions
