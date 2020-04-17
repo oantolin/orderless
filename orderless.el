@@ -92,48 +92,47 @@ component regexps."
                  (regexp :tag "Custom regexp"))
   :group 'orderless)
 
-(let ((faces [orderless-match-face-0
-              orderless-match-face-1
-              orderless-match-face-2
-              orderless-match-face-3]))
-  (defun orderless--highlight-match (regexp string face)
-    "Highlight REGEXP match in STRING with the face numbered FACE.
+(let ((faces '(orderless-match-face-0
+               orderless-match-face-1
+               orderless-match-face-2
+               orderless-match-face-3)))
+  (nconc faces faces)
+  (defun orderless--highlight-matches (regexps string)
+    "Highlight matches of REGEXPS in STRING.
 Warning: only call this function when you know REGEXP matches STRING!"
-    (string-match regexp string)
-    (font-lock-prepend-text-property
-     (match-beginning 0)
-     (match-end 0)
-     'face (aref faces (mod face 4))
-     string)))
+    (setq string (copy-sequence string))
+    (cl-loop for regexp in regexps and face in faces do
+             (string-match regexp string)
+             (font-lock-prepend-text-property
+              (match-beginning 0)
+              (match-end 0)
+              'face face
+              string))
+    string))
 
 (defun orderless-all-completions (string table pred _point)
   "Split STRING into components and find entries TABLE matching all.
 The predicate PRED is used to constrain the entries in TABLE.
 This function is part of the `orderless' completion style."
-  (save-match-data
-    (let* ((limit (car (completion-boundaries string table pred "")))
-           (prefix (substring string 0 limit))
-           (all (all-completions prefix table pred))
-           (regexps (split-string (substring string limit)
-                                  orderless-regexp-separator
-                                  t)))
-      (when minibuffer-completing-file-name
-        (setq all (completion-pcm--filename-try-filter all)))
-      (condition-case nil
-          (progn
-            (setq all
-                  (cl-loop for original in all
-                           when
-                           (cl-loop for regexp in regexps
-                                    always (string-match-p regexp original))
-                           collect      ; it's a match, copy and highlight
-                           (cl-loop with candidate = (copy-sequence original)
-                                    for regexp in regexps and face from 0 do
-                                    (orderless--highlight-match
-                                     regexp candidate face)
-                                    finally (return candidate))))
-            (when all (nconc all (length prefix))))
-        (invalid-regexp nil)))))
+  (condition-case nil
+      (save-match-data
+        (let* ((limit (car (completion-boundaries string table pred "")))
+               (prefix (substring string 0 limit))
+               (completion-regexp-list ; used by all-completions!!!
+                (split-string (substring string limit)
+                              orderless-regexp-separator
+                              t))
+               (completions (all-completions prefix table pred)))
+          (when minibuffer-completing-file-name
+            (setq completions
+                  (completion-pcm--filename-try-filter completions)))
+          (nconc
+           (cl-loop for candidate in completions
+                    collect (orderless--highlight-matches
+                             completion-regexp-list
+                             candidate))
+           limit)))
+    (invalid-regexp nil)))
 
 (defun orderless-try-completion (string table pred point &optional _metadata)
   "Complete STRING to unique matching entry in TABLE.
