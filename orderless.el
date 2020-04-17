@@ -170,7 +170,7 @@ This function is part of the `orderless' completion style."
   (remove-hook 'minibuffer-exit-hook #'orderless--restore-regexp-separator))
 
 (defun orderless-temporarily-change-separator (separator)
-  "Change `orderless-regexp-separator' for the current completion session."
+  "Use SEPARATOR to split the input for the current completion session."
   (interactive
    (list (let ((enable-recursive-minibuffers t))
            (read-string "Orderless regexp separator: "))))
