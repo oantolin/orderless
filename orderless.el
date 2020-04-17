@@ -112,11 +112,18 @@ The predicate PRED is used to constrain the entries in TABLE.
 This function is part of the `orderless' completion style."
   (save-match-data
     (let* ((limit (car (completion-boundaries string table pred "")))
-           (prefix (substring string 0 limit))
-           (all (all-completions prefix table pred))
-           (regexps (split-string (substring string limit)
-                                  orderless-regexp-separator
-                                  t)))
+           (all-regexps (split-string (substring string limit)
+                                      orderless-regexp-separator
+                                      t))
+           (pending-regexps all-regexps)
+           (first (if (> limit 0)
+                      (substring string 0 limit)
+                    (let ((first (car all-regexps)))
+                      (if (not (string= first (regexp-quote first)))
+                          ""
+                        (setq pending-regexps (cdr all-regexps))
+                        first))))
+           (all (all-completions first table pred)))
       (when minibuffer-completing-file-name
         (setq all (completion-pcm--filename-try-filter all)))
       (condition-case nil
@@ -124,15 +131,15 @@ This function is part of the `orderless' completion style."
             (setq all
                   (cl-loop for original in all
                            when
-                           (cl-loop for regexp in regexps
+                           (cl-loop for regexp in pending-regexps
                                     always (string-match-p regexp original))
                            collect      ; it's a match, copy and highlight
                            (cl-loop with candidate = (copy-sequence original)
-                                    for regexp in regexps and face from 0 do
+                                    for regexp in all-regexps and face from 0 do
                                     (orderless--highlight-match
                                      regexp candidate face)
                                     finally (return candidate))))
-            (when all (nconc all (length prefix))))
+            (when all (nconc all limit)))
         (invalid-regexp nil)))))
 
 (defun orderless-try-completion (string table pred point &optional _metadata)
