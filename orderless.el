@@ -92,23 +92,28 @@ component regexps."
                  (regexp :tag "Custom regexp"))
   :group 'orderless)
 
-(let ((faces '(orderless-match-face-0
-               orderless-match-face-1
-               orderless-match-face-2
-               orderless-match-face-3)))
-  (nconc faces faces)
-  (defun orderless--highlight-matches (regexps string)
+(defcustom orderless-match-faces
+  [orderless-match-face-0
+   orderless-match-face-1
+   orderless-match-face-2
+   orderless-match-face-3]
+  "Vector of faces used (cyclically) for component matches."
+  :type '(vector 'face)
+  :group 'orderless)
+
+(defun orderless--highlight-matches (regexps string)
     "Highlight matches of REGEXPS in STRING.
-Warning: only call this function when you know REGEXP matches STRING!"
+Warning: only call this if you know all REGEXPs match STRING!"
     (setq string (copy-sequence string))
-    (cl-loop for regexp in regexps and face in faces do
+    (cl-loop with n = (length orderless-match-faces)
+             for regexp in regexps and i from 0 do
              (string-match regexp string)
              (font-lock-prepend-text-property
               (match-beginning 0)
               (match-end 0)
-              'face face
+              'face (aref orderless-match-faces (mod i n))
               string))
-    string))
+    string)
 
 (defun orderless-all-completions (string table pred _point)
   "Split STRING into components and find entries TABLE matching all.
