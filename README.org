@@ -3,13 +3,16 @@
 This package provides an =orderless= completion style that divides the
 pattern into space-separated components, and matches candidates that
 match all of the components in any order. Each component can match in
-any one of several matching styles: literally, as a regexp, as an
-initialism, in the flex style, or as word prefixes. The regexp and
-initialism styles are enabled by default.
+any one of several ways: literally, as a regexp, as an initialism, in
+the flex style, or as hyphenated word prefixes. By default, regexp and
+initialism matches are enabled.
 
-Completion styles are used as entries in the variables
+Completion styles like =orderless= are used as entries in the variables
 =completion-styles= and =completion-category-overrides=, see their
-documentation.
+documentation. These completions styles can be used with the default
+Emacs completion UI (sometimes called minibuffer tab completion) or
+with the built-in Icomplete package (which is similar to the more
+well-know Ido Mode).
 
 So to test this completion method you can put =orderless.el= somewhere
 on your =load-path=, and use the following configuration:
@@ -17,7 +20,14 @@ on your =load-path=, and use the following configuration:
 #+begin_src emacs-lisp
 (require 'orderless)
 (setq completion-styles '(orderless))
+(icomplete-mode) ; optional but recommended!
 #+end_src
+
+(And of course, if you use another completion framework such as Ivy or
+Helm, disable it.)
+
+If you like the experience of using =orderless= with Icomplete, but wish
+the candidates displayed vertically, you can use [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]].
 
 Bug reports are highly welcome and appreciated!
 
@@ -28,7 +38,7 @@ Bug reports are highly welcome and appreciated!
 Each component of a pattern can match in any of several matching
 styles. A matching style is simply a function from strings to strings
 that maps a component to a regexp to match against, so it is easy to
-add new matching styles. The predefined one are:
+define new matching styles. The predefined ones are:
 
 - orderless-regexp :: the component is treated as a regexp that must
   match somewhere in the candidate.
