@@ -205,9 +205,6 @@ This function is part of the `orderless' completion style."
                   components))
                (completions (all-completions prefix table pred)))
           (when completions
-            (when minibuffer-completing-file-name
-              (setq completions
-                    (completion-pcm--filename-try-filter completions)))
             (nconc
              (cl-loop for candidate in completions
                       collect (orderless--highlight-matches
