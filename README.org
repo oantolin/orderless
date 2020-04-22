@@ -12,7 +12,7 @@ Completion styles like =orderless= are used as entries in the variables
 documentation. These completions styles can be used with the default
 Emacs completion UI (sometimes called minibuffer tab completion) or
 with the built-in Icomplete package (which is similar to the more
-well-know Ido Mode).
+well-known Ido Mode).
 
 So to test this completion method you can put =orderless.el= somewhere
 on your =load-path=, and use the following configuration:
@@ -73,7 +73,7 @@ and initialism styles.
 
 ** Component separator regexp
 
-The pattern components by default are space-separated, but this is
+The pattern components are space-separated by default: this is
 controlled by the variable =orderless-regexp-separator=, which should be
 set to a regexp that matches the desired component separator. The
 default value matches a sequence of spaces. It may be useful to add
@@ -94,18 +94,18 @@ key in a keymap that will be active during your completion session:
   =minibuffer-local-completion-map= and
   =minibuffer-local-filename-completion-map=.
 
-** Faces for component matches 
+** Faces for component matches
 
 The portions of a candidate matching each component get highlighted in
 one of four faces, =orderless-match-face-?= where =?= is a number from 0
 to 3. If the pattern has more than four components, the faces get
 reused cyclically.
 
-If your =completion-styles= has more than one entry (as is usual, I
-believe), remember than Emacs tries each completion style in turn and
-uses the first one returning matches. You will only see these
-particular faces when the =orderless= completion is the one that ends up
-being used, of course.
+If your =completion-styles= (or =completion-category-overrides= for some
+particular category) has more than one entry, remember than Emacs
+tries each completion style in turn and uses the first one returning
+matches. You will only see these particular faces when the =orderless=
+completion is the one that ends up being used, of course.
 
 * Related packages
 
@@ -117,15 +117,14 @@ order. In Ivy, this is done with the =ivy--regex-ignore-order= matcher.
 In Helm, it is the default, called "multi pattern matching".
 
 This package is significantly smaller than either of those because it
-solely provides a completion style, meant to be used with the built-in
+solely defines a completion style, meant to be used with the built-in
 Icomplete completion UI, while both of those provide their own
 completion UI (and many other cool features!).
 
 It is worth pointing out that Helm does provide its multi pattern
-matching as a completion style which could be used with Icomplete!
-(Ivy does not.) So, Icomplete users could, instead of using this
-package, instead install Helm and configure Icomplete to use it as
-follows:
+matching as a completion style which could be used with Icomplete! (Ivy
+does not.) So, Icomplete users could, instead of using this package,
+install Helm and configure Icomplete to use it as follows:
 
 #+begin_src emacs-lisp
   (require 'helm)
@@ -133,16 +132,16 @@ follows:
   (icomplete-mode)
 #+end_src
 
-(Of course, if you install Helm, you probably might as well use the
-Helm UI in =helm-mode= rather than using Icomplete.)
+(Of course, if you install Helm, you might as well use the Helm UI in
+=helm-mode= rather than Icomplete.)
 
 ** Prescient
 
 The [[https://github.com/raxod502/prescient.el][prescient.el]] library also provides matching of space-separated
 components in any order and it can be used with either the [[https://github.com/raxod502/selectrum][Selectrum]]
-or [[https://github.com/abo-abo/swiper][Ivy]] completion UIs (it does not provide a completion-style that
+or [[https://github.com/abo-abo/swiper][Ivy]] completion UIs (it does not offer a completion-style that
 could be used with Emacs' default completion UI or with Icomplete).
 The components can be matched literally, as regexps, as initialisms or
 in the flex style (called "fuzzy" in prescient). In addition to
-matching, =prescient.el= also provides sorting of candidates (=orderless=
+matching, =prescient.el= also supports sorting of candidates (=orderless=
 leaves that up to the candidate source and the completion UI).
