@@ -1,9 +1,11 @@
 * Overview
 
 This package provides an =orderless= completion style that divides the
-pattern into space-separated components, treats each one as a regexp,
-and matches candidates that match all of the component regexps in any
-order.
+pattern into space-separated components, and matches candidates that
+match all of the components in any order. Each component can match in
+any one of several matching styles: literally, as a regexp, as an
+initialism or in the "flex" style. The regexp and initialism styles
+are enabled by default.
 
 Completion styles are used as entries in the variables
 =completion-styles= and =completion-category-overrides=, see their
@@ -20,13 +22,52 @@ on your =load-path=, and use the following configuration:
 Bug reports are highly welcome and appreciated!
 
 * Customization
+
+** Component matching styles
+
+Each component of a pattern can match in any of several matching
+styles. A matching style is simply a function from strings to strings
+that maps a component to a regexp to match against, so it is easy to
+add new matching styles. The predefined one are:
+
+- orderless-regexp :: the component is treated as a regexp that must
+  match somewhere in the candidate.
+
+  This is simply the identity function!
+
+- orderless-literal :: the component is treated as a literal string
+  that must occur in the candidate.
+
+  This is just =regexp-quote=.
+
+- orderless-initialism :: each character of the component should appear
+  as at the beginning of a word in the candidate, in order.
+
+  This maps =abc= to =\<a.*\<b.*\c=.
+
+- orderless-flex :: the characters of the component should appear in
+  that order in the candidate, but not necessarily consecutively.
+
+  This maps =abc= to =a.*b.*c=.
+
+- orderless-prefixes :: the component is split on hyphens and slashes
+  and each piece must be a word prefix in the candidate, occurring in
+  that order.
+
+  This is similar to the built-in =partial-completion= completion-style.
+  For example =re-re= matches =query-replace-regexp= and =recode-region=.
+
+The variable =orderless-component-matching-style= should be set to a
+list of the desired styles to use. By default it enables the regexp
+and initialism styles.
+
 ** Component separator regexp
 
-The regexp components by default are space-separated, but this is
+The pattern components by default are space-separated, but this is
 controlled by the variable =orderless-regexp-separator=, which should be
 set to a regexp that matches the desired component separator. The
 default value matches a sequence of spaces. It may be useful to add
-hypens or slashes (or both), to match symbols or file paths,
+hyphens or slashes (or both), to match symbols or file paths,
 respectively.
 
 If you are implementing a command for which you know you want a
@@ -58,6 +99,8 @@ being used, of course.
 
 * Related packages
 
+** Ivy and Helm
+
 The well-known and hugely powerful completion frameworks [[https://github.com/abo-abo/swiper][Ivy]] and [[https://github.com/emacs-helm/helm][Helm]]
 also provide for matching space-separated component regexps in any
 order. In Ivy, this is done with the =ivy--regex-ignore-order= matcher.
@@ -69,9 +112,10 @@ Icomplete completion UI, while both of those provide their own
 completion UI (and many other cool features!).
 
 It is worth pointing out that Helm does provide its multi pattern
-matching as a completion style which could be used with Icomplete! So,
-Icomplete users could, instead of using this package, instead install
-Helm and configure Icomplete to use it as follows:
+matching as a completion style which could be used with Icomplete!
+(Ivy does not.) So, Icomplete users could, instead of using this
+package, instead install Helm and configure Icomplete to use it as
+follows:
 
 #+begin_src emacs-lisp
   (require 'helm)
@@ -82,7 +126,13 @@ Helm and configure Icomplete to use it as follows:
 (Of course, if you install Helm, you probably might as well use the
 Helm UI in =helm-mode= rather than using Icomplete.)
 
-The combination of [[https://github.com/raxod502/selectrum][Selectrum]] and [[https://github.com/raxod502/prescient.el][prescient.el]] also provides matching
-of space-separated components in any order, but each component can be
-matched not only as a regexp, but also a literal string or an
-initialism, so the set of candidates returned may be larger.
+** Prescient
+
+The [[https://github.com/raxod502/prescient.el][prescient.el]] library also provides matching of space-separated
+components in any order and it can be used with either the [[https://github.com/raxod502/selectrum][Selectrum]]
+or [[https://github.com/abo-abo/swiper][Ivy]] completion UIs (it does not provide a completion-style that
+could be used with Emacs' default completion UI or with Icomplete).
+The components can be matched literally, as regexps, as initialisms or
+in the flex style (called "fuzzy" in prescient). In addition to
+matching, =prescient.el= also provides sorting of candidates (=orderless=
+leaves that up to the candidate source and the completion UI).
