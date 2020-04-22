@@ -51,7 +51,7 @@ define new matching styles. The predefined ones are:
   This is just =regexp-quote=.
 
 - orderless-initialism :: each character of the component should appear
-  as at the beginning of a word in the candidate, in order.
+  as the beginning of a word in the candidate, in order.
 
   This maps =abc= to =\<a.*\<b.*\c=.
 
