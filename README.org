@@ -4,8 +4,8 @@ This package provides an =orderless= completion style that divides the
 pattern into space-separated components, and matches candidates that
 match all of the components in any order. Each component can match in
 any one of several matching styles: literally, as a regexp, as an
-initialism or in the "flex" style. The regexp and initialism styles
-are enabled by default.
+initialism, in the flex style, or as word prefixes. The regexp and
+initialism styles are enabled by default.
 
 Completion styles are used as entries in the variables
 =completion-styles= and =completion-category-overrides=, see their
