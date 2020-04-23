@@ -4,7 +4,7 @@ This package provides an =orderless= completion style that divides the
 pattern into space-separated components, and matches candidates that
 match all of the components in any order. Each component can match in
 any one of several ways: literally, as a regexp, as an initialism, in
-the flex style, or as hyphenated word prefixes. By default, regexp and
+the flex style, or as multiple word prefixes. By default, regexp and
 initialism matches are enabled.
 
 Completion styles like =orderless= are used as entries in the variables
@@ -60,12 +60,13 @@ define new matching styles. The predefined ones are:
 
   This maps =abc= to =a.*b.*c=.
 
-- orderless-prefixes :: the component is split on hyphens and slashes
-  and each piece must be a word prefix in the candidate, occurring in
-  that order.
+- orderless-prefixes :: the component is split at word endings and
+  each piece must match at a word boundary in the candidate, occurring
+  in that order.
 
   This is similar to the built-in =partial-completion= completion-style.
-  For example =re-re= matches =query-replace-regexp= and =recode-region=.
+  For example, =re-re= matches =query-replace-regexp=, =recode-region= and
+  =magit-remote-list-refs=; =f-d.t= matches =final-draft.txt=.
 
 The variable =orderless-component-matching-style= should be set to a
 list of the desired styles to use. By default it enables the regexp

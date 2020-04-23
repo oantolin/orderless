@@ -156,13 +156,13 @@ candidate, in that order, at the beginning of words."
    (cl-loop for char across component collect `(seq word-start ,char))))
 
 (defun orderless-prefixes (component)
-  "Match a component as slash-or-hyphen-separated word prefixes.
-The COMPONENT is split on slashes and hyphens, and each piece
-must match a prefix of a word in the candidate.  This is similar
-to the `partial-completion' completion style."
+  "Match a component as multiple word prefixes.
+The COMPONENT is split at word endings, and each piece must match
+at a word boundary in the candidate.  This is similar to the
+`partial-completion' completion style."
   (orderless--anything-between
-   (cl-loop for prefix in (split-string component "[/-]")
-            collect `(seq word-start ,prefix))))
+   (cl-loop for prefix in (split-string component "\\>" t)
+            collect `(seq word-boundary ,prefix))))
 
 (defun orderless--highlight-matches (regexps string)
     "Highlight a match of each of the REGEXPS in STRING.
