@@ -216,6 +216,7 @@ The predicate PRED is used to constrain the entries in TABLE."
           (all-completions prefix table pred)))
     (invalid-regexp nil)))
 
+;;;###autoload
 (defun orderless-all-completions (string table pred _point)
   "Split STRING into components and find entries TABLE matching all.
 The predicate PRED is used to constrain the entries in TABLE.  The
@@ -229,6 +230,7 @@ This function is part of the `orderless' completion style."
          (orderless-highlight-matches pattern completions)
          (length prefix))))))
 
+;;;###autoload
 (defun orderless-try-completion (string table pred point &optional _metadata)
   "Complete STRING to unique matching entry in TABLE.
 This uses `orderless-all-completions' to find matches for STRING
@@ -247,6 +249,7 @@ This function is part of the `orderless' completion style."
         (cons full (length full))))
      (t (cons string point)))))
 
+;;;###autoload
 (cl-pushnew '(orderless
               orderless-try-completion orderless-all-completions
               "Completion of multiple components, in any order.")
