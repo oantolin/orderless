@@ -14,8 +14,18 @@ Emacs completion UI (sometimes called minibuffer tab completion) or
 with the built-in Icomplete package (which is similar to the more
 well-known Ido Mode).
 
-So to test this completion method you can put =orderless.el= somewhere
-on your =load-path=, and use the following configuration:
+If you use MELPA, the easiest way to install =orderless= is via
+=package-install=. If you use both MELPA and =use-package=, you can use:
+
+#+begin_src emacs-lisp
+  (use-package orderless
+    :ensure t
+    :init (icomplete-mode) ; optional but recommended!
+    :custom (completion-styles '(orderless)))
+#+end_src
+
+Alternatively, put =orderless.el= somewhere on your =load-path=, and use
+the following configuration:
 
 #+begin_src emacs-lisp
 (require 'orderless)
