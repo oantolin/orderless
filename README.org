@@ -1,4 +1,7 @@
 * Overview
+:PROPERTIES:
+:TOC: :include all :ignore this
+:END:
 
 This package provides an =orderless= completion style that divides the
 pattern into space-separated components, and matches candidates that
@@ -40,6 +43,18 @@ If you like the experience of using =orderless= with Icomplete, but wish
 the candidates displayed vertically, you can use [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]].
 
 Bug reports are highly welcome and appreciated!
+
+:CONTENTS:
+- [[#screenshot][Screenshot]]
+- [[#customization][Customization]]
+  - [[#component-matching-styles][Component matching styles]]
+  - [[#component-separator-regexp][Component separator regexp]]
+  - [[#faces-for-component-matches][Faces for component matches]]
+- [[#related-packages][Related packages]]
+  - [[#ivy-and-helm][Ivy and Helm]]
+  - [[#prescient][Prescient]]
+  - [[#icicless-progressive-matching][Icicles's progressive matching]]
+:END:
 
 * Screenshot
 
