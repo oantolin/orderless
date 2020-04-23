@@ -88,7 +88,7 @@ define new matching styles. The predefined ones are:
   For example, =re-re= matches =query-replace-regexp=, =recode-region= and
   =magit-remote-list-refs=; =f-d.t= matches =final-draft.txt=.
 
-The variable =orderless-component-matching-style= should be set to a
+The variable =orderless-component-matching-styles= should be set to a
 list of the desired styles to use. By default it enables the regexp
 and initialism styles.
 
