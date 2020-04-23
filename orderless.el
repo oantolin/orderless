@@ -36,7 +36,7 @@
 
 ;; (setq completion-styles '(orderless))
 
-;; You can customize the `orderless-regexp-separator' to decide how
+;; You can customize the `orderless-component-separator' to decide how
 ;; the input pattern is split into component regexps.  The default
 ;; splits on spaces.  You might want to add hyphens and slashes, for
 ;; example, to ease completion of symbols and file paths,
@@ -90,7 +90,7 @@
   "Face for matches of components numbered 3 mod 4."
   :group 'orderless)
 
-(defcustom orderless-regexp-separator " +"
+(defcustom orderless-component-separator " +"
   "Regexp to match component separators for orderless completion.
 This is passed to `split-string' to divide the pattern into
 component regexps."
@@ -197,7 +197,7 @@ This function is part of the `orderless' completion style."
         (let* ((limit (car (completion-boundaries string table pred "")))
                (prefix (substring string 0 limit))
                (components (split-string (substring string limit)
-                                         orderless-regexp-separator
+                                         orderless-component-separator
                                          t))
                (completion-regexp-list ; used by all-completions!!!
                 (if orderless-component-matching-styles
@@ -237,25 +237,25 @@ This function is part of the `orderless' completion style."
             completion-styles-alist
             :test #'equal)
 
-(defvar orderless-old-regexp-separator nil
-  "Stores the old value of `orderless-regexp-separator'.")
+(defvar orderless-old-component-separator nil
+  "Stores the old value of `orderless-component-separator'.")
 
-(defun orderless--restore-regexp-separator ()
-  "Restore old value of `orderless-regexp-separator'."
-  (when orderless-old-regexp-separator
-    (setq orderless-regexp-separator orderless-old-regexp-separator
-          orderless-old-regexp-separator nil))
-  (remove-hook 'minibuffer-exit-hook #'orderless--restore-regexp-separator))
+(defun orderless--restore-component-separator ()
+  "Restore old value of `orderless-component-separator'."
+  (when orderless-old-component-separator
+    (setq orderless-component-separator orderless-old-component-separator
+          orderless-old-component-separator nil))
+  (remove-hook 'minibuffer-exit-hook #'orderless--restore-component-separator))
 
 (defun orderless-temporarily-change-separator (separator)
   "Use SEPARATOR to split the input for the current completion session."
   (interactive
    (list (let ((enable-recursive-minibuffers t))
            (read-string "Orderless regexp separator: "))))
-  (unless orderless-old-regexp-separator
-    (setq orderless-old-regexp-separator orderless-regexp-separator))
-  (setq orderless-regexp-separator separator)
-  (add-to-list 'minibuffer-exit-hook #'orderless--restore-regexp-separator))
+  (unless orderless-old-component-separator
+    (setq orderless-old-component-separator orderless-component-separator))
+  (setq orderless-component-separator separator)
+  (add-to-list 'minibuffer-exit-hook #'orderless--restore-component-separator))
 
 (provide 'orderless)
 ;;; orderless.el ends here

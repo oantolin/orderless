@@ -85,7 +85,7 @@ and initialism styles.
 ** Component separator regexp
 
 The pattern components are space-separated by default: this is
-controlled by the variable =orderless-regexp-separator=, which should be
+controlled by the variable =orderless-component-separator=, which should be
 set to a regexp that matches the desired component separator. The
 default value matches a sequence of spaces. It may be useful to add
 hyphens or slashes (or both), to match symbols or file paths,
@@ -93,7 +93,7 @@ respectively.
 
 If you are implementing a command for which you know you want a
 different separator for the components, bind
-=orderless-regexp-separator= in a =let= form.
+=orderless-component-separator= in a =let= form.
 
 The package also provides a command
 =orderless-temporarily-change-separator= to change it for the rest of
