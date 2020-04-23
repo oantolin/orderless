@@ -167,7 +167,7 @@ in the flex style (called "fuzzy" in prescient). In addition to
 matching, =prescient.el= also supports sorting of candidates (=orderless=
 leaves that up to the candidate source and the completion UI).
 
-* Icicles's progressive matching
+** Icicles's progressive matching
 
 An effect equivalent to matching multiple components in any order can
 be achieved in completion frameworks that provide a way to restrict
