@@ -21,8 +21,9 @@ documentation).
 
 With a bit of effort, it might still be possible to use =orderless= with
 other completion UIs, even if those UIs don't support the standard
-Emacs completion styles. Currently there is support for [[https://github.com/raxod502/selectrum][Selectrum]] (see
-below).
+Emacs completion styles. Currently there is support for 
+[[https://github.com/abo-abo/swiper][Ivy]] and 
+[[https://github.com/raxod502/selectrum][Selectrum]] (see below).
 
 If you use MELPA, the easiest way to install =orderless= is via
 =package-install=. If you use both MELPA and =use-package=, you can use:
