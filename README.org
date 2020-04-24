@@ -211,8 +211,10 @@ integration with them must be done on a case by case basis.
 
 If you manage to use =orderless= with a completion UI not listed here,
 please file an issue or make a pull request so others can benefit from
-your effort. The functions =orderless-filter= and
-=orderless-highlight-matches= are likely to help with the integration.
+your effort. The functions =orderless-filter=,
+=orderless-highlight-matches=, =orderless--highlight= and
+=orderless--component-regexps= are likely to help with the
+integration.
 
 ** Ivy
 
