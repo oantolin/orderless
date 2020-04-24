@@ -164,6 +164,21 @@ at a word boundary in the candidate.  This is similar to the
    (cl-loop for prefix in (split-string component "\\>" t)
             collect `(seq word-boundary ,prefix))))
 
+(defun orderless--highlight (regexps string)
+  "Propertize STRING to highlight a match of each of the REGEXPS.
+Warning: only use this if you know all REGEXPs match!"
+  (cl-loop with n = (length orderless-match-faces)
+           for regexp in regexps and i from 0 do
+           (string-match regexp string)
+           (cl-loop
+            for (x y) on (or (cddr (match-data)) (match-data)) by #'cddr
+            when x do
+            (font-lock-prepend-text-property
+             x y
+             'face (aref orderless-match-faces (mod i n))
+             string)))
+  string)
+
 ;;;###autoload
 (defun orderless-highlight-matches (regexps strings)
     "Highlight a match of each of the REGEXPS in each of the STRINGS.
@@ -174,26 +189,15 @@ converted to a list of regexps according to the value of
     (when (stringp regexps)
       (setq regexps (orderless--component-regexps regexps)))
     (cl-loop for original in strings
-             for string = (copy-sequence original) do
-             (cl-loop with n = (length orderless-match-faces)
-                      for regexp in regexps and i from 0 do
-                      (string-match regexp string)
-                      (cl-loop
-                       for (x y) on (or (cddr (match-data)) (match-data))
-                       by #'cddr
-                       when x do
-                       (font-lock-prepend-text-property
-                        x y
-                        'face (aref orderless-match-faces (mod i n))
-                        string)))
-             collect string))
+             for string = (copy-sequence original)
+             collect (orderless--highlight regexps string)))
 
 (defun orderless--component-regexps (pattern)
   "Build regexps to match PATTERN.
 Consults `orderless-component-matching-styles' to decide what to
 match."
   (cl-loop for component in
-           (split-string pattern orderless-component-separator t) 
+           (split-string pattern orderless-component-separator t)
            collect
            (rx-to-string
             `(or ,@(cl-loop for style in orderless-component-matching-styles
@@ -277,6 +281,19 @@ This function is part of the `orderless' completion style."
     (setq orderless-old-component-separator orderless-component-separator))
   (setq orderless-component-separator separator)
   (add-to-list 'minibuffer-exit-hook #'orderless--restore-component-separator))
+
+(defun orderless--ivy-re-builder (str)
+  "Convert STR into regexps for use with ivy.
+This function is for integration of orderless with ivy, use it as
+a value in `ivy-re-builders-alist'."
+  (or (mapcar (lambda (x) (cons x t)) (orderless--component-regexps str)) ""))
+
+(defun orderless--ivy-highlight (str)
+  "Highlight a match in STR of each regexp in `ivy-regex'.
+This function is for integration of orderless with ivy. Add a
+pair with key `orderless--ivy-re-builder' and value
+`orderless--ivy-highlight' to `ivy-highlight-functions-alist'."
+  (orderless--highlight (mapcar #'car ivy-regex) str) str)
 
 (provide 'orderless)
 ;;; orderless.el ends here
