@@ -62,6 +62,7 @@ Bug reports are highly welcome and appreciated!
   - [[#prescient][Prescient]]
   - [[#icicless-progressive-matching][Icicles's progressive matching]]
 - [[#integration-with-other-completion-uis][Integration with other completion UIs]]
+  - [[#ivy][Ivy]]
   - [[#selectrum][Selectrum]]
 :END:
 
