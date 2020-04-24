@@ -288,6 +288,8 @@ This function is for integration of orderless with ivy, use it as
 a value in `ivy-re-builders-alist'."
   (or (mapcar (lambda (x) (cons x t)) (orderless--component-regexps str)) ""))
 
+(defvar ivy-regex)
+
 (defun orderless--ivy-highlight (str)
   "Highlight a match in STR of each regexp in `ivy-regex'.
 This function is for integration of orderless with ivy. Add a
