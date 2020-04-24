@@ -3,19 +3,26 @@
 :TOC: :include all :ignore this
 :END:
 
-This package provides an =orderless= completion style that divides the
+This package provides an =orderless= /completion style/ that divides the
 pattern into space-separated components, and matches candidates that
 match all of the components in any order. Each component can match in
 any one of several ways: literally, as a regexp, as an initialism, in
 the flex style, or as multiple word prefixes. By default, regexp and
 initialism matches are enabled.
 
-Completion styles like =orderless= are used as entries in the variables
-=completion-styles= and =completion-category-overrides=, see their
-documentation. These completions styles can be used with the default
-Emacs completion UI (sometimes called minibuffer tab completion) or
-with the built-in Icomplete package (which is similar to the more
-well-known Ido Mode).
+A completion style is a backend for completion and is used from a
+frontend that provides a completion UI. Any completion style can be
+used with the default Emacs completion UI (sometimes called minibuffer
+tab completion) or with the built-in Icomplete package (which is
+similar to the more well-known Ido Mode). To use a completion style in
+this fashion simply add it as an entry in the variables
+=completion-styles= and =completion-category-overrides= (see their
+documentation).
+
+With a bit of effort, it might still be possible to use =orderless= with
+other completion UIs, even if those UIs don't support the standard
+Emacs completion styles. Currently there is support for [[https://github.com/raxod502/selectrum][Selectrum]] (see
+below).
 
 If you use MELPA, the easiest way to install =orderless= is via
 =package-install=. If you use both MELPA and =use-package=, you can use:
@@ -54,9 +61,11 @@ Bug reports are highly welcome and appreciated!
   - [[#ivy-and-helm][Ivy and Helm]]
   - [[#prescient][Prescient]]
   - [[#icicless-progressive-matching][Icicles's progressive matching]]
+- [[#integration-with-other-completion-uis][Integration with other completion UIs]]
+  - [[#selectrum][Selectrum]]
 :END:
 
-* Screenshot
+** Screenshot
 
 This is what it looks like to use =describe-function= (bound by default
 to =C-h f=) to match =eis ff=. Notice that in this particular case =eis=
@@ -192,3 +201,24 @@ separate components will do it. (Note that Ivy has an analogous
 command, also bound to =S-SPC=, called =ivy-restrict-to-matches=, so you
 can get the effect of out of order matching without using
 =ivy--regex-ignore-order=.)
+
+* Integration with other completion UIs
+
+Several excellent completion UIs exist for Emacs in third party
+packages. They do have a tendency to forsake standard Emacs APIs, so
+integration with them must be done on a case by case basis.
+
+If you manage to use =orderless= with a completion UI not listed here,
+please file an issue or make a pull request so others can benefit from
+your effort. The functions =orderless-filter= and
+=orderless-highlight-matches= are likely to help with the integration.
+
+** Selectrum
+
+To use =orderless= from Selectrum add this to your Selectrum
+configuration:
+
+#+begin_src emacs-lisp
+  (setq selectrum-refine-candidates-function #'orderless-filter)
+  (setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
+#+end_src
