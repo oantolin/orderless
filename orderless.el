@@ -164,6 +164,7 @@ at a word boundary in the candidate.  This is similar to the
    (cl-loop for prefix in (split-string component "\\>" t)
             collect `(seq word-boundary ,prefix))))
 
+;;;###autoload
 (defun orderless-highlight-matches (regexps strings)
     "Highlight a match of each of the REGEXPS in each of the STRINGS.
 Warning: only use this if you know all REGEXPs match all STRINGS!
@@ -204,6 +205,7 @@ The predicate PRED is used to constrain the entries in TABLE."
   (let ((limit (car (completion-boundaries string table pred ""))))
     (cons (substring string 0 limit) (substring string limit))))
 
+;;;###autoload
 (defun orderless-filter (string table &optional pred)
   "Split STRING into components and find entries TABLE matching all.
 The predicate PRED is used to constrain the entries in TABLE."
