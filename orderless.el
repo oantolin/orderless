@@ -285,20 +285,28 @@ This function is part of the `orderless' completion style."
   (setq orderless-component-separator separator)
   (add-to-list 'minibuffer-exit-hook #'orderless--restore-component-separator))
 
-(defun orderless--ivy-re-builder (str)
+;;; ivy integration
+
+(defvar ivy-regex)
+(defvar ivy-highlight-functions-alist)
+
+;;;###autoload
+(defun orderless-ivy-re-builder (str)
   "Convert STR into regexps for use with ivy.
 This function is for integration of orderless with ivy, use it as
 a value in `ivy-re-builders-alist'."
   (or (mapcar (lambda (x) (cons x t)) (orderless--component-regexps str)) ""))
 
-(defvar ivy-regex)
-
-(defun orderless--ivy-highlight (str)
+(defun orderless-ivy-highlight (str)
   "Highlight a match in STR of each regexp in `ivy-regex'.
-This function is for integration of orderless with ivy. Add a
-pair with key `orderless--ivy-re-builder' and value
-`orderless--ivy-highlight' to `ivy-highlight-functions-alist'."
+This function is for integration of orderless with ivy."
   (orderless--highlight (mapcar #'car ivy-regex) str) str)
+
+;;;###autoload
+(eval-after-load 'ivy
+  (cl-pushnew '(orderless-ivy-re-builder . orderless-ivy-highlight)
+              ivy-highlight-functions-alist
+              :test #'equal))
 
 (provide 'orderless)
 ;;; orderless.el ends here

@@ -222,9 +222,6 @@ integration.
 To use =orderless= from Ivy add this to your Ivy configuration:
 
 #+begin_src emacs-lisp
-  (require 'orderless)
-  (cl-pushnew '(orderless--ivy-re-builder . orderless--ivy-highlight)
-              ivy-highlight-functions-alist)
   (setq ivy-re-builders-alist '((t . orderless--ivy-re-builder)))
 #+end_src
 
