@@ -196,12 +196,15 @@ converted to a list of regexps according to the value of
   "Build regexps to match PATTERN.
 Consults `orderless-component-matching-styles' to decide what to
 match."
-  (cl-loop for component in
-           (split-string pattern orderless-component-separator t)
-           collect
-           (rx-to-string
-            `(or ,@(cl-loop for style in orderless-component-matching-styles
-                            collect `(regexp ,(funcall style component)))))))
+  (let ((components (split-string pattern orderless-component-separator t)))
+    (if orderless-component-matching-styles
+        (cl-loop for component in components
+                 collect
+                 (rx-to-string
+                  `(or
+                    ,@(cl-loop for style in orderless-component-matching-styles
+                               collect `(regexp ,(funcall style component))))))
+      components)))
 
 (defun orderless--prefix+pattern (string table pred)
   "Split STRING into prefix and pattern according to TABLE.
