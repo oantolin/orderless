@@ -287,7 +287,6 @@ This function is part of the `orderless' completion style."
 ;;; ivy integration
 
 (defvar ivy-regex)
-(defvar ivy-highlight-functions-alist)
 
 ;;;###autoload
 (defun orderless-ivy-re-builder (str)
@@ -303,9 +302,8 @@ This function is for integration of orderless with ivy."
 
 ;;;###autoload
 (with-eval-after-load 'ivy
-  (cl-pushnew '(orderless-ivy-re-builder . orderless-ivy-highlight)
-              ivy-highlight-functions-alist
-              :test #'equal))
+  (add-to-list 'ivy-highlight-functions-alist
+               '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 
 (provide 'orderless)
 ;;; orderless.el ends here
