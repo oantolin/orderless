@@ -258,11 +258,10 @@ This function is part of the `orderless' completion style."
      (t (cons string point)))))
 
 ;;;###autoload
-(cl-pushnew '(orderless
-              orderless-try-completion orderless-all-completions
-              "Completion of multiple components, in any order.")
-            completion-styles-alist
-            :test #'equal)
+(add-to-list 'completion-styles-alist
+             '(orderless
+               orderless-try-completion orderless-all-completions
+               "Completion of multiple components, in any order."))
 
 (defvar orderless-old-component-separator nil
   "Stores the old value of `orderless-component-separator'.")
