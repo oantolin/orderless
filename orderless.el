@@ -6,7 +6,7 @@
 ;; Keywords: extensions
 ;; Version: 0.3
 ;; Homepage: https://github.com/oantolin/orderless
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "24.4"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -179,7 +179,6 @@ Warning: only use this if you know all REGEXPs match!"
              string)))
   string)
 
-;;;###autoload
 (defun orderless-highlight-matches (regexps strings)
     "Highlight a match of each of the REGEXPS in each of the STRINGS.
 Warning: only use this if you know all REGEXPs match all STRINGS!
@@ -303,7 +302,7 @@ This function is for integration of orderless with ivy."
   (orderless--highlight (mapcar #'car ivy-regex) str) str)
 
 ;;;###autoload
-(eval-after-load 'ivy
+(with-eval-after-load 'ivy
   (cl-pushnew '(orderless-ivy-re-builder . orderless-ivy-highlight)
               ivy-highlight-functions-alist
               :test #'equal))
