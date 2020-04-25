@@ -121,6 +121,11 @@ highlighted, otherwise just the captured groups are."
           (const :tag "Regexp" orderless-regexp)
           (const :tag "Literal" orderless-literal)
           (const :tag "Initialism" orderless-initialism)
+          (const :tag "Strict initialism" orderless-strict-initialism)
+          (const :tag "Strict leading initialism"
+            orderless-strict-leading-initialism)
+          (const :tag "Strict full initialism"
+            orderless-strict-full-initialism)
           (const :tag "Flex" orderless-flex)
           (const :tag "Prefixes" orderless-prefixes)
           (function :tag "Custom matching style"))
@@ -134,12 +139,21 @@ This is simply the identity function.")
   "Match a component as a literal string.
 This is simply `regexp-quote'.")
 
+(cl-defun orderless--separated-by (sep rxs &optional (before "") (after ""))
+  "Return a regexp to match the rx-regexps RXS with SEP in between.
+If BEFORE is specified, add it to the beginning of the rx sequence. If AFTER is
+specified, add it to the end of the rx sequence."
+  (rx-to-string
+   `(seq
+     ,before
+     ,@(cl-loop for (sexp . more) on rxs
+                collect `(group ,sexp)
+                when more collect `,sep)
+     ,after)))
+
 (defun orderless--anything-between (rxs)
   "Return a regexp to match the rx-regexps RXS with .* in between."
-  (rx-to-string
-   `(seq ,@(cl-loop for (sexp . more) on rxs
-                    collect `(group ,sexp)
-                    when more collect `(zero-or-more nonl)))))
+  (orderless--separated-by '(zero-or-more nonl) rxs))
 
 (defun orderless-flex (component)
   "Match a component in flex style.
@@ -154,6 +168,39 @@ This means the characters in COMPONENT must occur in the
 candidate, in that order, at the beginning of words."
   (orderless--anything-between
    (cl-loop for char across component collect `(seq word-start ,char))))
+
+(defun orderless-strict-initialism (component)
+  "Match a COMPONENT as a strict initialism.
+This means the characters in COMPONENT must occur in the candidate in that order
+at the beginning of subsequent words comprised of letters. Only non-letters can
+be in between the words that start with the initials."
+  (orderless--separated-by '(seq (zero-or-more word)
+                                 word-end
+                                 (zero-or-more (not alpha)))
+   (cl-loop for char across component collect `(seq word-start ,char))))
+
+(defun orderless-strict-leading-initialism (component)
+  "Match a COMPONENT as a strict initialism (see `orderless-strict-initialism').
+Additionally require that the first initial appear at the first word of the
+candidate."
+  (orderless--separated-by
+   '(seq (zero-or-more word)
+         word-end
+         (zero-or-more (not alpha)))
+   (cl-loop for char across component collect `(seq word-start ,char))
+   '(seq buffer-start (zero-or-more (not alpha)))))
+
+(defun orderless-strict-full-initialism (component)
+  "Match a COMPONENT as a strict initialism (see `orderless-strict-initialism').
+Additionally require that the first initial appear at the first word of the
+candidate and the last initial appear the the last word in the candidate."
+  (orderless--separated-by
+   '(seq (zero-or-more word)
+         word-end
+         (zero-or-more (not alpha)))
+   (cl-loop for char across component collect `(seq word-start ,char))
+   '(seq buffer-start (zero-or-more (not alpha)))
+   '(seq (zero-or-more word) word-end (zero-or-more (not alpha)) eol)))
 
 (defun orderless-prefixes (component)
   "Match a component as multiple word prefixes.

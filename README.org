@@ -101,6 +101,22 @@ define new matching styles. The predefined ones are:
 
   This maps =abc= to =\<a.*\<b.*\c=.
 
+- orderless-strict-initialism :: like initialism but only allow
+  non-letters in between the matched words.
+
+	For example =fb= would match =foo-bar= but not =foo-qux-bar=.
+
+- orderless-strict-leading-initialism :: like strict-initialism but
+  require the first initial to match the candidate's first word.
+
+	For example =bb= would match =bar-baz= but not =foo-bar-baz=.
+
+- orderless-strict-full-initialism :: like strict-initialism but
+  require the first initial to match the candidate's first word and the
+  last initial to be at the final word.
+
+	For example =fbb= would match =foo-bar-baz= but not =foo-bar-baz-qux=.
+
 - orderless-flex :: the characters of the component should appear in
   that order in the candidate, but not necessarily consecutively.
 
