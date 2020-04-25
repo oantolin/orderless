@@ -110,13 +110,17 @@ component regexps."
 
 (defcustom orderless-component-matching-styles
   '(orderless-regexp orderless-initialism)
-  "List of allowed component matching styles.
+  "List of default allowed component matching styles.
 If this variable is nil, regexp matching is assumed.
 
 A matching style is simply a function from strings to strings
 that takes a component to a regexp to match against.  If the
 resulting regexp has no capturing groups, the entire match is
-highlighted, otherwise just the captured groups are."
+highlighted, otherwise just the captured groups are.
+
+The matching styles in this list are used for a given component
+of the input string if all the style dispatchers in
+`orderless-style-dispatchers' decline to handle said component."
   :type '(set
           (const :tag "Regexp" orderless-regexp)
           (const :tag "Literal" orderless-literal)
@@ -129,6 +133,35 @@ highlighted, otherwise just the captured groups are."
           (const :tag "Flex" orderless-flex)
           (const :tag "Prefixes" orderless-prefixes)
           (function :tag "Custom matching style"))
+  :group 'orderless)
+
+(defcustom orderless-style-dispatchers nil
+  "List of style dispatchers used to compute matching styles.
+
+The `orderless' completion style splits the input into components
+and for each component tries all style dispatchers stored in this
+variable one at a time until one handles the component (details
+below). If no dispatcher handles the component, the matching
+styles in `orderless-component-matching-styles' are applied.
+
+A style dispatcher is a function of two arguments, a string and
+an integer.  It is called with each component of the input string
+and the component's index (starting from 0).  It should either
+return nil to indicate the dispatcher will not handle that
+component at that index, or it should return the matching styles
+to use and, if needed, a string to use in place of the
+component (for example, a dispatcher can decide which style to
+use based on a suffix of the component and then it must also
+return the component stripped of the suffix).
+
+More precisely, the return value of a style dispatcher can be of
+one of the following forms:
+
+- nil,
+- a matching style or non-empty list of matching styles,
+- a `cons' whose `car' is as in the previous case and whose `cdr'
+  is a string (to be used in place of the component)."
+  :type 'hook
   :group 'orderless)
 
 (defalias 'orderless-regexp #'identity
@@ -242,17 +275,28 @@ converted to a list of regexps according to the value of
 
 (defun orderless--component-regexps (pattern)
   "Build regexps to match PATTERN.
-Consults `orderless-component-matching-styles' to decide what to
+Consults `orderless-style-dispatchers' and, if
+necessary,`orderless-component-matching-styles' to decide what to
 match."
-  (let ((components (split-string pattern orderless-component-separator t)))
-    (if orderless-component-matching-styles
-        (cl-loop for component in components
-                 collect
-                 (rx-to-string
-                  `(or
-                    ,@(cl-loop for style in orderless-component-matching-styles
-                               collect `(regexp ,(funcall style component))))))
-      components)))
+  (cl-loop
+   for component in (split-string pattern orderless-component-separator)
+   and index from 0
+   for styles = (or (run-hook-with-args-until-success
+                     'orderless-style-dispatchers component index)
+                    orderless-component-matching-styles)
+   when (and (consp styles) (stringp (cdr styles)))
+   ;; dispatcher requested component change
+   do (setq component (cdr styles) styles (car styles))
+   collect
+   (cond
+    ((null styles) component) ;; assume regexp matching if no styles given
+    ((functionp styles) (funcall styles component))
+    (t (rx-to-string
+        `(or
+          ,@(cl-loop for style in styles
+                     collect `(regexp ,(funcall style component)))))))))
+
+(orderless--component-regexps "osi") 
 
 (defun orderless--prefix+pattern (string table pred)
   "Split STRING into prefix and pattern according to TABLE.
