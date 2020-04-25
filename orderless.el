@@ -333,6 +333,7 @@ This function is part of the `orderless' completion style."
 ;;; ivy integration
 
 (defvar ivy-regex)
+(defvar ivy-highlight-functions-alist)
 
 ;;;###autoload
 (defun orderless-ivy-re-builder (str)
