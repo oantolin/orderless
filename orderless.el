@@ -110,20 +110,32 @@ component regexps."
 
 (defcustom orderless-component-matching-styles
   '(orderless-regexp orderless-initialism)
-  "List of allowed component matching styles.
-If this variable is nil, regexp matching is assumed.
+  "Default matching style for a component.
+Can be a list of functions to indicate various matching styles
+are allowed, but for other possibilities see the function
+`orderless-apply-matching-style'.  If this variable is nil, regexp
+matching is assumed.
 
-A matching style is simply a function from strings to strings
-that takes a component to a regexp to match against.  If the
-resulting regexp has no capturing groups, the entire match is
-highlighted, otherwise just the captured groups are."
-  :type '(set
-          (const :tag "Regexp" orderless-regexp)
-          (const :tag "Literal" orderless-literal)
-          (const :tag "Initialism" orderless-initialism)
-          (const :tag "Flex" orderless-flex)
-          (const :tag "Prefixes" orderless-prefixes)
-          (function :tag "Custom matching style"))
+Matching styles transform pattern to regexps, according to
+`orderless-apply-matching-style'.  If the resulting regexp has no
+capturing groups, the entire match is highlighted, otherwise just
+the captured groups are."
+  :type '(choice
+          (set :tag "Any of"
+           (const :tag "Regexp" orderless-regexp)
+           (const :tag "Literal" orderless-literal)
+           (const :tag "Initialism" orderless-initialism)
+           (const :tag "Flex" orderless-flex)
+           (const :tag "Prefixes" orderless-prefixes))
+          (sexp :tag "Custom atching style"))
+  :group 'orderless)
+
+(defcustom orderless-positional-overrides nil
+  "List of overriding matching styles by index.
+If the nth entry of this list is non-nil, it will be used instead
+of `orderless-component-matching-style' for turning the nth
+component of the input into a regexp."
+  :type '(list sexp)
   :group 'orderless)
 
 (defalias 'orderless-regexp #'identity
@@ -191,19 +203,44 @@ converted to a list of regexps according to the value of
              for string = (copy-sequence original)
              collect (orderless--highlight regexps string)))
 
+(defun orderless-apply-matching-style (style pattern)
+  "Apply the matching STYLE to PATTERN to produce a regexp.
+A matching style can be:
+
+1. A function, which is called with PATTERN as its argmuent and
+must return either a regexp or nil, if it cannot hanlde the
+PATTERN.
+
+2. A list of matching styles, all of which are applied to PATTERN
+and the various regexps returned are joined with `\\|'.
+
+3. A vector of matching styles, which are applied in turn to
+PATTERN and the first non-nil result is returned."
+  (cond
+   ((functionp style) (funcall style pattern))
+   ((listp style)
+    (rx-to-string
+     `(or ,@(cl-loop for case in style
+                     collect
+                     `(regexp
+                       ,(orderless-apply-matching-style case pattern))))))
+   ((vectorp style)
+    (cl-loop for attempt across style
+             thereis (orderless-apply-matching-style attempt pattern)))))
+
 (defun orderless--component-regexps (pattern)
   "Build regexps to match PATTERN.
-Consults `orderless-component-matching-styles' to decide what to
-match."
-  (let ((components (split-string pattern orderless-component-separator t)))
-    (if orderless-component-matching-styles
-        (cl-loop for component in components
-                 collect
-                 (rx-to-string
-                  `(or
-                    ,@(cl-loop for style in orderless-component-matching-styles
-                               collect `(regexp ,(funcall style component))))))
-      components)))
+Consults `orderless-component-matching-styles' and
+`orderless-positional-overrides' to decide what to match."
+  (let ((components (split-string pattern orderless-component-separator t))
+        (overrides orderless-positional-overrides)
+        (default orderless-component-matching-styles))
+    (cl-loop for component in components and index from 0
+             for style = (or (when (< index (length overrides))
+                               (elt overrides index))
+                             default
+                             #'orderless-regexp)
+             collect (orderless-apply-matching-style style component))))
 
 (defun orderless--prefix+pattern (string table pred)
   "Split STRING into prefix and pattern according to TABLE.
@@ -287,6 +324,7 @@ This function is part of the `orderless' completion style."
 ;;; ivy integration
 
 (defvar ivy-regex)
+(defvar ivy-highlight-functions-alist)
 
 ;;;###autoload
 (defun orderless-ivy-re-builder (str)
