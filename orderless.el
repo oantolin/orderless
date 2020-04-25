@@ -139,75 +139,77 @@ This is simply the identity function.")
   "Match a component as a literal string.
 This is simply `regexp-quote'.")
 
-(cl-defun orderless--separated-by (sep rxs &optional (before "") (after ""))
+(defun orderless--separated-by (sep rxs &optional before after)
   "Return a regexp to match the rx-regexps RXS with SEP in between.
-If BEFORE is specified, add it to the beginning of the rx sequence. If AFTER is
-specified, add it to the end of the rx sequence."
+If BEFORE is specified, add it to the beginning of the rx
+sequence.  If AFTER is specified, add it to the end of the rx
+sequence."
   (rx-to-string
    `(seq
-     ,before
+     ,(or before "")
      ,@(cl-loop for (sexp . more) on rxs
                 collect `(group ,sexp)
-                when more collect `,sep)
-     ,after)))
-
-(defun orderless--anything-between (rxs)
-  "Return a regexp to match the rx-regexps RXS with .* in between."
-  (orderless--separated-by '(zero-or-more nonl) rxs))
+                when more collect sep)
+     ,(or after ""))))
 
 (defun orderless-flex (component)
   "Match a component in flex style.
 This means the characters in COMPONENT must occur in the
 candidate in that order, but not necessarily consecutively."
-  (orderless--anything-between
+  (orderless--separated-by '(zero-or-more nonl)
    (cl-loop for char across component collect char)))
 
 (defun orderless-initialism (component)
   "Match a component as an initialism.
 This means the characters in COMPONENT must occur in the
 candidate, in that order, at the beginning of words."
-  (orderless--anything-between
+  (orderless--separated-by '(zero-or-more nonl)
    (cl-loop for char across component collect `(seq word-start ,char))))
+
+(defun orderless--strict-*-initialism (component &optional start end)
+  "Match a COMPONENT as a strict initialism, optionally anchored.
+The characters in COMPONENT must occur in the candidate in that
+order at the beginning of subsequent words comprised of letters.
+Only non-letters can be in between the words that start with the
+initials.
+
+If START is non-nil, require that the first initial appear at the
+first word of the candidate.  Similarly, if END is non-nil
+require the last initial appear in the last word."
+  (orderless--separated-by
+   '(seq (zero-or-more word) word-end (zero-or-more (not alpha)))
+   (cl-loop for char across component collect `(seq word-start ,char))
+   (when start '(seq buffer-start (zero-or-more (not alpha))))
+   (when end
+     '(seq (zero-or-more word) word-end (zero-or-more (not alpha)) eol))))
 
 (defun orderless-strict-initialism (component)
   "Match a COMPONENT as a strict initialism.
-This means the characters in COMPONENT must occur in the candidate in that order
-at the beginning of subsequent words comprised of letters. Only non-letters can
-be in between the words that start with the initials."
-  (orderless--separated-by '(seq (zero-or-more word)
-                                 word-end
-                                 (zero-or-more (not alpha)))
-   (cl-loop for char across component collect `(seq word-start ,char))))
+This means the characters in COMPONENT must occur in the
+candidate in that order at the beginning of subsequent words
+comprised of letters.  Only non-letters can be in between the
+words that start with the initials."
+  (orderless--strict-*-initialism component))
 
 (defun orderless-strict-leading-initialism (component)
-  "Match a COMPONENT as a strict initialism (see `orderless-strict-initialism').
-Additionally require that the first initial appear at the first word of the
-candidate."
-  (orderless--separated-by
-   '(seq (zero-or-more word)
-         word-end
-         (zero-or-more (not alpha)))
-   (cl-loop for char across component collect `(seq word-start ,char))
-   '(seq buffer-start (zero-or-more (not alpha)))))
+  "Match a COMPONENT as a strict initialism, anchored at start.
+See `orderless-strict-initialism'.  Additionally require that the
+first initial appear in the first word of the candidate."
+  (orderless--strict-*-initialism component t))
 
 (defun orderless-strict-full-initialism (component)
-  "Match a COMPONENT as a strict initialism (see `orderless-strict-initialism').
-Additionally require that the first initial appear at the first word of the
-candidate and the last initial appear the the last word in the candidate."
-  (orderless--separated-by
-   '(seq (zero-or-more word)
-         word-end
-         (zero-or-more (not alpha)))
-   (cl-loop for char across component collect `(seq word-start ,char))
-   '(seq buffer-start (zero-or-more (not alpha)))
-   '(seq (zero-or-more word) word-end (zero-or-more (not alpha)) eol)))
+  "Match a COMPONENT as a strict initialism, anchored at both ends.
+See `orderless-strict-initialism'.  Additionally require that the
+first and last initials appear in the first and last words of the
+candidate, respectively."
+  (orderless--strict-*-initialism component t t))
 
 (defun orderless-prefixes (component)
   "Match a component as multiple word prefixes.
 The COMPONENT is split at word endings, and each piece must match
 at a word boundary in the candidate.  This is similar to the
 `partial-completion' completion style."
-  (orderless--anything-between
+  (orderless--separated-by '(zero-or-more nonl)
    (cl-loop for prefix in (split-string component "\\>" t)
             collect `(seq word-boundary ,prefix))))
 
