@@ -64,6 +64,7 @@ Bug reports are highly welcome and appreciated!
 - [[#integration-with-other-completion-uis][Integration with other completion UIs]]
   - [[#ivy][Ivy]]
   - [[#selectrum][Selectrum]]
+  - [[#company][Company]]
 :END:
 
 ** Screenshot
