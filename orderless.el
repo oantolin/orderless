@@ -281,9 +281,12 @@ match."
   (cl-loop
    for component in (split-string pattern orderless-component-separator)
    and index from 0
-   for styles = (or (run-hook-with-args-until-success
-                     'orderless-style-dispatchers component index)
-                    orderless-component-matching-styles)
+   for styles = (cl-loop for dispatcher in orderless-style-dispatchers
+                         for result = (funcall dispatcher component index)
+                         when (stringp result)
+                         do (setq component result result nil)
+                         thereis result
+                         finally (return orderless-component-matching-styles))
    when (and (consp styles) (stringp (cdr styles)))
    ;; dispatcher requested component change
    do (setq component (cdr styles) styles (car styles))
