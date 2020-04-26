@@ -58,6 +58,7 @@ Bug reports are highly welcome and appreciated!
   - [[#component-matching-styles][Component matching styles]]
   - [[#component-separator-regexp][Component separator regexp]]
   - [[#faces-for-component-matches][Faces for component matches]]
+  - [[#style-dispatchers][Style dispatchers]]
 - [[#related-packages][Related packages]]
   - [[#ivy-and-helm][Ivy and Helm]]
   - [[#prescient][Prescient]]
@@ -169,6 +170,43 @@ particular category) has more than one entry, remember than Emacs
 tries each completion style in turn and uses the first one returning
 matches. You will only see these particular faces when the =orderless=
 completion is the one that ends up being used, of course.
+
+** Style dispatchers
+
+For more fine-grained control on which matching styles to use for each
+component of the input string, you can use the =orderless-style-dispatchers=
+variable, which should be set to list of /style dispatchers/. 
+
+A style dispatcher is a function of two arguments, a string and an
+integer. It is called with each component of the input string and the
+component's index (starting from 0). It can either decline to handle
+the component or return which matching styles to use for it. It can
+also, if desired, additionally return a new string to use in place of
+the component. Consult the documentation of
+=orderless-style-dispatchers= for full details.
+
+As an example, say you wanted the following setup:
+
+- you want the first component to match as an initialism and
+  subsequent components to match literally ---this is pretty useful for,
+  say, =execute-extended-command= (=M-x=) or =describe-function= (=C-h f=).
+- except that any component ending in =~= should match (the characters
+  other than the final =~=) in the flex style.
+
+You can achieve this with the following configuration:
+
+#+begin_src emacs-lisp
+  (defun flex-if-twiddle (pattern _index)
+    (when (string-suffix-p "~" pattern)
+      `(orderless-flex . ,(substring pattern 0 (1- (length pattern))))))
+
+  (defun first-initialism-then-literal (pattern index)
+    (if (= index 0) 'orderless-initialism 'orderless-literal))
+
+  (setq orderless-style-dispatchers
+        '(flex-if-twiddle first-initialism-then-literal))
+#+end_src
+
 
 * Related packages
 
