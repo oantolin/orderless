@@ -21,8 +21,7 @@ documentation).
 
 With a bit of effort, it might still be possible to use =orderless= with
 other completion UIs, even if those UIs don't support the standard
-Emacs completion styles. Currently there is support for 
-[[https://github.com/abo-abo/swiper][Ivy]] and 
+Emacs completion styles. Currently there is support for [[https://github.com/abo-abo/swiper][Ivy]] and
 [[https://github.com/raxod502/selectrum][Selectrum]] (see below).
 
 If you use MELPA, the easiest way to install =orderless= is via
@@ -96,6 +95,14 @@ define new matching styles. The predefined ones are:
 
   This is just =regexp-quote=.
 
+- orderless-prefixes :: the component is split at word endings and
+  each piece must match at a word boundary in the candidate, occurring
+  in that order.
+
+  This is similar to the built-in =partial-completion= completion-style.
+  For example, =re-re= matches =query-replace-regexp=, =recode-region= and
+  =magit-remote-list-refs=; =f-d.t= matches =final-draft.txt=.
+
 - orderless-initialism :: each character of the component should appear
   as the beginning of a word in the candidate, in order.
 
@@ -104,31 +111,23 @@ define new matching styles. The predefined ones are:
 - orderless-strict-initialism :: like initialism but only allow
   non-letters in between the matched words.
 
-	For example =fb= would match =foo-bar= but not =foo-qux-bar=.
+  For example =fb= would match =foo-bar= but not =foo-qux-bar=.
 
 - orderless-strict-leading-initialism :: like strict-initialism but
   require the first initial to match the candidate's first word.
 
-	For example =bb= would match =bar-baz= but not =foo-bar-baz=.
+  For example =bb= would match =bar-baz= but not =foo-bar-baz=.
 
 - orderless-strict-full-initialism :: like strict-initialism but
   require the first initial to match the candidate's first word and the
   last initial to be at the final word.
 
-	For example =fbb= would match =foo-bar-baz= but not =foo-bar-baz-qux=.
+  For example =fbb= would match =foo-bar-baz= but not =foo-bar-baz-qux=.
 
 - orderless-flex :: the characters of the component should appear in
   that order in the candidate, but not necessarily consecutively.
 
   This maps =abc= to =a.*b.*c=.
-
-- orderless-prefixes :: the component is split at word endings and
-  each piece must match at a word boundary in the candidate, occurring
-  in that order.
-
-  This is similar to the built-in =partial-completion= completion-style.
-  For example, =re-re= matches =query-replace-regexp=, =recode-region= and
-  =magit-remote-list-refs=; =f-d.t= matches =final-draft.txt=.
 
 The variable =orderless-component-matching-styles= should be set to a
 list of the desired styles to use. By default it enables the regexp
@@ -250,3 +249,40 @@ configuration:
   (setq selectrum-refine-candidates-function #'orderless-filter)
   (setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
 #+end_src
+
+** Company
+
+Company comes with a =company-capf= backend that uses the
+completion-at-point functions, which in turn use completion styles.
+This means that the =company-capf= backend will automatically use
+=orderless=, no configuration necessary!
+
+But there are a couple of points of discomfort:
+
+1. Pressing SPC takes you out of completion, so with the default
+   separator you are limited to one component, which is no fun. To fix
+   this add a separator that is allowed to occur in identifiers, for
+   example, for Emacs Lisp code you could use an ampersand:
+
+   #+begin_src emacs-lisp
+     (setq orderless-component-separator "[ &]")
+   #+end_src
+
+2. The matching portions of candidates aren't highlighted. That's
+   because =company-capf= is hard-coded to look for the
+   =completions-common-part= face, and it only use one face,
+   =company-echo-common= to highlight candidates.
+
+   So, while you can't get different faces for different components,
+   you can at least get the matches highlighted in the sole available
+   face with this configuration:
+
+   #+begin_src emacs-lisp
+     (defun just-one-face (fn &rest args)
+       (let ((orderless-match-faces [completions-common-part]))
+         (apply fn args)))
+
+     (advice-add 'company-capf--candidates :around #'just-one-face)
+   #+end_src
+
+   (Aren't dynamically scoped variables and the advice system nifty?)
