@@ -4,7 +4,7 @@
 
 ;; Author: Omar Antolín Camarena <omar@matem.unam.mx>
 ;; Keywords: extensions
-;; Version: 0.3
+;; Version: 0.4
 ;; Homepage: https://github.com/oantolin/orderless
 ;; Package-Requires: ((emacs "24.4"))
 
@@ -145,11 +145,12 @@ below). If no dispatcher handles the component, the matching
 styles in `orderless-component-matching-styles' are applied.
 
 A style dispatcher is a function of two arguments, a string and
-an integer.  It is called with each component of the input string
-and the component's index (starting from 0).  It should either
-return nil to indicate the dispatcher will not handle that
-component at that index, or it should return the matching styles
-to use and, if needed, a string to use in place of the
+an integer. It is called with each component of the input string
+and the component's index (starting from 0). It should either
+return (a) nil to indicate the dispatcher will not handle that
+component at that index, (b) a string to replace the component
+with that string and continue dispatch, or (c) the matching
+styles to use and, if needed, a string to use in place of the
 component (for example, a dispatcher can decide which style to
 use based on a suffix of the component and then it must also
 return the component stripped of the suffix).
@@ -157,10 +158,12 @@ return the component stripped of the suffix).
 More precisely, the return value of a style dispatcher can be of
 one of the following forms:
 
-- nil,
-- a matching style or non-empty list of matching styles,
-- a `cons' whose `car' is as in the previous case and whose `cdr'
-  is a string (to be used in place of the component)."
+- nil
+- a string (to replace the component and continue dispatching),
+- a matching style or non-empty list of matching styles to use,
+- a `cons' whose `car' is either as in the previous case or
+  nil (to request the default matching styles), and whose `cdr'
+  is a string (to replace the component)."
   :type 'hook
   :group 'orderless)
 
@@ -279,20 +282,20 @@ Consults `orderless-style-dispatchers' and, if
 necessary,`orderless-component-matching-styles' to decide what to
 match."
   (cl-loop
+   with default = (or orderless-component-matching-styles 'orderless-regexp)
    for component in (split-string pattern orderless-component-separator)
    and index from 0
    for styles = (cl-loop for dispatcher in orderless-style-dispatchers
                          for result = (funcall dispatcher component index)
-                         when (stringp result)
+                         if (stringp result)
                          do (setq component result result nil)
+                         else if (and (consp result) (stringp (cdr result)))
+                         do (setq component (cdr result)
+                                  result (or (car result) default))
                          thereis result
-                         finally (return orderless-component-matching-styles))
-   when (and (consp styles) (stringp (cdr styles)))
-   ;; dispatcher requested component change
-   do (setq component (cdr styles) styles (car styles))
+                         finally (return default))
    collect
    (cond
-    ((null styles) component) ;; assume regexp matching if no styles given
     ((functionp styles) (funcall styles component))
     (t (rx-to-string
         `(or
