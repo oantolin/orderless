@@ -292,6 +292,10 @@ converted to a list of regexps according to the value of
              for string = (copy-sequence original)
              collect (orderless--highlight regexps string)))
 
+(defun orderless--forgiving-funcall (fn &rest args)
+  "Call FN with as many ARGS as its arity allows."
+  (apply fn (cl-subseq args 0 (cdr (func-arity fn)))))
+
 (defun orderless--component-regexps (pattern)
   "Build regexps to match PATTERN.
 Consults `orderless-style-dispatchers' and, if
