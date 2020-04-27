@@ -141,21 +141,20 @@ of the input string if all the style dispatchers in
 The `orderless' completion style splits the input into components
 and for each component tries all style dispatchers stored in this
 variable one at a time until one handles the component (details
-below). If no dispatcher handles the component, the matching
+below).  If no dispatcher handles the component, the matching
 styles in `orderless-component-matching-styles' are applied.
 
-A style dispatcher is a function of between 1 and 3 arguments, a
-string and 1 or 2 integers. It is called with each component of
-the input string, the component's index (starting from 0), and
-the total number of components --well, it's called with as many
-of those arguments as it can take. It should either return (a)
-nil to indicate the dispatcher will not handle that component at
-that index, (b) a string to replace the component with that
-string and continue dispatch, or (c) the matching styles to use
-and, if needed, a string to use in place of the component (for
-example, a dispatcher can decide which style to use based on a
-suffix of the component and then it must also return the
-component stripped of the suffix).
+A style dispatcher is a function of 3 arguments, a string and 2
+integers.  It is called with each component of the input string,
+the component's index (starting from 0), and the total number of
+components.  It should either return (a) nil to indicate the
+dispatcher will not handle that component at that index, (b) a
+string to replace the component with that string and continue
+dispatch, or (c) the matching styles to use and, if needed, a
+string to use in place of the component (for example, a
+dispatcher can decide which style to use based on a suffix of the
+component and then it must also return the component stripped of
+the suffix).
 
 More precisely, the return value of a style dispatcher can be of
 one of the following forms:
@@ -176,10 +175,10 @@ a list of regexps that must all match a candidate in order for
 the candidate to be considered a completion of the pattern.
 
 The default pattern compiler is probably flexible enough for most
-users. It splits the input on `orderless-component-separator',
+users.  It splits the input on `orderless-component-separator',
 and consults both `orderless-style-dispatchers' and
 `orderless-component-matching-styles' to decide how to match each
-component. See `orderless-style-dispatchers' for details."
+component.  See `orderless-style-dispatchers' for details."
   :type 'function
   :group 'orderless)
 
@@ -292,15 +291,12 @@ converted to a list of regexps according to the value of
              for string = (copy-sequence original)
              collect (orderless--highlight regexps string)))
 
-(defun orderless--forgiving-funcall (fn &rest args)
-  "Call FN with as many ARGS as its arity allows."
-  (apply fn (cl-subseq args 0 (cdr (func-arity fn)))))
-
 (defun orderless--component-regexps (pattern)
-  "Build regexps to match PATTERN.
-Consults `orderless-style-dispatchers' and, if
-necessary,`orderless-component-matching-styles' to decide what to
-match.  See `orderless-style-dispatchers' for details.
+  "Build regexps to match the components of PATTERN.
+Split PATTERN on `orderless-component-separator' and consult
+`orderless-style-dispatchers' and, if necessary,
+`orderless-component-matching-styles' to decide what how to match
+each component.  See `orderless-style-dispatchers' for details.
 
 This is the default value of `orderless-pattern-compiler'."
   (cl-loop
@@ -308,16 +304,16 @@ This is the default value of `orderless-pattern-compiler'."
    with components = (split-string pattern orderless-component-separator)
    with total = (length components)
    for component in components and index from 0
-   for styles = (cl-loop for dispatcher in orderless-style-dispatchers
-                         for result = (orderless--forgiving-funcall
-                                       dispatcher component index total)
-                         if (stringp result)
-                         do (setq component result result nil)
-                         else if (and (consp result) (stringp (cdr result)))
-                         do (setq component (cdr result)
-                                  result (or (car result) default))
-                         thereis result
-                         finally (return default))
+   for styles = (cl-loop
+                 for dispatcher in orderless-style-dispatchers
+                 for result = (funcall dispatcher component index total)
+                 if (stringp result)
+                 do (setq component result result nil)
+                 else if (and (consp result) (stringp (cdr result)))
+                 do (setq component (cdr result)
+                          result (or (car result) default))
+                 thereis result
+                 finally (return default))
    collect
    (cond
     ((functionp styles) (funcall styles component))
