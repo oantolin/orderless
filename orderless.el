@@ -116,7 +116,12 @@ If this variable is nil, regexp matching is assumed.
 A matching style is simply a function from strings to strings
 that takes a component to a regexp to match against.  If the
 resulting regexp has no capturing groups, the entire match is
-highlighted, otherwise just the captured groups are."
+highlighted, otherwise just the captured groups are.
+
+A matching style is allowed to have one or two optional
+arguments.  Pattern compilers that, like the default compiler,
+are component based will use these extra arguments to pass in the
+index of the component and the total number of components."
   :type '(set
           (const :tag "Regexp" orderless-regexp)
           (const :tag "Literal" orderless-literal)
@@ -129,6 +134,20 @@ highlighted, otherwise just the captured groups are."
           (const :tag "Flex" orderless-flex)
           (const :tag "Prefixes" orderless-prefixes)
           (function :tag "Custom matching style"))
+  :group 'orderless)
+
+(defcustom orderless-to-regexps #'orderless--to-regexps-default
+  "Pattern compiler to use for matching.
+A pattern compiler is a function that takes an input string and
+returns a list of regexps.  The default splits the string on
+`orderless-component-separator', and for each component computes
+a regexp that matches in any of the styles in
+`orderless-component-matching-styles'.
+
+A number of helper functions are provided to ease writing
+functions to use as values for this function, see
+`orderless-split', `orderless-seq' and `orderless-or'."
+  :type 'function
   :group 'orderless)
 
 (defalias 'orderless-regexp #'identity
@@ -235,24 +254,86 @@ For the user's convenience, if REGEXPS is a string, it is
 converted to a list of regexps according to the value of
 `orderless-component-matching-styles'."
     (when (stringp regexps)
-      (setq regexps (orderless--component-regexps regexps)))
+      (setq regexps (funcall orderless-to-regexps regexps)))
     (cl-loop for original in strings
              for string = (copy-sequence original)
              collect (orderless--highlight regexps string)))
 
-(defun orderless--component-regexps (pattern)
-  "Build regexps to match PATTERN.
-Consults `orderless-component-matching-styles' to decide what to
-match."
-  (let ((components (split-string pattern orderless-component-separator t)))
-    (if orderless-component-matching-styles
-        (cl-loop for component in components
-                 collect
-                 (rx-to-string
-                  `(or
-                    ,@(cl-loop for style in orderless-component-matching-styles
-                               collect `(regexp ,(funcall style component))))))
-      components)))
+(defun orderless--forgiving-funcall (fn &rest args)
+  "Call FN with as many ARGS as its arity allows."
+  (apply fn (cl-subseq args 0 (cdr (func-arity fn)))))
+
+(defun orderless-or (&rest styles)
+  "Return matching style that matches if any of the STYLES do."
+  (lambda (string &optional index total)
+    (rx-to-string
+     `(or
+       ,@(cl-loop for style in styles
+                  for regexp = (orderless--forgiving-funcall
+                                style string index total)
+                  when regexp collect `(regexp ,regexp))))))
+
+(defun orderless-seq (&rest handlers)
+  "Return a matching style that tries all HANDLERS in sequence.
+A handler is a function that takes a string and possibly one or
+two integers, it will be called with a string to convert to a
+regexp and, in pattern compilers that are component based, it
+also receives the component index and total number of
+components (well, as many of those arguments as the function can
+take).  A handler must return either:
+
+- nil, to indicate it declines to handle the string,
+
+- a new string, also declining but replacing the string with the
+  new one in further processing,
+
+- a matching style, which gets applied to the string, or
+
+- a `cons' whose car is a matching style and whose `cdr' is a new
+  string to replace the given one.
+
+The matching style returned by this function applies the HANDLERS
+one at time while they keep declining the string."
+  (lambda (string &optional index total)
+    (let ((style (cl-loop for handler in handlers
+                          for result = (orderless--forgiving-funcall
+                                        handler string index total)
+                          if (stringp result)
+                          do (setq string result result nil)
+                          else if (and (consp result) (stringp (cdr result)))
+                          do (setq string (cdr result) result (car result))
+                          thereis result)))
+      (when style (funcall style string)))))
+
+(defun orderless-split (matching-style)
+  "Returns a pattern compiler that splits the input into components.
+This returns a function that takes a string, splits it on
+`orderless-component-separator' and for each component calls the
+MATCHING-STYLE with that component, its index in the list of
+components and the total number of components (the MATCHING-STYLE
+need not take all 3 arguments and it is actually only called with
+as many of those arguments as it can take).
+
+For help writing matching styles, see `orderless-seq' and
+`orderless-or'."
+  (lambda (string)
+    (let* ((components (split-string string orderless-component-separator))
+           (total (length components)))
+    (cl-loop
+     for component in components and index from 0
+     for result = (orderless--forgiving-funcall
+                   matching-style component index total)
+     when result collect result))))
+
+(defun orderless--to-regexps-default (pattern)
+  "Default pattern compiler.
+Splits the PATTERN on `orderless-component-separator', and for
+each component computes a regexp that matches in any of the
+styles in `orderless-component-matching-styles'."
+  (let* ((styles (or orderless-component-matching-styles #'orderless-regexp))
+         (matching-style
+          (if (functionp styles) styles (apply #'orderless-or styles))))
+    (funcall (orderless-split matching-style) pattern)))
 
 (defun orderless--prefix+pattern (string table pred)
   "Split STRING into prefix and pattern according to TABLE.
@@ -269,7 +350,7 @@ The predicate PRED is used to constrain the entries in TABLE."
         (pcase-let* ((`(,prefix . ,pattern)
                       (orderless--prefix+pattern string table pred))
                      (completion-regexp-list
-                      (orderless--component-regexps pattern)))
+                      (funcall orderless-to-regexps pattern)))
           (all-completions prefix table pred)))
     (invalid-regexp nil)))
 
