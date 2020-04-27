@@ -177,13 +177,14 @@ For more fine-grained control on which matching styles to use for each
 component of the input string, you can use the =orderless-style-dispatchers=
 variable, which should be set to list of /style dispatchers/. 
 
-A style dispatcher is a function of two arguments, a string and an
-integer. It is called with each component of the input string and the
-component's index (starting from 0). It can either decline to handle
-the component or return which matching styles to use for it. It can
-also, if desired, additionally return a new string to use in place of
-the component. Consult the documentation of
-=orderless-style-dispatchers= for full details.
+A style dispatcher is a function of three arguments, a string and two
+integers. It is called with each component of the input string, the
+component's index (starting from 0), and the total number of
+components. It can either decline to handle the component or return
+which matching styles to use for it. It can also, if desired,
+additionally return a new string to use in place of the
+component. Consult the documentation of =orderless-style-dispatchers=
+for full details.
 
 As an example, say you wanted the following setup:
 
@@ -196,17 +197,26 @@ As an example, say you wanted the following setup:
 You can achieve this with the following configuration:
 
 #+begin_src emacs-lisp
-  (defun flex-if-twiddle (pattern _index)
+  (defun flex-if-twiddle (pattern _index _total)
     (when (string-suffix-p "~" pattern)
       `(orderless-flex . ,(substring pattern 0 (1- (length pattern))))))
 
-  (defun first-initialism-then-literal (pattern index)
+  (defun first-initialism-then-literal (pattern index _total)
     (if (= index 0) 'orderless-initialism 'orderless-literal))
 
   (setq orderless-style-dispatchers
         '(flex-if-twiddle first-initialism-then-literal))
 #+end_src
 
+** Pattern compiler
+
+The default machanism for turning an input string into a list of
+regexps to match against, using =orderless-component-separator=,
+=orderless-component-matching-styles= and
+=orderless-style-dispatchers=, is probably fleixble enough for the
+vast majority of users. But if you want to completely change the
+mechanism, customize the =orderless-pattern-compiler=. It's value
+should be a function from string to lists of regexps.
 
 * Related packages
 
