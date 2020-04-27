@@ -167,6 +167,20 @@ one of the following forms:
   :type 'hook
   :group 'orderless)
 
+(defcustom orderless-pattern-compiler #'orderless--component-regexps
+  "The `orderless' pattern compiler.
+This should be a function that takes an input pattern and returns
+a list of regexps that must all match a candidate in order for
+the candidate to be considered a completion of the pattern.
+
+The default pattern compiler splits the input on
+`orderless-component-separator', and consults both
+`orderless-style-dispatchers' and
+`orderless-component-matching-styles' to decide how to match each
+component.  See `orderless-style-dispatchers' for details."
+  :type 'function
+  :group 'orderless)
+
 (defalias 'orderless-regexp #'identity
   "Match a component as a regexp.
 This is simply the identity function.")
@@ -271,7 +285,7 @@ For the user's convenience, if REGEXPS is a string, it is
 converted to a list of regexps according to the value of
 `orderless-component-matching-styles'."
     (when (stringp regexps)
-      (setq regexps (orderless--component-regexps regexps)))
+      (setq regexps (funcall orderless-pattern-compiler regexps)))
     (cl-loop for original in strings
              for string = (copy-sequence original)
              collect (orderless--highlight regexps string)))
@@ -280,7 +294,7 @@ converted to a list of regexps according to the value of
   "Build regexps to match PATTERN.
 Consults `orderless-style-dispatchers' and, if
 necessary,`orderless-component-matching-styles' to decide what to
-match."
+match.  See `orderless-style-dispatchers' for details."
   (cl-loop
    with default = (or orderless-component-matching-styles 'orderless-regexp)
    for component in (split-string pattern orderless-component-separator)
@@ -302,8 +316,6 @@ match."
           ,@(cl-loop for style in styles
                      collect `(regexp ,(funcall style component)))))))))
 
-(orderless--component-regexps "osi") 
-
 (defun orderless--prefix+pattern (string table pred)
   "Split STRING into prefix and pattern according to TABLE.
 The predicate PRED is used to constrain the entries in TABLE."
@@ -319,7 +331,7 @@ The predicate PRED is used to constrain the entries in TABLE."
         (pcase-let* ((`(,prefix . ,pattern)
                       (orderless--prefix+pattern string table pred))
                      (completion-regexp-list
-                      (orderless--component-regexps pattern)))
+                      (funcall orderless-pattern-compiler pattern)))
           (all-completions prefix table pred)))
     (invalid-regexp nil)))
 
@@ -392,7 +404,9 @@ This function is part of the `orderless' completion style."
   "Convert STR into regexps for use with ivy.
 This function is for integration of orderless with ivy, use it as
 a value in `ivy-re-builders-alist'."
-  (or (mapcar (lambda (x) (cons x t)) (orderless--component-regexps str)) ""))
+  (or (mapcar (lambda (x) (cons x t))
+              (funcall orderless-pattern-compiler str))
+      ""))
 
 (defun orderless-ivy-highlight (str)
   "Highlight a match in STR of each regexp in `ivy-regex'.
