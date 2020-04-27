@@ -144,16 +144,18 @@ variable one at a time until one handles the component (details
 below). If no dispatcher handles the component, the matching
 styles in `orderless-component-matching-styles' are applied.
 
-A style dispatcher is a function of two arguments, a string and
-an integer. It is called with each component of the input string
-and the component's index (starting from 0). It should either
-return (a) nil to indicate the dispatcher will not handle that
-component at that index, (b) a string to replace the component
-with that string and continue dispatch, or (c) the matching
-styles to use and, if needed, a string to use in place of the
-component (for example, a dispatcher can decide which style to
-use based on a suffix of the component and then it must also
-return the component stripped of the suffix).
+A style dispatcher is a function of between 1 and 3 arguments, a
+string and 1 or 2 integers. It is called with each component of
+the input string, the component's index (starting from 0), and
+the total number of components --well, it's called with as many
+of those arguments as it can take. It should either return (a)
+nil to indicate the dispatcher will not handle that component at
+that index, (b) a string to replace the component with that
+string and continue dispatch, or (c) the matching styles to use
+and, if needed, a string to use in place of the component (for
+example, a dispatcher can decide which style to use based on a
+suffix of the component and then it must also return the
+component stripped of the suffix).
 
 More precisely, the return value of a style dispatcher can be of
 one of the following forms:
@@ -173,11 +175,11 @@ This should be a function that takes an input pattern and returns
 a list of regexps that must all match a candidate in order for
 the candidate to be considered a completion of the pattern.
 
-The default pattern compiler splits the input on
-`orderless-component-separator', and consults both
-`orderless-style-dispatchers' and
+The default pattern compiler is probably flexible enough for most
+users. It splits the input on `orderless-component-separator',
+and consults both `orderless-style-dispatchers' and
 `orderless-component-matching-styles' to decide how to match each
-component.  See `orderless-style-dispatchers' for details."
+component. See `orderless-style-dispatchers' for details."
   :type 'function
   :group 'orderless)
 
@@ -294,13 +296,17 @@ converted to a list of regexps according to the value of
   "Build regexps to match PATTERN.
 Consults `orderless-style-dispatchers' and, if
 necessary,`orderless-component-matching-styles' to decide what to
-match.  See `orderless-style-dispatchers' for details."
+match.  See `orderless-style-dispatchers' for details.
+
+This is the default value of `orderless-pattern-compiler'."
   (cl-loop
    with default = (or orderless-component-matching-styles 'orderless-regexp)
-   for component in (split-string pattern orderless-component-separator)
-   and index from 0
+   with components = (split-string pattern orderless-component-separator)
+   with total = (length components)
+   for component in components and index from 0
    for styles = (cl-loop for dispatcher in orderless-style-dispatchers
-                         for result = (funcall dispatcher component index)
+                         for result = (orderless--forgiving-funcall
+                                       dispatcher component index total)
                          if (stringp result)
                          do (setq component result result nil)
                          else if (and (consp result) (stringp (cdr result)))
