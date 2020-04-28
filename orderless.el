@@ -166,21 +166,22 @@ candidate, in that order, at the beginning of words."
   (orderless--separated-by '(zero-or-more nonl)
    (cl-loop for char across component collect `(seq word-start ,char))))
 
-(defun orderless--strict-*-initialism (component &optional start end)
-  "Match a COMPONENT as a strict initialism, optionally anchored.
+(defun orderless--strict-*-initialism (component &optional anchored)
+  "Match a COMPONENT as a strict initialism, optionally ANCHORED.
 The characters in COMPONENT must occur in the candidate in that
 order at the beginning of subsequent words comprised of letters.
 Only non-letters can be in between the words that start with the
 initials.
 
-If START is non-nil, require that the first initial appear at the
-first word of the candidate.  Similarly, if END is non-nil
-require the last initial appear in the last word."
+If ANCHORED is `start' require that the first initial appear in
+the first word of the candidate.  If ANCHORED is `both' require
+that the first and last initials appear in the first and last
+words of the candidate, respectively."
   (orderless--separated-by
    '(seq (zero-or-more word) word-end (zero-or-more (not alpha)))
    (cl-loop for char across component collect `(seq word-start ,char))
-   (when start '(seq buffer-start (zero-or-more (not alpha))))
-   (when end
+   (when anchored '(seq buffer-start (zero-or-more (not alpha))))
+   (when (eq anchored 'both)
      '(seq (zero-or-more word) word-end (zero-or-more (not alpha)) eol))))
 
 (defun orderless-strict-initialism (component)
@@ -195,14 +196,14 @@ words that start with the initials."
   "Match a COMPONENT as a strict initialism, anchored at start.
 See `orderless-strict-initialism'.  Additionally require that the
 first initial appear in the first word of the candidate."
-  (orderless--strict-*-initialism component t))
+  (orderless--strict-*-initialism component 'start))
 
 (defun orderless-strict-full-initialism (component)
   "Match a COMPONENT as a strict initialism, anchored at both ends.
 See `orderless-strict-initialism'.  Additionally require that the
 first and last initials appear in the first and last words of the
 candidate, respectively."
-  (orderless--strict-*-initialism component t t))
+  (orderless--strict-*-initialism component 'both))
 
 (defun orderless-prefixes (component)
   "Match a component as multiple word prefixes.
