@@ -60,7 +60,7 @@ Bug reports are highly welcome and appreciated!
 - [[#related-packages][Related packages]]
   - [[#ivy-and-helm][Ivy and Helm]]
   - [[#prescient][Prescient]]
-  - [[#icicless-progressive-matching][Icicles's progressive matching]]
+  - [[#icicless-progressive-completion][Icicles's progressive completion]]
 - [[#integration-with-other-completion-uis][Integration with other completion UIs]]
   - [[#ivy][Ivy]]
   - [[#selectrum][Selectrum]]
@@ -209,7 +209,7 @@ in the flex style (called "fuzzy" in prescient). In addition to
 matching, =prescient.el= also supports sorting of candidates (=orderless=
 leaves that up to the candidate source and the completion UI).
 
-** Icicles's progressive matching
+** Icicles's progressive completion
 
 An effect equivalent to matching multiple components in any order can
 be achieved in completion frameworks that provide a way to restrict
