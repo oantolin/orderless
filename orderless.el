@@ -168,7 +168,7 @@ one of the following forms:
   :type 'hook
   :group 'orderless)
 
-(defcustom orderless-pattern-compiler #'orderless--component-regexps
+(defcustom orderless-pattern-compiler #'orderless-default-pattern-compiler
   "The `orderless' pattern compiler.
 This should be a function that takes an input pattern and returns
 a list of regexps that must all match a candidate in order for
@@ -291,7 +291,7 @@ converted to a list of regexps according to the value of
              for string = (copy-sequence original)
              collect (orderless--highlight regexps string)))
 
-(defun orderless--component-regexps (pattern)
+(defun orderless-default-pattern-compiler (pattern)
   "Build regexps to match the components of PATTERN.
 Split PATTERN on `orderless-component-separator' and consult
 `orderless-style-dispatchers' and, if necessary,
