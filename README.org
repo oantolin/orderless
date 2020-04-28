@@ -60,7 +60,7 @@ Bug reports are highly welcome and appreciated!
 - [[#related-packages][Related packages]]
   - [[#ivy-and-helm][Ivy and Helm]]
   - [[#prescient][Prescient]]
-  - [[#icicless-progressive-completion][Icicles's progressive completion]]
+  - [[#restricting-to-current-matches-icicles-ido-and-ivy][Restricting to current matches: Icicles, Ido and Ivy]]
 - [[#integration-with-other-completion-uis][Integration with other completion UIs]]
   - [[#ivy][Ivy]]
   - [[#selectrum][Selectrum]]
@@ -209,16 +209,21 @@ in the flex style (called "fuzzy" in prescient). In addition to
 matching, =prescient.el= also supports sorting of candidates (=orderless=
 leaves that up to the candidate source and the completion UI).
 
-** Icicles's progressive completion
+** Restricting to current matches: Icicles, Ido and Ivy
 
 An effect equivalent to matching multiple components in any order can
 be achieved in completion frameworks that provide a way to restrict
-further matching to the current lists of candidates. In [[https://www.emacswiki.org/emacs/Icicles][Icicles]] this
-is called /progressive completion/ and using =S-SPC= instead of =SPC= to
-separate components will do it. (Note that Ivy has an analogous
-command, also bound to =S-SPC=, called =ivy-restrict-to-matches=, so you
-can get the effect of out of order matching without using
-=ivy--regex-ignore-order=.)
+further matching to the current list of candidates. If you use the
+keybinding for restriction instead of =SPC= to separate your components,
+you get out of order matching!
+
+- [[https://www.emacswiki.org/emacs/Icicles][Icicles]] calls this /progressive completion/ and uses the
+  =icicle-apropos-complete-and-narrow= command, bound to =S-SPC=, to do it.
+
+- Ido has =ido-restrict-to-matches= and binds it to =C-SPC=.
+
+- Ivy has =ivy-restrict-to-matches=, bound to =S-SPC=, so you can get the
+  effect of out of order matching without using =ivy--regex-ignore-order=.
 
 * Integration with other completion UIs
 
