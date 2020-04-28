@@ -190,6 +190,8 @@ This is simply the identity function.")
   "Match a component as a literal string.
 This is simply `regexp-quote'.")
 
+;;; Matching styles
+
 (defun orderless--separated-by (sep rxs &optional before after)
   "Return a regexp to match the rx-regexps RXS with SEP in between.
 If BEFORE is specified, add it to the beginning of the rx
@@ -264,6 +266,8 @@ at a word boundary in the candidate.  This is similar to the
    (cl-loop for prefix in (split-string component "\\>" t)
             collect `(seq word-boundary ,prefix))))
 
+;;; Highlighting matches
+
 (defun orderless--highlight (regexps string)
   "Propertize STRING to highlight a match of each of the REGEXPS.
 Warning: only use this if you know all REGEXPs match!"
@@ -290,6 +294,8 @@ converted to a list of regexps according to the value of
     (cl-loop for original in strings
              for string = (copy-sequence original)
              collect (orderless--highlight regexps string)))
+
+;;; Compiling patterns to lists of regexps
 
 (defun orderless-default-pattern-compiler (pattern)
   "Build regexps to match the components of PATTERN.
@@ -321,6 +327,8 @@ This is the default value of `orderless-pattern-compiler'."
         `(or
           ,@(cl-loop for style in styles
                      collect `(regexp ,(funcall style component)))))))))
+
+;;; Completion style implementation
 
 (defun orderless--prefix+pattern (string table pred)
   "Split STRING into prefix and pattern according to TABLE.
@@ -380,6 +388,8 @@ This function is part of the `orderless' completion style."
                orderless-try-completion orderless-all-completions
                "Completion of multiple components, in any order."))
 
+;;; Temporary separator change (does anyone use this?)
+
 (defvar orderless-old-component-separator nil
   "Stores the old value of `orderless-component-separator'.")
 
@@ -400,7 +410,7 @@ This function is part of the `orderless' completion style."
   (setq orderless-component-separator separator)
   (add-to-list 'minibuffer-exit-hook #'orderless--restore-component-separator))
 
-;;; ivy integration
+;;; Ivy integration
 
 (defvar ivy-regex)
 (defvar ivy-highlight-functions-alist)
