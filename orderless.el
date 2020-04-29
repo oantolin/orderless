@@ -315,6 +315,9 @@ This function is part of the `orderless' completion style."
 
 (defvar orderless-old-component-separator nil
   "Stores the old value of `orderless-component-separator'.")
+(make-obsolete-variable 'orderless-old-component-separator
+                        "See https://github.com/oantolin/orderless/issues/15"
+                        "20200419")
 
 (defun orderless--restore-component-separator ()
   "Restore old value of `orderless-component-separator'."
