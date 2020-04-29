@@ -318,6 +318,8 @@ This function is part of the `orderless' completion style."
 
 (defun orderless--restore-component-separator ()
   "Restore old value of `orderless-component-separator'."
+  (declare (obsolete "See https://github.com/oantolin/orderless/issues/15"
+                     "20200419"))
   (when orderless-old-component-separator
     (setq orderless-component-separator orderless-old-component-separator
           orderless-old-component-separator nil))
@@ -325,6 +327,8 @@ This function is part of the `orderless' completion style."
 
 (defun orderless-temporarily-change-separator (separator)
   "Use SEPARATOR to split the input for the current completion session."
+  (declare (obsolete "See https://github.com/oantolin/orderless/issues/15"
+                     "20200419"))
   (interactive
    (list (let ((enable-recursive-minibuffers t))
            (read-string "Orderless regexp separator: "))))
