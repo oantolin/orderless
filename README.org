@@ -57,14 +57,14 @@ Bug reports are highly welcome and appreciated!
   - [[#component-matching-styles][Component matching styles]]
   - [[#component-separator-regexp][Component separator regexp]]
   - [[#faces-for-component-matches][Faces for component matches]]
-- [[#related-packages][Related packages]]
-  - [[#ivy-and-helm][Ivy and Helm]]
-  - [[#prescient][Prescient]]
-  - [[#restricting-to-current-matches-icicles-ido-and-ivy][Restricting to current matches: Icicles, Ido and Ivy]]
 - [[#integration-with-other-completion-uis][Integration with other completion UIs]]
   - [[#ivy][Ivy]]
   - [[#selectrum][Selectrum]]
   - [[#company][Company]]
+- [[#related-packages][Related packages]]
+  - [[#ivy-and-helm][Ivy and Helm]]
+  - [[#prescient][Prescient]]
+  - [[#restricting-to-current-matches-icicles-ido-and-ivy][Restricting to current matches: Icicles, Ido and Ivy]]
 :END:
 
 ** Screenshot
@@ -160,61 +160,6 @@ tries each completion style in turn and uses the first one returning
 matches. You will only see these particular faces when the =orderless=
 completion is the one that ends up being used, of course.
 
-* Related packages
-
-** Ivy and Helm
-
-The well-known and hugely powerful completion frameworks [[https://github.com/abo-abo/swiper][Ivy]] and [[https://github.com/emacs-helm/helm][Helm]]
-also provide for matching space-separated component regexps in any
-order. In Ivy, this is done with the =ivy--regex-ignore-order= matcher.
-In Helm, it is the default, called "multi pattern matching".
-
-This package is significantly smaller than either of those because it
-solely defines a completion style, meant to be used with the built-in
-Icomplete completion UI, while both of those provide their own
-completion UI (and many other cool features!).
-
-It is worth pointing out that Helm does provide its multi pattern
-matching as a completion style which could be used with Icomplete! (Ivy
-does not.) So, Icomplete users could, instead of using this package,
-install Helm and configure Icomplete to use it as follows:
-
-#+begin_src emacs-lisp
-  (require 'helm)
-  (setq completion-styles '(helm))
-  (icomplete-mode)
-#+end_src
-
-(Of course, if you install Helm, you might as well use the Helm UI in
-=helm-mode= rather than Icomplete.)
-
-** Prescient
-
-The [[https://github.com/raxod502/prescient.el][prescient.el]] library also provides matching of space-separated
-components in any order and it can be used with either the [[https://github.com/raxod502/selectrum][Selectrum]]
-or [[https://github.com/abo-abo/swiper][Ivy]] completion UIs (it does not offer a completion-style that
-could be used with Emacs' default completion UI or with Icomplete).
-The components can be matched literally, as regexps, as initialisms or
-in the flex style (called "fuzzy" in prescient). In addition to
-matching, =prescient.el= also supports sorting of candidates (=orderless=
-leaves that up to the candidate source and the completion UI).
-
-** Restricting to current matches: Icicles, Ido and Ivy
-
-An effect equivalent to matching multiple components in any order can
-be achieved in completion frameworks that provide a way to restrict
-further matching to the current list of candidates. If you use the
-keybinding for restriction instead of =SPC= to separate your components,
-you get out of order matching!
-
-- [[https://www.emacswiki.org/emacs/Icicles][Icicles]] calls this /progressive completion/ and uses the
-  =icicle-apropos-complete-and-narrow= command, bound to =S-SPC=, to do it.
-
-- Ido has =ido-restrict-to-matches= and binds it to =C-SPC=.
-
-- Ivy has =ivy-restrict-to-matches=, bound to =S-SPC=, so you can get the
-  effect of out of order matching without using =ivy--regex-ignore-order=.
-
 * Integration with other completion UIs
 
 Several excellent completion UIs exist for Emacs in third party
@@ -282,3 +227,58 @@ But there are a couple of points of discomfort:
    #+end_src
 
    (Aren't dynamically scoped variables and the advice system nifty?)
+* Related packages
+
+** Ivy and Helm
+
+The well-known and hugely powerful completion frameworks [[https://github.com/abo-abo/swiper][Ivy]] and [[https://github.com/emacs-helm/helm][Helm]]
+also provide for matching space-separated component regexps in any
+order. In Ivy, this is done with the =ivy--regex-ignore-order= matcher.
+In Helm, it is the default, called "multi pattern matching".
+
+This package is significantly smaller than either of those because it
+solely defines a completion style, meant to be used with the built-in
+Icomplete completion UI, while both of those provide their own
+completion UI (and many other cool features!).
+
+It is worth pointing out that Helm does provide its multi pattern
+matching as a completion style which could be used with Icomplete! (Ivy
+does not.) So, Icomplete users could, instead of using this package,
+install Helm and configure Icomplete to use it as follows:
+
+#+begin_src emacs-lisp
+  (require 'helm)
+  (setq completion-styles '(helm))
+  (icomplete-mode)
+#+end_src
+
+(Of course, if you install Helm, you might as well use the Helm UI in
+=helm-mode= rather than Icomplete.)
+
+** Prescient
+
+The [[https://github.com/raxod502/prescient.el][prescient.el]] library also provides matching of space-separated
+components in any order and it can be used with either the [[https://github.com/raxod502/selectrum][Selectrum]]
+or [[https://github.com/abo-abo/swiper][Ivy]] completion UIs (it does not offer a completion-style that
+could be used with Emacs' default completion UI or with Icomplete).
+The components can be matched literally, as regexps, as initialisms or
+in the flex style (called "fuzzy" in prescient). In addition to
+matching, =prescient.el= also supports sorting of candidates (=orderless=
+leaves that up to the candidate source and the completion UI).
+
+** Restricting to current matches: Icicles, Ido and Ivy
+
+An effect equivalent to matching multiple components in any order can
+be achieved in completion frameworks that provide a way to restrict
+further matching to the current list of candidates. If you use the
+keybinding for restriction instead of =SPC= to separate your components,
+you get out of order matching!
+
+- [[https://www.emacswiki.org/emacs/Icicles][Icicles]] calls this /progressive completion/ and uses the
+  =icicle-apropos-complete-and-narrow= command, bound to =S-SPC=, to do it.
+
+- Ido has =ido-restrict-to-matches= and binds it to =C-SPC=.
+
+- Ivy has =ivy-restrict-to-matches=, bound to =S-SPC=, so you can get the
+  effect of out of order matching without using =ivy--regex-ignore-order=.
+
