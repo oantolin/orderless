@@ -99,6 +99,20 @@ component regexps."
                  (regexp :tag "Custom regexp"))
   :group 'orderless)
 
+(defcustom orderless-transient-component-separator nil
+  "Override for `orderless-component-separator'.
+This variable should be either nil or a regexp, when it is a
+regexp it overrides `orderless-component-separator'.  It is meant
+to be set by commands that interactively change the separator.
+No such commands are provided with this package, but this
+variable is meant to make writing them simple.  If you do use
+this variable you are likely to want to reset it to nil after
+every completion session, which can be achieved by adding the
+function `orderless-remove-transient-configuration' to the
+`minibuffer-exit-hook'."
+  :type '(choice string nil)
+  :group 'orderless)
+
 (defcustom orderless-match-faces
   [orderless-match-face-0
    orderless-match-face-1
@@ -110,7 +124,21 @@ component regexps."
 
 (defcustom orderless-component-matching-styles
   '(orderless-regexp orderless-initialism)
-  "List of default allowed component matching styles.
+  "Component matching style configuration.
+This should be a list of functions optionally with the symbols
+`:global-dispatchers' and `:component-dispatcher' used to delimit
+portions:
+
+(matching-styles...
+ :global-dispatchers global-dispatchers...
+ :component-dispatcher component-dispatchers...)
+
+Here matching-styles... denotes a sequence of matching style
+functions, and each of the *-dispatcher... denotes a sequence of
+style dispatcher functions.  The `:global-dispatchers' and
+`:component-dispatcher' sections are both optional and can occur
+in either order.
+
 If this variable is nil, regexp matching is assumed.
 
 A matching style is simply a function from strings to strings
@@ -118,13 +146,15 @@ that takes a component to a regexp to match against.  If the
 resulting regexp has no capturing groups, the entire match is
 highlighted, otherwise just the captured groups are.
 
-This list provides the default matching styles for components
-when the style dispatchers in `orderless-global-dispatchers'
+The list of matching styles at the beginning provides the default
+matching styles for components when the global style dispatchers
 decline to compute a list of default matching styles.  (Even if
 those dispatchers do compute a list of matching styles, it is
 only the default used for components, and can be overridden for
-individual components by the style dispatchers in
-`orderless-component-dispatchers')."
+individual components by the component style dispatchers).
+
+For information on how the lists of dispatchers are used, see
+`orderless-dispatch'."
   :type '(set
           (const :tag "Regexp" orderless-regexp)
           (const :tag "Literal" orderless-literal)
@@ -136,43 +166,24 @@ individual components by the style dispatchers in
             orderless-strict-full-initialism)
           (const :tag "Flex" orderless-flex)
           (const :tag "Prefixes" orderless-prefixes)
-          (function :tag "Custom matching style"))
+          (const :tag "Global dispatchers" :global-dispatchers)
+          (const :tag "Component dispatchers" :component-dispatchers)
+          (function :tag "Custom function"))
   :group 'orderless)
 
-(defcustom orderless-component-dispatchers nil
-  "List of style dispatchers for computing component matching styles.
-
-The `orderless' completion style splits the input string into
-components and for each component tries all style dispatchers
-stored in this variable one at a time until one handles the
-component.  If no dispatcher handles the component, default
-matching styles are used for the component.
-
-Those default matching styles are computed based on the entire
-input string by `orderless-global-dispatchers' or, if no global
-dispatcher handles the input string, the default styles are given
-by `orderless-component-matching-styles'.
-
-For details on the dispatch procedure see `orderless-dispatch'."
-  :type 'hook
-  :group 'orderless)
-
-(defcustom orderless-global-dispatchers nil
-  "List of style dispatchers for computing default matching styles.
-
-This variable is used to compute default matching styles for
-components based on the entire input string.  The dispatchers
-stored in this variable are tried one at a time until one handles
-the input sting.  If none do, the default matching styles are
-instead given by `orderless-component-matching-styles'.
-
-The matching styles computed as outlined above are only the
-default styles to be used for each component, and can be
-overridden on a component-by-component basis by
-`orderless-component-dispatchers'.
-
-For details on the dispatch procedure see `orderless-dispatch'."
-  :type 'hook
+(defcustom orderless-transient-matching-styles nil
+  "Component matching style configuration override.
+This variable has the format and meaning as
+`orderless-component-matching-styles' and overrides it when this
+one is non-nil.  It is meant to be set by commands that
+interactively change the matching style configuration.  No such
+commands are provided with this package, but this variable is
+meant to make writing them simple.  If you do use this variable
+you are likely to want to reset it to nil after every completion
+session, which can be achieved by adding the function
+`orderless-remove-transient-configuration' to the
+`minibuffer-exit-hook'."
+  :type 'sexp
   :group 'orderless)
 
 (defcustom orderless-pattern-compiler #'orderless-default-pattern-compiler
@@ -182,22 +193,12 @@ a list of regexps that must all match a candidate in order for
 the candidate to be considered a completion of the pattern.
 
 The default pattern compiler is probably flexible enough for most
-users.  It splits the input on `orderless-component-separator',
-computes default matching styles to use for all components by
-running `orderless-global-dispatchers' (falling back on
-`orderless-component-matching-styles'), and then computes
-matching styles for individual components using
-`orderless-style-dispatchers' (falling back on the global default
-computed in the previous step).
+users.  See `orderless-default-pattern-compiler' for details.
 
-The documentation for the following variables is written assuming
-the default pattern compiler is used, if you change the pattern
-compiler it can, of course, do anything and need not consult
-these variables at all:
-
-- `orderless-style-dispatchers'
-- `orderless-global-dispatchers'
-- `orderless-component-matching-styles'"
+The documentation for `orderless-component-matching-styles' is
+written assuming the default pattern compiler is used, if you
+change the pattern compiler it can, of course, do anything and
+need not consult this variable at all."
   :type 'function
   :group 'orderless)
 
@@ -316,6 +317,39 @@ converted to a list of regexps according to the value of
 
 ;;; Compiling patterns to lists of regexps
 
+(defun orderless-remove-transient-configuration ()
+  "Remove all transient orderless configuration.
+Meant to be added to `exit-minibuffer-hook'."
+  (setq orderless-transient-matching-styles nil
+        orderless-transient-component-separator nil))
+
+(defun orderless--parse-matching-styles (configuration)
+  "Parse a matching styles CONFIGURATION.
+The CONFIGURATION argument should be a list of functions
+optionally with the symbols `:global-dispatchers' and
+`:component-dispatcher' used to delimit portions:
+
+(matching-styles...
+ :global-dispatchers global-dispatchers...
+ :component-dispatcher component-dispatchers...)
+
+Here matching-styles... denotes a sequence of matching style
+functions, and each of the *-dispatcher... denotes a sequence of
+style dispatcher functions.  The `:global-dispatchers' and
+`:component-dispatcher' sections are both optional and can occur
+in either order.
+
+This function returns a 3-element lists of lists: the styles, the
+global dispatchers and the component dispatchers."
+  (let ((result (vector (list) (list) (list)))
+        (type 0))
+    (dolist (elt configuration)
+      (pcase elt
+        (:global-dispatchers (setq type 1))
+        (:component-dispatchers (setq type 2))
+        (_ (push elt (aref result type)))))
+    (mapcar #'nreverse result)))
+
 (defun orderless-dispatch (dispatchers default string &rest args)
   "Run DISPATCHERS to compute matching styles for STRING.
 
@@ -364,24 +398,36 @@ DEFAULT as the list of styles."
 
 Split PATTERN on `orderless-component-separator' and compute
 matching styles for each component.  The matching styles are
-computed using `orderless-component-dispatchers' and default to
-the value computed using `orderless-global-dispatchers', which in
-turn defaults to `orderless-component-matching-styles'.  See
-`orderless-dispatch' for details on how the lists of dispatchers
-are used.
+computed according to `orderless-component-matching-styles',
+unless the variable `orderless-transient-matching-styles' is
+non-nil, in which case it is used instead.  Whichever variable is
+used is split into a list of default matching styles, a list of
+global dispatchers and a list of component dispatchers.  For each
+component of the PATTERN, the component dispatchers are run to
+determine the matching styles to be used for that component.  If
+the component dispatchers decline to handle the component, then
+the global dispatchers are run on the PATTERN to determine
+matching styles.  Finally, if the global dispatchers decline to
+handle the PATTERN, the list of default matching styles is used.
+
+See `orderless-dispatch' for details on how the lists of
+dispatchers are used.
 
 This is the default value of `orderless-pattern-compiler'."
   (cl-loop
+   with (matching-styles global-dispatchers component-dispatchers) =
+     (orderless--parse-matching-styles
+      (or orderless-transient-matching-styles
+          orderless-component-matching-styles))
    with (default . newpat) = (orderless-dispatch
-                              orderless-global-dispatchers
-                              (or orderless-component-matching-styles
-                                  'orderless-regexp)
+                              global-dispatchers
+                              (or matching-styles 'orderless-regexp)
                               pattern)
    with components = (split-string newpat orderless-component-separator)
    with total = (length components)
    for component in components and index from 0
    for (styles . newcomp) = (orderless-dispatch
-                             orderless-component-dispatchers
+                             component-dispatchers
                              default component index total)
    collect
    (if (functionp styles)
