@@ -56,9 +56,11 @@ Bug reports are highly welcome and appreciated!
 - [[#screenshot][Screenshot]]
 - [[#customization][Customization]]
   - [[#component-matching-styles][Component matching styles]]
+    - [[#style-dispatchers][Style dispatchers]]
   - [[#component-separator-regexp][Component separator regexp]]
   - [[#faces-for-component-matches][Faces for component matches]]
-  - [[#style-dispatchers][Style dispatchers]]
+  - [[#pattern-compiler][Pattern compiler]]
+  - [[#interactively-changing-the-configuration][Interactively changing the configuration]]
 - [[#related-packages][Related packages]]
   - [[#ivy-and-helm][Ivy and Helm]]
   - [[#prescient][Prescient]]
@@ -131,9 +133,76 @@ define new matching styles. The predefined ones are:
   For example, =re-re= matches =query-replace-regexp=, =recode-region= and
   =magit-remote-list-refs=; =f-d.t= matches =final-draft.txt=.
 
-The variable =orderless-component-matching-styles= should be set to a
-list of the desired styles to use. By default it enables the regexp
-and initialism styles.
+The variable =orderless-component-matching-styles= can be set to a list
+of the desired matching styles to use. By default it enables the
+regexp and initialism styles. 
+
+That variable, in addition to matching styles, can contain dispatchers
+that can change which styles are used depending on the actual input
+string.
+
+*** Style dispatchers
+
+ For more fine-grained control on which matching styles to use for
+ each component of the input string, you can add use /style
+ dispatchers/. These are specificied in the
+ =orderless-component-matching-styles= whose full syntax is:
+
+ =(= /matching-styles/...
+   =:global-dispatchers= /global-dispatchers/...
+   =:component-dispatchers= /component-dispatchers/... =)=
+
+ There are two types of style dispatchers:
+
+ - /global style dispatchers/, which are functions that take the entire
+   input string and are used to determine which matching styles to use
+   by default for each component; and
+
+ - /component style dispatchers/, which take a component, its index in
+   the list of components (starting from 0), and the total number of
+   components, and are used to determine the matching styles used for
+   that specific component, overriding the default matching styles.
+
+ A style dispatcher can either decline to handle the input string or
+ component, or it can return which matching styles to use. It can
+ also, if desired, additionally return a new string to use in place of
+ the given one. Consult the documentation of =orderless-dispatch= for
+ full details.
+
+ As an example, say you wanted the following setup:
+
+ - you normally want components to match as regexps,
+ - but if you end the string with =!= you want the default to be that
+   components (of the string left removing the final =!=) match
+   literally,
+ - except for the first component, which should always match as an
+   initialism ---this is pretty useful for, say,
+   =execute-extended-command= (=M-x=) or =describe-function= (=C-h f=),
+ - and any later component ending in =~= should match (the characters
+   other than the final =~=) in the flex style.
+
+ You can achieve this with the following configuration:
+
+ #+begin_src emacs-lisp
+   (defun flex-if-twiddle (pattern _index _total)
+     (when (string-suffix-p "~" pattern)
+       `(orderless-flex . ,(substring pattern 0 -1))))
+
+   (defun literal-if-bang (pattern)
+     (when (string-suffix-p "!" pattern)
+       `(orderless-literal . ,(substring pattern 0 -1))))
+
+   (defun first-initialism (pattern index _total)
+     (if (= index 0) 'orderless-initialism))
+
+   (setq orderless-component-matching-styles
+         '(orderless-regexp orderless-initialism orderless-prefixes))
+
+   (setq orderless-component-matching-styles
+         '(orderless-regexp
+           :global-dispatchers literal-if-bang
+           :component-dispatchers first-initialism flex-if-twiddle))
+ #+end_src
 
 ** Component separator regexp
 
@@ -171,52 +240,58 @@ tries each completion style in turn and uses the first one returning
 matches. You will only see these particular faces when the =orderless=
 completion is the one that ends up being used, of course.
 
-** Style dispatchers
-
-For more fine-grained control on which matching styles to use for each
-component of the input string, you can use the =orderless-style-dispatchers=
-variable, which should be set to list of /style dispatchers/. 
-
-A style dispatcher is a function of three arguments, a string and two
-integers. It is called with each component of the input string, the
-component's index (starting from 0), and the total number of
-components. It can either decline to handle the component or return
-which matching styles to use for it. It can also, if desired,
-additionally return a new string to use in place of the
-component. Consult the documentation of =orderless-style-dispatchers=
-for full details.
-
-As an example, say you wanted the following setup:
-
-- you want the first component to match as an initialism and
-  subsequent components to match literally ---this is pretty useful for,
-  say, =execute-extended-command= (=M-x=) or =describe-function= (=C-h f=).
-- except that any component ending in =~= should match (the characters
-  other than the final =~=) in the flex style.
-
-You can achieve this with the following configuration:
-
-#+begin_src emacs-lisp
-  (defun flex-if-twiddle (pattern _index _total)
-    (when (string-suffix-p "~" pattern)
-      `(orderless-flex . ,(substring pattern 0 (1- (length pattern))))))
-
-  (defun first-initialism-then-literal (pattern index _total)
-    (if (= index 0) 'orderless-initialism 'orderless-literal))
-
-  (setq orderless-style-dispatchers
-        '(flex-if-twiddle first-initialism-then-literal))
-#+end_src
-
 ** Pattern compiler
 
 The default machanism for turning an input string into a list of
-regexps to match against, using =orderless-component-separator=,
-=orderless-component-matching-styles= and
-=orderless-style-dispatchers=, is probably fleixble enough for the
-vast majority of users. But if you want to completely change the
-mechanism, customize the =orderless-pattern-compiler=. It's value
-should be a function from string to lists of regexps.
+regexps to match against, configured using
+=orderless-component-matching-styles=, is probably flexible enough for
+the vast majority of users. But if you want to completely change the
+mechanism, customize the =orderless-pattern-compiler=. It's value should
+be a function from string to lists of regexps.
+
+** Interactively changing the configuration
+
+You might want to change the separator or the matching style
+configuration on the fly while matching. There many possible UIs for
+this: you could toggle between two chosen configurations, cycle among
+several, have a keymap where each key sets a different configurations,
+have a set of named configurations and be prompted (with completion)
+for one of them, popup a [[https://github.com/abo-abo/hydra][hydra]] to choose a configuration, etc.
+
+Rather than include commands for any of those on-the-fly configuration
+changes, =orderless= provides a general mechanism to make it easy to
+write such commands yourself. There are two "override" variables:
+
+- =orderless-transient-matching-styles= which, if non-nil, overrides
+  =orderless-component-matching-styles=, and
+- =orderless-transient-component-separator= which, if non-nil,
+  overrides =orderless-component-separator=.
+
+You can write your own commands to set these transient variable to the
+desired value without clobbering the value of the variables they
+override. To set them to =nil= again after each completion session, use
+the following configuration:
+
+#+begin_src emacs-lisp
+  (add-hook 'minibuffer-exit-hook
+            #'orderless-remove-transient-configuration)
+#+end_src
+
+For example, say you want to use the keybinding =C-l= to make all
+components match literally. You could use the following configuration:
+
+#+begin_src emacs-lisp
+  (defun my/match-components-literally ()
+    "Components match literally for the rest of the session."
+    (interactive)
+    (setq orderless-transient-matching-styles '(orderless-literal)))
+
+  (add-hook 'minibuffer-exit-hook
+            #'orderless-remove-transient-configuration)
+
+  (define-key minibuffer-local-completion-map (kbd "C-l")
+    #'my/match-components-literally)
+#+end_src
 
 * Related packages
 
