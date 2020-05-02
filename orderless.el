@@ -298,7 +298,7 @@ The COMPONENT is split at word endings, and each piece must match
 at a word boundary in the candidate.  This is similar to the
 `partial-completion' completion style."
   (orderless--separated-by '(zero-or-more nonl)
-   (cl-loop for prefix in (split-string component "\\>" t)
+   (cl-loop for prefix in (split-string-and-unquote component "\\>")
             collect `(seq word-boundary ,prefix))))
 
 ;;; Highlighting matches
