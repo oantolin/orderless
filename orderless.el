@@ -99,7 +99,7 @@ component regexps."
                  (regexp :tag "Custom regexp"))
   :group 'orderless)
 
-(defcustom orderless-transient-component-separator nil
+(defvar-local orderless-transient-component-separator nil
   "Component separator regexp override.
 This variabel, if non-nil, overrides `orderless-component-separator'.
 It is meant to be set by commands that interactively change the
@@ -108,10 +108,7 @@ this variable is meant to make writing them simple.  If you do
 use this variable you are likely to want to reset it to nil after
 every completion session, which can be achieved by adding the
 function `orderless-remove-transient-configuration' to the
-`minibuffer-exit-hook'."
-  :local t
-  :type '(choice string nil)
-  :group 'orderless)
+`minibuffer-exit-hook'.")
 
 (defcustom orderless-match-faces
   [orderless-match-face-0
@@ -170,7 +167,7 @@ information on how this variable is used see
   :type 'hook
   :group 'orderless)
 
-(defcustom orderless-transient-matching-styles nil
+(defvar-local orderless-transient-matching-styles nil
   "Component matching styles override.
 This variable, if non-nil, overrides `orderless-matching-styles'.
 It is meant to be set by commands that interactively change the
@@ -180,12 +177,9 @@ simple.  If you do use this variable you are likely to want to
 reset it to nil after every completion session, which can be
 achieved by adding the function
 `orderless-remove-transient-configuration' to the
-`minibuffer-exit-hook'."
-  :local t
-  :type 'hook
-  :group 'orderless)
+`minibuffer-exit-hook'.")
 
-(defcustom orderless-transient-style-dispatchers nil
+(defvar-local orderless-transient-style-dispatchers nil
   "Component style dispatchers override.
 This variable, if non-nil, overrides `orderless-style-dispatchers'.
 It is meant to be set by commands that interactively change the
@@ -195,10 +189,7 @@ simple.  If you do use this variable you are likely to want to
 reset it to nil after every completion session, which can be
 achieved by adding the function
 `orderless-remove-transient-configuration' to the
-`minibuffer-exit-hook'."
-  :local t
-  :type 'hook
-  :group 'orderless)
+`minibuffer-exit-hook'.")
 
 (defcustom orderless-pattern-compiler #'orderless-default-pattern-compiler
   "The `orderless' pattern compiler.
