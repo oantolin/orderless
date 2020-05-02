@@ -10,8 +10,8 @@ any one of several ways: literally, as a regexp, as an initialism, in
 the flex style, or as multiple word prefixes. By default, regexp and
 initialism matches are enabled.
 
-A completion style is a backend for completion and is used from a
-frontend that provides a completion UI. Any completion style can be
+A completion style is a back-end for completion and is used from a
+front-end that provides a completion UI. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
 tab completion) or with the built-in Icomplete package (which is
 similar to the more well-known Ido Mode). To use a completion style in
@@ -145,23 +145,15 @@ string.
 
  For more fine-grained control on which matching styles to use for
  each component of the input string, you can add use /style
- dispatchers/. These are specificied in the
+ dispatchers/. These are also specified in the variable
  =orderless-component-matching-styles= whose full syntax is:
 
- =(= /matching-styles/...
-   =:global-dispatchers= /global-dispatchers/...
-   =:component-dispatchers= /component-dispatchers/... =)=
+ =(= /matching-styles/... =:dispatchers= /style-dispatchers/... =)=
 
- There are two types of style dispatchers:
-
- - /global style dispatchers/, which are functions that take the entire
-   input string and are used to determine which matching styles to use
-   by default for each component; and
-
- - /component style dispatchers/, which take a component, its index in
-   the list of components (starting from 0), and the total number of
-   components, and are used to determine the matching styles used for
-   that specific component, overriding the default matching styles.
+ Style dispatchers are functions which take a component, its index in
+ the list of components (starting from 0), and the total number of
+ components, and are used to determine the matching styles used for
+ that specific component, overriding the default matching styles.
 
  A style dispatcher can either decline to handle the input string or
  component, or it can return which matching styles to use. It can
@@ -172,9 +164,6 @@ string.
  As an example, say you wanted the following setup:
 
  - you normally want components to match as regexps,
- - but if you end the string with =!= you want the default to be that
-   components (of the string left removing the final =!=) match
-   literally,
  - except for the first component, which should always match as an
    initialism ---this is pretty useful for, say,
    =execute-extended-command= (=M-x=) or =describe-function= (=C-h f=),
@@ -188,20 +177,11 @@ string.
      (when (string-suffix-p "~" pattern)
        `(orderless-flex . ,(substring pattern 0 -1))))
 
-   (defun literal-if-bang (pattern)
-     (when (string-suffix-p "!" pattern)
-       `(orderless-literal . ,(substring pattern 0 -1))))
-
    (defun first-initialism (pattern index _total)
      (if (= index 0) 'orderless-initialism))
 
    (setq orderless-component-matching-styles
-         '(orderless-regexp orderless-initialism orderless-prefixes))
-
-   (setq orderless-component-matching-styles
-         '(orderless-regexp
-           :global-dispatchers literal-if-bang
-           :component-dispatchers first-initialism flex-if-twiddle))
+         '(orderless-regexp :dispatchers first-initialism flex-if-twiddle))
  #+end_src
 
 ** Component separator regexp
@@ -242,12 +222,16 @@ completion is the one that ends up being used, of course.
 
 ** Pattern compiler
 
-The default machanism for turning an input string into a list of
+The default mechanism for turning an input string into a list of
 regexps to match against, configured using
 =orderless-component-matching-styles=, is probably flexible enough for
 the vast majority of users. But if you want to completely change the
 mechanism, customize the =orderless-pattern-compiler=. It's value should
-be a function from string to lists of regexps.
+be a function from string to lists of regexps. You might find it
+convenient to use =orderless-default-pattern-compiler= as a subroutine
+in your own pattern compiler, it conveniently accepts an optional
+second argument that specifies a list to use instead of
+=orderless-component-matching-styles=.
 
 ** Interactively changing the configuration
 
@@ -284,7 +268,8 @@ components match literally. You could use the following configuration:
   (defun my/match-components-literally ()
     "Components match literally for the rest of the session."
     (interactive)
-    (setq orderless-transient-matching-styles '(orderless-literal)))
+    (setq orderless-transient-matching-styles
+          '(orderless-literal :dispatchers)))
 
   (add-hook 'minibuffer-exit-hook
             #'orderless-remove-transient-configuration)
@@ -292,6 +277,13 @@ components match literally. You could use the following configuration:
   (define-key minibuffer-local-completion-map (kbd "C-l")
     #'my/match-components-literally)
 #+end_src
+
+Note there is nothing after =:dispatchers= in the above code. This is
+different from not including =:dispatchers= at all in the value of
+=orderless-transient-matching-styles=: omitting it all together means
+inherit the dispatchers from =orderless-component-matching-styles=;
+while including =:dispatchers= overrides the list of dispatchers ---in
+the example above, setting it to the empty list.
 
 * Related packages
 
