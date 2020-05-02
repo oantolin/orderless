@@ -109,6 +109,7 @@ use this variable you are likely to want to reset it to nil after
 every completion session, which can be achieved by adding the
 function `orderless-remove-transient-configuration' to the
 `minibuffer-exit-hook'."
+  :local t
   :type '(choice string nil)
   :group 'orderless)
 
@@ -180,6 +181,7 @@ reset it to nil after every completion session, which can be
 achieved by adding the function
 `orderless-remove-transient-configuration' to the
 `minibuffer-exit-hook'."
+  :local t
   :type 'hook
   :group 'orderless)
 
@@ -194,6 +196,7 @@ reset it to nil after every completion session, which can be
 achieved by adding the function
 `orderless-remove-transient-configuration' to the
 `minibuffer-exit-hook'."
+  :local t
   :type 'hook
   :group 'orderless)
 
