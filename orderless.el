@@ -116,7 +116,7 @@ function `orderless-remove-transient-configuration' to the
    orderless-match-face-2
    orderless-match-face-3]
   "Vector of faces used (cyclically) for component matches."
-  :type '(vector 'face)
+  :type '(vector face)
   :group 'orderless)
 
 (define-obsolete-variable-alias
