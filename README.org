@@ -133,22 +133,15 @@ define new matching styles. The predefined ones are:
   For example, =re-re= matches =query-replace-regexp=, =recode-region= and
   =magit-remote-list-refs=; =f-d.t= matches =final-draft.txt=.
 
-The variable =orderless-component-matching-styles= can be set to a list
-of the desired matching styles to use. By default it enables the
-regexp and initialism styles. 
-
-That variable, in addition to matching styles, can contain dispatchers
-that can change which styles are used depending on the actual input
-string.
+The variable =orderless-matching-styles= can be set to a list of the
+desired matching styles to use. By default it enables the regexp and
+initialism styles.
 
 *** Style dispatchers
 
  For more fine-grained control on which matching styles to use for
- each component of the input string, you can add use /style
- dispatchers/. These are also specified in the variable
- =orderless-component-matching-styles= whose full syntax is:
-
- =(= /matching-styles/... =:dispatchers= /style-dispatchers/... =)=
+ each component of the input string, you can customize the variable
+ =orderless-style-dispatchers=.
 
  Style dispatchers are functions which take a component, its index in
  the list of components (starting from 0), and the total number of
@@ -180,8 +173,8 @@ string.
    (defun first-initialism (pattern index _total)
      (if (= index 0) 'orderless-initialism))
 
-   (setq orderless-component-matching-styles
-         '(orderless-regexp :dispatchers first-initialism flex-if-twiddle))
+   (setq orderless-matching-styles '(orderless-regexp)
+         orderless-style-dispatchers '(first-initialism flex-if-twiddle))
  #+end_src
 
 ** Component separator regexp
@@ -196,16 +189,6 @@ respectively.
 If you are implementing a command for which you know you want a
 different separator for the components, bind
 =orderless-component-separator= in a =let= form.
-
-The package also provides a command
-=orderless-temporarily-change-separator= to change it for the rest of
-the current completion session. If you want to use it, bind it to a
-key in a keymap that will be active during your completion session:
-
-- Icomplete users should bind it in =icomplete-minibuffer-map=.
-- Users of the default completion should bind it in both
-  =minibuffer-local-completion-map= and
-  =minibuffer-local-filename-completion-map=.
 
 ** Faces for component matches
 
@@ -223,15 +206,14 @@ completion is the one that ends up being used, of course.
 ** Pattern compiler
 
 The default mechanism for turning an input string into a list of
-regexps to match against, configured using
-=orderless-component-matching-styles=, is probably flexible enough for
-the vast majority of users. But if you want to completely change the
-mechanism, customize the =orderless-pattern-compiler=. It's value should
-be a function from string to lists of regexps. You might find it
-convenient to use =orderless-default-pattern-compiler= as a subroutine
-in your own pattern compiler, it conveniently accepts an optional
-second argument that specifies a list to use instead of
-=orderless-component-matching-styles=.
+regexps to match against, configured using =orderless-matching-styles=,
+is probably flexible enough for the vast majority of users. But if you
+want to completely change the mechanism, customize the
+=orderless-pattern-compiler=. It's value should be a function from
+string to lists of regexps. You might find it convenient to use
+=orderless-default-pattern-compiler= as a subroutine in your own pattern
+compiler, it conveniently accepts optional arguments that specify
+lists to use instead of =orderless-matching-styles=.
 
 ** Interactively changing the configuration
 
@@ -244,22 +226,24 @@ for one of them, popup a [[https://github.com/abo-abo/hydra][hydra]] to choose a
 
 Rather than include commands for any of those on-the-fly configuration
 changes, =orderless= provides a general mechanism to make it easy to
-write such commands yourself. There are two "override" variables:
-
-- =orderless-transient-matching-styles= which, if non-nil, overrides
-  =orderless-component-matching-styles=, and
-- =orderless-transient-component-separator= which, if non-nil,
-  overrides =orderless-component-separator=.
-
-You can write your own commands to set these transient variable to the
-desired value without clobbering the value of the variables they
-override. To set them to =nil= again after each completion session, use
-the following configuration:
+write such commands yourself. For each variable you might to
+temporarily change there is a corresponding /transient/ variable that
+overrides it when the transient variable is non-nil. You can write
+your own commands to set these transient variable to the desired value
+without clobbering the value of the variables they override. To reset
+the transient variables to =nil= again after each completion session,
+use the following configuration:
 
 #+begin_src emacs-lisp
   (add-hook 'minibuffer-exit-hook
             #'orderless-remove-transient-configuration)
 #+end_src
+
+The transient variables provided are:
+
+- =orderless-transient-component-separator=
+- =orderless-transient-matching-styles=
+- =orderless-transient-style-dispatchers=
 
 For example, say you want to use the keybinding =C-l= to make all
 components match literally. You could use the following configuration:
@@ -268,8 +252,8 @@ components match literally. You could use the following configuration:
   (defun my/match-components-literally ()
     "Components match literally for the rest of the session."
     (interactive)
-    (setq orderless-transient-matching-styles
-          '(orderless-literal :dispatchers)))
+    (setq orderless-transient-matching-styles '(orderless-literal)
+          orderless-transient-style-dispatchers nil))
 
   (add-hook 'minibuffer-exit-hook
             #'orderless-remove-transient-configuration)
@@ -278,12 +262,10 @@ components match literally. You could use the following configuration:
     #'my/match-components-literally)
 #+end_src
 
-Note there is nothing after =:dispatchers= in the above code. This is
-different from not including =:dispatchers= at all in the value of
-=orderless-transient-matching-styles=: omitting it all together means
-inherit the dispatchers from =orderless-component-matching-styles=;
-while including =:dispatchers= overrides the list of dispatchers ---in
-the example above, setting it to the empty list.
+Note that we also set =orderless-transient-style-dispatchers= to =nil=, to
+ensure the literal matching does not get overridden. You may want to
+allow dispatcher overrides, in which case you'd simply remove that
+assignment.
 
 * Related packages
 

@@ -46,8 +46,8 @@
 ;; literally, as a regexp, as an initialism, in the flex style, or as
 ;; word prefixes.  It is easy to add new styles: they are functions
 ;; from strings to strings that map a component to a regexp to match
-;; against.  The variable `orderless-component-matching-styles' lists
-;; the matching styles to be used for components, by default it allows
+;; against.  The variable `orderless-matching-styles' lists the
+;; matching styles to be used for components, by default it allows
 ;; regexp and initialism matching.
 
 ;;; Code:
@@ -100,13 +100,12 @@ component regexps."
   :group 'orderless)
 
 (defcustom orderless-transient-component-separator nil
-  "Override for `orderless-component-separator'.
-This variable should be either nil or a regexp, when it is a
-regexp it overrides `orderless-component-separator'.  It is meant
-to be set by commands that interactively change the separator.
-No such commands are provided with this package, but this
-variable is meant to make writing them simple.  If you do use
-this variable you are likely to want to reset it to nil after
+  "Component separator regexp override.
+This variabel, if non-nil, overrides `orderless-component-separator'.
+It is meant to be set by commands that interactively change the
+separator.  No such commands are provided with this package, but
+this variable is meant to make writing them simple.  If you do
+use this variable you are likely to want to reset it to nil after
 every completion session, which can be achieved by adding the
 function `orderless-remove-transient-configuration' to the
 `minibuffer-exit-hook'."
@@ -122,16 +121,13 @@ function `orderless-remove-transient-configuration' to the
   :type '(vector 'face)
   :group 'orderless)
 
-(defcustom orderless-component-matching-styles
+(define-obsolete-variable-alias
+  'orderless-component-matching-styles 'orderless-matching-styles
+  "20200502")
+
+(defcustom orderless-matching-styles
   '(orderless-regexp orderless-initialism)
-  "Component matching style configuration.
-This should be a list of matching styles or a list of the form:
-
-\(matching-styles... :dispatchers dispatchers...)
-
-containing matching styles, the symbol `:dispatchers', and style
-dispatchers.
-
+  "List of component matching styles.
 If this variable is nil, regexp matching is assumed.
 
 A matching style is simply a function from strings to strings
@@ -139,52 +135,66 @@ that takes a component to a regexp to match against.  If the
 resulting regexp has no capturing groups, the entire match is
 highlighted, otherwise just the captured groups are.  Several are
 provided with this package: try customizing this variable to see
-a list of them.
+a list of them."
+  :type 'hook
+  :options '(orderless-regexp
+             orderless-literal
+             orderless-initialism
+             orderless-strict-initialism
+             orderless-strict-leading-initialism
+             orderless-strict-full-initialism
+             orderless-prefixes
+             orderless-flex)
+  :group 'orderless)
 
-The style dispatchers, if present, are used to override to the
-matching styles based on the actual component and its place in
-the list of components.  For example, a style dispatcher could
-arrange for the first component to match as an initialism and
-subsequent components to match as literals.  As another example,
-a style dispatcher could arrange for a component starting with
-`?' to match the rest of the component in the `orderless-flex'
-style.  For more information on how this variable is used see
+(defcustom orderless-style-dispatchers nil
+  "List of style dispatchers.
+Style dispatchers are used to override to the matching styles
+based on the actual component and its place in the list of
+components.  A style dispatcher is a function that takes a string
+and two integers as arguments, it gets called with a component,
+the 0-based index of the component and the total number of
+components.  It can decides what matching styles to use for the
+component and otionally replace the component with a different
+string, or it can decline to handle the component leaving it for
+future dispatchers.  For details see `orderless-dispatch'.
+
+For example, a style dispatcher could arrange for the first
+component to match as an initialism and subsequent components to
+match as literals.  As another example, a style dispatcher could
+arrange for a component starting with `?' to match the rest of
+the component in the `orderless-flex' style.  For more
+information on how this variable is used see
 `orderless-default-pattern-compiler'."
-  :type '(set
-          (const :tag "Regexp" orderless-regexp)
-          (const :tag "Literal" orderless-literal)
-          (const :tag "Initialism" orderless-initialism)
-          (const :tag "Strict initialism" orderless-strict-initialism)
-          (const :tag "Strict leading initialism"
-            orderless-strict-leading-initialism)
-          (const :tag "Strict full initialism"
-            orderless-strict-full-initialism)
-          (const :tag "Flex" orderless-flex)
-          (const :tag "Prefixes" orderless-prefixes)
-          (const :tag "Start dispatchers" :dispatchers)
-          (function :tag "Custom function"))
+  :type 'hook
   :group 'orderless)
 
 (defcustom orderless-transient-matching-styles nil
-  "Component matching style configuration override.
-This has the format as `orderless-component-matching-styles' and
-overrides it when this one is non-nil.  It is meant to be set by
-commands that interactively change the matching style
-configuration.  No such commands are provided with this package,
-but this variable is meant to make writing them simple.  If you
-do use this variable you are likely to want to reset it to nil
-after every completion session, which can be achieved by adding
-the function `orderless-remove-transient-configuration' to the
-`minibuffer-exit-hook'.
+  "Component matching styles override.
+This variable, if non-nil, overrides `orderless-matching-styles'.
+It is meant to be set by commands that interactively change the
+matching style configuration.  No such commands are provided with
+this package, but this variable is meant to make writing them
+simple.  If you do use this variable you are likely to want to
+reset it to nil after every completion session, which can be
+achieved by adding the function
+`orderless-remove-transient-configuration' to the
+`minibuffer-exit-hook'."
+  :type 'hook
+  :group 'orderless)
 
-If this variable doesn't not include a `:dispatchers' section,
-then the dispatchers in `orderless-component-matching-styles' are
-used instead.  To indicate you want to use no style dispatchers
-at all, include an empty dispatchers section, for example:
-
-\(setq `orderless-transient-matching-styles'
-       '(orderless-literal :dispatchers))"
-  :type 'sexp
+(defcustom orderless-transient-style-dispatchers nil
+  "Component style dispatchers override.
+This variable, if non-nil, overrides `orderless-style-dispatchers'.
+It is meant to be set by commands that interactively change the
+matching style configuration.  No such commands are provided with
+this package, but this variable is meant to make writing them
+simple.  If you do use this variable you are likely to want to
+reset it to nil after every completion session, which can be
+achieved by adding the function
+`orderless-remove-transient-configuration' to the
+`minibuffer-exit-hook'."
+  :type 'hook
   :group 'orderless)
 
 (defcustom orderless-pattern-compiler #'orderless-default-pattern-compiler
@@ -196,10 +206,10 @@ the candidate to be considered a completion of the pattern.
 The default pattern compiler is probably flexible enough for most
 users.  See `orderless-default-pattern-compiler' for details.
 
-The documentation for `orderless-component-matching-styles' is
-written assuming the default pattern compiler is used, if you
-change the pattern compiler it can, of course, do anything and
-need not consult this variable at all."
+The documentation for `orderless-matching-styles' is written
+assuming the default pattern compiler is used, if you change the
+pattern compiler it can, of course, do anything and need not
+consult this variable at all."
   :type 'function
   :group 'orderless)
 
@@ -309,7 +319,7 @@ Warning: only use this if you know all REGEXPs match!"
 Warning: only use this if you know all REGEXPs match all STRINGS!
 For the user's convenience, if REGEXPS is a string, it is
 converted to a list of regexps according to the value of
-`orderless-component-matching-styles'."
+`orderless-matching-styles'."
     (when (stringp regexps)
       (setq regexps (funcall orderless-pattern-compiler regexps)))
     (cl-loop for original in strings
@@ -323,23 +333,6 @@ converted to a list of regexps according to the value of
 Meant to be added to `exit-minibuffer-hook'."
   (setq orderless-transient-matching-styles nil
         orderless-transient-component-separator nil))
-
-(defun orderless--styles+dispatchers (configuration)
-  "Parse a matching styles CONFIGURATION.
-The CONFIGURATION should be a list of matching styles or a list
-of the form:
-
-\(matching-styles... :dispatchers dispatchers...)
-
-containing matching styles, the symbol `:dispatchers', and style
-dispatchers.
-
-This function returns a `cons' whose `car' is the list of
-matching styles, and whose `cdr' is the list of style
-dispatchers."
-  (cons
-   (cl-loop for x in configuration until (eq x :dispatchers) collect x)
-   (cdr (memq :dispatchers configuration))))
 
 (defun orderless-dispatch (dispatchers default string &rest args)
   "Run DISPATCHERS to compute matching styles for STRING.
@@ -384,62 +377,48 @@ DEFAULT as the list of styles."
            when result return (cons result string)
            finally (return (cons default string))))
 
-(defun orderless-inherit-defaults (config)
-  "Combine CONFIG with `orderless-component-matching-styles'.
-If CONFIG is nil, return `orderless-component-matching-styles'.
-If CONFIG is non-nil, but does not include `:dispatchers',
-inherit them from `orderless-component-matching-styles'.
-Otherwise return CONFIG."
-  (cond
-   ((null config)
-    (or orderless-component-matching-styles 'orderless-regexp))
-   ((memq :dispatchers config)
-    config)
-   (t (append config
-              (memq :dispatchers orderless-component-matching-styles)))))
-
-(defun orderless-default-pattern-compiler (pattern &optional config)
+(defun orderless-default-pattern-compiler (pattern &optional styles dispatchers)
   "Build regexps to match the components of PATTERN.
-
 Split PATTERN on `orderless-component-separator' and compute
-matching styles for each component. The matching styles are
-computed according to CONFIG (more precisely, by the result of
-applying `orderless-inherit-defaults' to CONFIG), which is split
-into a list of default matching styles, and a list of style
-dispatchers. For each component of the PATTERN, the style
-dispatchers are run to determine the matching styles to be used
-for that component, they are called with arguments the component,
-the 0-based index of the component and the total number of
-components. If the component dispatchers decline to handle the
-component, then the list of default matching styles is used. See
-`orderless-dispatch' for details on dispatchers.
+matching styles for each component.  For each component the style
+DISPATCHERS are run to determine the matching styles to be used;
+they are called with arguments the component, the 0-based index
+of the component and the total number of components.  If the
+DISPATCHERS decline to handle the component, then the list of
+matching STYLES is used.  See `orderless-dispatch' for details on
+dispatchers.
 
-The CONFIG defaults to `orderless-component-matching-styles',
-unless overriden by `orderless-transient-matching-styles'.  More
-precisely, it defaults to:
+The STYLES default to `orderless-matching-styles', and the
+DISPATCHERS default to `orderless-dipatchers'.  Since nil gets you
+the default, if want to no dispatchers to be run, use '(ignore)
+as the value of DISPATCHERS.
 
-\(orderless-inherit-defaults `orderless-transient-matching-styles').
+The `orderless-transient-*' variables, when non-nil, override the
+corresponding value among `orderless-component-separator', STYLES
+and DISPATCHERS.
 
 This function is the default for `orderless-pattern-compiler' and
 might come in handy as a subroutine to implement other pattern
 compilers."
-  (unless config (setq config orderless-transient-matching-styles))
-  (setq config (orderless-inherit-defaults config))
+  (unless styles (setq styles orderless-matching-styles))
+  (setq styles (or orderless-transient-matching-styles styles))
+  (unless dispatchers (setq dispatchers orderless-style-dispatchers))
+  (setq dispatchers (or orderless-transient-style-dispatchers dispatchers))
   (cl-loop
-   with (matching-styles . style-dispatchers) =
-     (orderless--styles+dispatchers config)
-   with components = (split-string pattern orderless-component-separator)
+   with components = (split-string
+                      pattern
+                      (or orderless-transient-component-separator
+                          orderless-component-separator))
    with total = (length components)
    for component in components and index from 0
-   for (styles . newcomp) = (orderless-dispatch
-                             style-dispatchers matching-styles
-                             component index total)
+   for (newstyles . newcomp) = (orderless-dispatch
+                                dispatchers styles component index total)
    collect
-   (if (functionp styles)
-       (funcall styles newcomp)
+   (if (functionp newstyles)
+       (funcall newstyles newcomp)
      (rx-to-string
       `(or
-        ,@(cl-loop for style in styles
+        ,@(cl-loop for style in newstyles
                    collect `(regexp ,(funcall style newcomp))))))))
 
 ;;; Completion style implementation
