@@ -10,8 +10,8 @@ any one of several ways: literally, as a regexp, as an initialism, in
 the flex style, or as multiple word prefixes. By default, regexp and
 initialism matches are enabled.
 
-A completion style is a backend for completion and is used from a
-frontend that provides a completion UI. Any completion style can be
+A completion style is a back-end for completion and is used from a
+front-end that provides a completion UI. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
 tab completion) or with the built-in Icomplete package (which is
 similar to the more well-known Ido Mode). To use a completion style in
@@ -55,8 +55,11 @@ Bug reports are highly welcome and appreciated!
 - [[#screenshot][Screenshot]]
 - [[#customization][Customization]]
   - [[#component-matching-styles][Component matching styles]]
+    - [[#style-dispatchers][Style dispatchers]]
   - [[#component-separator-regexp][Component separator regexp]]
   - [[#faces-for-component-matches][Faces for component matches]]
+  - [[#pattern-compiler][Pattern compiler]]
+  - [[#interactively-changing-the-configuration][Interactively changing the configuration]]
 - [[#integration-with-other-completion-uis][Integration with other completion UIs]]
   - [[#ivy][Ivy]]
   - [[#selectrum][Selectrum]]
@@ -130,9 +133,57 @@ define new matching styles. The predefined ones are:
 
   This maps =abc= to =a.*b.*c=.
 
-The variable =orderless-component-matching-styles= should be set to a
-list of the desired styles to use. By default it enables the regexp
-and initialism styles.
+- orderless-prefixes :: the component is split at word endings and
+  each piece must match at a word boundary in the candidate, occurring
+  in that order.
+
+  This is similar to the built-in =partial-completion= completion-style.
+  For example, =re-re= matches =query-replace-regexp=, =recode-region= and
+  =magit-remote-list-refs=; =f-d.t= matches =final-draft.txt=.
+
+The variable =orderless-matching-styles= can be set to a list of the
+desired matching styles to use. By default it enables the regexp and
+initialism styles.
+
+*** Style dispatchers
+
+ For more fine-grained control on which matching styles to use for
+ each component of the input string, you can customize the variable
+ =orderless-style-dispatchers=.
+
+ Style dispatchers are functions which take a component, its index in
+ the list of components (starting from 0), and the total number of
+ components, and are used to determine the matching styles used for
+ that specific component, overriding the default matching styles.
+
+ A style dispatcher can either decline to handle the input string or
+ component, or it can return which matching styles to use. It can
+ also, if desired, additionally return a new string to use in place of
+ the given one. Consult the documentation of =orderless-dispatch= for
+ full details.
+
+ As an example, say you wanted the following setup:
+
+ - you normally want components to match as regexps,
+ - except for the first component, which should always match as an
+   initialism ---this is pretty useful for, say,
+   =execute-extended-command= (=M-x=) or =describe-function= (=C-h f=),
+ - and any later component ending in =~= should match (the characters
+   other than the final =~=) in the flex style.
+
+ You can achieve this with the following configuration:
+
+ #+begin_src emacs-lisp
+   (defun flex-if-twiddle (pattern _index _total)
+     (when (string-suffix-p "~" pattern)
+       `(orderless-flex . ,(substring pattern 0 -1))))
+
+   (defun first-initialism (pattern index _total)
+     (if (= index 0) 'orderless-initialism))
+
+   (setq orderless-matching-styles '(orderless-regexp)
+         orderless-style-dispatchers '(first-initialism flex-if-twiddle))
+ #+end_src
 
 ** Component separator regexp
 
@@ -159,6 +210,70 @@ particular category) has more than one entry, remember than Emacs
 tries each completion style in turn and uses the first one returning
 matches. You will only see these particular faces when the =orderless=
 completion is the one that ends up being used, of course.
+
+** Pattern compiler
+
+The default mechanism for turning an input string into a list of
+regexps to match against, configured using =orderless-matching-styles=,
+is probably flexible enough for the vast majority of users. But if you
+want to completely change the mechanism, customize the
+=orderless-pattern-compiler=. It's value should be a function from
+string to lists of regexps. You might find it convenient to use
+=orderless-default-pattern-compiler= as a subroutine in your own pattern
+compiler, it conveniently accepts optional arguments that specify
+lists to use instead of =orderless-matching-styles=.
+
+** Interactively changing the configuration
+
+You might want to change the separator or the matching style
+configuration on the fly while matching. There many possible UIs for
+this: you could toggle between two chosen configurations, cycle among
+several, have a keymap where each key sets a different configurations,
+have a set of named configurations and be prompted (with completion)
+for one of them, popup a [[https://github.com/abo-abo/hydra][hydra]] to choose a configuration, etc.
+
+Rather than include commands for any of those on-the-fly configuration
+changes, =orderless= provides a general mechanism to make it easy to
+write such commands yourself. For each variable you might to
+temporarily change there is a corresponding /transient/ variable that
+overrides it when the transient variable is non-nil. You can write
+your own commands to set these transient variable to the desired value
+without clobbering the value of the variables they override. To reset
+the transient variables to =nil= again after each completion session,
+use the following configuration:
+
+#+begin_src emacs-lisp
+  (add-hook 'minibuffer-exit-hook
+            #'orderless-remove-transient-configuration)
+#+end_src
+
+The transient variables provided are:
+
+- =orderless-transient-component-separator=
+- =orderless-transient-matching-styles=
+- =orderless-transient-style-dispatchers=
+
+For example, say you want to use the keybinding =C-l= to make all
+components match literally. You could use the following configuration:
+
+#+begin_src emacs-lisp
+  (defun my/match-components-literally ()
+    "Components match literally for the rest of the session."
+    (interactive)
+    (setq orderless-transient-matching-styles '(orderless-literal)
+          orderless-transient-style-dispatchers nil))
+
+  (add-hook 'minibuffer-exit-hook
+            #'orderless-remove-transient-configuration)
+
+  (define-key minibuffer-local-completion-map (kbd "C-l")
+    #'my/match-components-literally)
+#+end_src
+
+Note that we also set =orderless-transient-style-dispatchers= to =nil=, to
+ensure the literal matching does not get overridden. You may want to
+allow dispatcher overrides, in which case you'd simply remove that
+assignment.
 
 * Integration with other completion UIs
 
@@ -227,6 +342,7 @@ But there are a couple of points of discomfort:
    #+end_src
 
    (Aren't dynamically scoped variables and the advice system nifty?)
+
 * Related packages
 
 ** Ivy and Helm
