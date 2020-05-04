@@ -261,7 +261,7 @@ components match literally. You could use the following configuration:
     "Components match literally for the rest of the session."
     (interactive)
     (setq orderless-transient-matching-styles '(orderless-literal)
-          orderless-transient-style-dispatchers nil))
+          orderless-transient-style-dispatchers '(ignore)))
 
   (add-hook 'minibuffer-exit-hook
             #'orderless-remove-transient-configuration)
@@ -270,10 +270,12 @@ components match literally. You could use the following configuration:
     #'my/match-components-literally)
 #+end_src
 
-Note that we also set =orderless-transient-style-dispatchers= to =nil=, to
-ensure the literal matching does not get overridden. You may want to
-allow dispatcher overrides, in which case you'd simply remove that
-assignment.
+Note that we also set =orderless-transient-style-dispatchers= to
+='(ignore)=, to ensure no style dispatchers are used so the literal
+matching does not get overridden. You may want to allow the
+dispatchers in =orderless-style-dispatchers= to override, in which case
+you'd set =orderless-transient-style-dispatchers= to =nil= or simply
+remove that assignment.
 
 * Integration with other completion UIs
 
