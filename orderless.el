@@ -91,12 +91,16 @@
   :group 'orderless)
 
 (defcustom orderless-component-separator " +"
-  "Regexp to match component separators for orderless completion.
-This is passed to `split-string' to divide the pattern into
-component regexps."
+  "Component separators for orderless completion.
+This can either be a string, which is passed to `split-string',
+or a function of a single string argument."
   :type '(choice (const :tag "Spaces" " +")
                  (const :tag "Spaces, hyphen or slash" " +\\|[-/]")
-                 (regexp :tag "Custom regexp"))
+                 (const :tag "Escapable space"
+                        orderless-escapeable-split-on-space)
+                 (const :tag "Quotable spaces" split-string-and-unquote)
+                 (regexp :tag "Custom regexp")
+                 (function : tag "Custom function"))
   :group 'orderless)
 
 (defvar-local orderless-transient-component-separator nil
@@ -323,6 +327,12 @@ converted to a list of regexps according to the value of
 
 ;;; Compiling patterns to lists of regexps
 
+(defun orderless-escapeable-split-on-space (string)
+  "Split STRING on spaces, which can be escaped with backslash."
+  (mapcar
+   (lambda (piece) (replace-regexp-in-string (string 0) " " piece))
+   (split-string (replace-regexp-in-string "\\\\ " (string 0) string) " ")))
+
 (defun orderless-remove-transient-configuration ()
   "Remove all transient orderless configuration.
 Meant to be added to `exit-minibuffer-hook'."
@@ -400,10 +410,11 @@ compilers."
   (unless dispatchers (setq dispatchers orderless-style-dispatchers))
   (setq dispatchers (or orderless-transient-style-dispatchers dispatchers))
   (cl-loop
-   with components = (split-string
-                      pattern
-                      (or orderless-transient-component-separator
-                          orderless-component-separator))
+   with splitter = (or orderless-transient-component-separator
+                       orderless-component-separator)
+   with components = (if (functionp splitter)
+                         (funcall splitter pattern)
+                       (split-string pattern splitter))
    with total = (length components)
    for component in components and index from 0
    for (newstyles . newcomp) = (orderless-dispatch
