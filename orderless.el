@@ -97,7 +97,7 @@ or a function of a single string argument."
   :type '(choice (const :tag "Spaces" " +")
                  (const :tag "Spaces, hyphen or slash" " +\\|[-/]")
                  (const :tag "Escapable space"
-                        orderless-escapeable-split-on-space)
+                        orderless-escapable-split-on-space)
                  (const :tag "Quotable spaces" split-string-and-unquote)
                  (regexp :tag "Custom regexp")
                  (function : tag "Custom function"))
@@ -327,7 +327,7 @@ converted to a list of regexps according to the value of
 
 ;;; Compiling patterns to lists of regexps
 
-(defun orderless-escapeable-split-on-space (string)
+(defun orderless-escapable-split-on-space (string)
   "Split STRING on spaces, which can be escaped with backslash."
   (mapcar
    (lambda (piece) (replace-regexp-in-string (string 0) " " piece))
