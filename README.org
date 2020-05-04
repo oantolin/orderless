@@ -188,11 +188,19 @@ initialism styles.
 ** Component separator regexp
 
 The pattern components are space-separated by default: this is
-controlled by the variable =orderless-component-separator=, which should be
-set to a regexp that matches the desired component separator. The
-default value matches a sequence of spaces. It may be useful to add
-hyphens or slashes (or both), to match symbols or file paths,
-respectively.
+controlled by the variable =orderless-component-separator=, which should
+be set either to a regexp that matches the desired component
+separator, or to a function that takes a string and returns the list
+of components. The default value is a regexp matches a non-empty
+sequence of spaces. It may be useful to add hyphens or slashes (or
+both), to match symbols or file paths, respectively.
+
+ Even if you want to split on spaces you might want to be able to
+escape those spaces or to enclose space in double quotes (as in shell
+argument parsing). For backslash-escaped spaces set
+=orderless-component-separator= to the function
+=orderless-escapable-split-on-space=; for shell-like double-quotable
+space, set it to the standard Emacs function =split-string-and-unquote=.
 
 If you are implementing a command for which you know you want a
 different separator for the components, bind
