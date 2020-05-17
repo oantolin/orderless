@@ -123,10 +123,6 @@ function `orderless-remove-transient-configuration' to the
   :type '(vector face)
   :group 'orderless)
 
-(define-obsolete-variable-alias
-  'orderless-component-matching-styles 'orderless-matching-styles
-  "20200502")
-
 (defcustom orderless-matching-styles
   '(orderless-regexp orderless-initialism)
   "List of component matching styles.
@@ -486,35 +482,6 @@ This function is part of the `orderless' completion style."
              '(orderless
                orderless-try-completion orderless-all-completions
                "Completion of multiple components, in any order."))
-
-;;; Temporary separator change (does anyone use this?)
-
-(defvar orderless-old-component-separator nil
-  "Stores the old value of `orderless-component-separator'.")
-(make-obsolete-variable 'orderless-old-component-separator
-                        "See https://github.com/oantolin/orderless/issues/15"
-                        "20200419")
-
-(defun orderless--restore-component-separator ()
-  "Restore old value of `orderless-component-separator'."
-  (declare (obsolete "See https://github.com/oantolin/orderless/issues/15"
-                     "20200419"))
-  (when orderless-old-component-separator
-    (setq orderless-component-separator orderless-old-component-separator
-          orderless-old-component-separator nil))
-  (remove-hook 'minibuffer-exit-hook #'orderless--restore-component-separator))
-
-(defun orderless-temporarily-change-separator (separator)
-  "Use SEPARATOR to split the input for the current completion session."
-  (declare (obsolete "See https://github.com/oantolin/orderless/issues/15"
-                     "20200419"))
-  (interactive
-   (list (let ((enable-recursive-minibuffers t))
-           (read-string "Orderless regexp separator: "))))
-  (unless orderless-old-component-separator
-    (setq orderless-old-component-separator orderless-component-separator))
-  (setq orderless-component-separator separator)
-  (add-to-list 'minibuffer-exit-hook #'orderless--restore-component-separator))
 
 ;;; Ivy integration
 
