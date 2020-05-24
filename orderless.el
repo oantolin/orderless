@@ -207,6 +207,21 @@ consult this variable at all."
   :type 'function
   :group 'orderless)
 
+(defcustom orderless-smart-case t
+  "Whether to use smart case.
+If this variable is t, then case-sensitivity is decided as
+follows: if any component contains upper case letters, the
+matches are case sensitive; otherwise case-insensitive.  This
+like the behavior of `isearch' when `search-upper-case' is
+non-nil.
+
+On the other hand, if this variable is nil, then case-sensitivity
+is determined by the values of `completion-ignore-case',
+`read-file-name-completion-ignore-case' and
+`read-buffer-completion-ignore-case', as usual for completion."
+  :type 'boolean
+  :group 'orderless)
+
 ;;; Matching styles
 
 (defalias 'orderless-regexp #'identity
@@ -440,7 +455,12 @@ The predicate PRED is used to constrain the entries in TABLE."
         (pcase-let* ((`(,prefix . ,pattern)
                       (orderless--prefix+pattern string table pred))
                      (completion-regexp-list
-                      (funcall orderless-pattern-compiler pattern)))
+                      (funcall orderless-pattern-compiler pattern))
+                     (completion-ignore-case
+                      (if orderless-smart-case
+                          (cl-loop for regexp in completion-regexp-list
+                                   always (isearch-no-upper-case-p regexp t))
+                        completion-ignore-case)))
           (all-completions prefix table pred)))
     (invalid-regexp nil)))
 
