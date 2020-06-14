@@ -310,11 +310,10 @@ at a word boundary in the candidate.  This is similar to the
 ;;; Highlighting matches
 
 (defun orderless--highlight (regexps string)
-  "Propertize STRING to highlight a match of each of the REGEXPS.
-Warning: only use this if you know all REGEXPs match!"
+  "Propertize STRING to highlight a match of each of the REGEXPS."
   (cl-loop with n = (length orderless-match-faces)
-           for regexp in regexps and i from 0 do
-           (string-match regexp string)
+           for regexp in regexps and i from 0
+           when (string-match regexp string) do
            (cl-loop
             for (x y) on (or (cddr (match-data)) (match-data)) by #'cddr
             when x do
