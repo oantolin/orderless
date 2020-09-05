@@ -147,13 +147,13 @@ a list of them."
 
 (defcustom orderless-style-dispatchers nil
   "List of style dispatchers.
-Style dispatchers are used to override to the matching styles
+Style dispatchers are used to override the matching styles
 based on the actual component and its place in the list of
 components.  A style dispatcher is a function that takes a string
 and two integers as arguments, it gets called with a component,
 the 0-based index of the component and the total number of
-components.  It can decides what matching styles to use for the
-component and otionally replace the component with a different
+components.  It can decide what matching styles to use for the
+component and optionally replace the component with a different
 string, or it can decline to handle the component leaving it for
 future dispatchers.  For details see `orderless-dispatch'.
 
@@ -162,7 +162,7 @@ component to match as an initialism and subsequent components to
 match as literals.  As another example, a style dispatcher could
 arrange for a component starting with `?' to match the rest of
 the component in the `orderless-flex' style.  For more
-information on how this variable is used see
+information on how this variable is used, see
 `orderless-default-pattern-compiler'."
   :type 'hook
   :group 'orderless)
