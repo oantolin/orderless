@@ -1,3 +1,6 @@
+[[https://melpa.org/#/orderless][file:https://melpa.org/packages/orderless-badge.svg]]
+[[https://stable.melpa.org/#/orderless][file:https://stable.melpa.org/packages/orderless-badge.svg]]
+
 * Overview
 :PROPERTIES:
 :TOC: :include all :ignore this
