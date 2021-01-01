@@ -313,8 +313,8 @@ at a word boundary in the candidate.  This is similar to the
    `(seq
      (group string-start)               ; highlight nothing!
      (zero-or-more
-      (or ,@(cl-loop for i from 1 below (length component)
-                     collect `(seq ,(substring component 1 i)
+      (or ,@(cl-loop for i below (length component)
+                     collect `(seq ,(substring component 0 i)
                                    (or (not (any ,(aref component i)))
                                        string-end)))))
      string-end)))
