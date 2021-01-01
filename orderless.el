@@ -307,6 +307,18 @@ at a word boundary in the candidate.  This is similar to the
    (cl-loop for prefix in (split-string component "\\>")
             collect `(seq word-boundary ,prefix))))
 
+(defun orderless-without-literal (component)
+  "Match strings that do *not* contain COMPONENT as a literal match."
+  (rx-to-string
+   `(seq
+     (group string-start)               ; highlight nothing!
+     (zero-or-more
+      (or ,@(cl-loop for i from 1 below (length component)
+                     collect `(seq ,(substring component 1 i)
+                                   (or (not (any ,(aref component i)))
+                                       string-end)))))
+     string-end)))
+
 ;;; Highlighting matches
 
 (defun orderless--highlight (regexps string)

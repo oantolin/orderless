@@ -102,6 +102,14 @@ define new matching styles. The predefined ones are:
 
   This is just =regexp-quote=.
 
+- *orderless-without-literal* :: the component is a treated as a literal
+  string that must *not* occur in the candidate.
+
+  Note that nothing is highlighted for this matching style. You
+  probably don't want to use this style directly in
+  =orderless-matching-styles= but with a style dispatcher instead. There
+  is an example in the section on style dispatchers.
+  
 - orderless-prefixes :: the component is split at word endings and
   each piece must match at a word boundary in the candidate, occurring
   in that order.
@@ -143,7 +151,7 @@ define new matching styles. The predefined ones are:
   This is similar to the built-in =partial-completion= completion-style.
   For example, =re-re= matches =query-replace-regexp=, =recode-region= and
   =magit-remote-list-refs=; =f-d.t= matches =final-draft.txt=.
-
+  
 The variable =orderless-matching-styles= can be set to a list of the
 desired matching styles to use. By default it enables the regexp and
 initialism styles.
@@ -171,8 +179,10 @@ initialism styles.
  - except for the first component, which should always match as an
    initialism ---this is pretty useful for, say,
    =execute-extended-command= (=M-x=) or =describe-function= (=C-h f=),
- - and any later component ending in =~= should match (the characters
-   other than the final =~=) in the flex style.
+ - later components ending in =~= should match (the characters
+   other than the final =~=) in the flex style, and
+ - later components starting with =!= should indicate the rest of the
+   component is a literal string not contained in the candidate.
 
  You can achieve this with the following configuration:
 
@@ -184,8 +194,14 @@ initialism styles.
    (defun first-initialism (pattern index _total)
      (if (= index 0) 'orderless-initialism))
 
+   (defun without-if-bang (pattern _index _total)
+     (when (string-prefix-p "!" pattern)
+       `(orderless-without-literal . ,(substring pattern 1))))
+
    (setq orderless-matching-styles '(orderless-regexp)
-         orderless-style-dispatchers '(first-initialism flex-if-twiddle))
+         orderless-style-dispatchers '(first-initialism
+                                       flex-if-twiddle
+                                       without-if-bang))
  #+end_src
 
 ** Component separator regexp
