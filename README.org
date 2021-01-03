@@ -144,14 +144,6 @@ define new matching styles. The predefined ones are:
 
   This maps =abc= to =a.*b.*c=.
 
-- orderless-prefixes :: the component is split at word endings and
-  each piece must match at a word boundary in the candidate, occurring
-  in that order.
-
-  This is similar to the built-in =partial-completion= completion-style.
-  For example, =re-re= matches =query-replace-regexp=, =recode-region= and
-  =magit-remote-list-refs=; =f-d.t= matches =final-draft.txt=.
-  
 The variable =orderless-matching-styles= can be set to a list of the
 desired matching styles to use. By default it enables the regexp and
 initialism styles.
