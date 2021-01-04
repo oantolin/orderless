@@ -1,0 +1,531 @@
+\input texinfo    @c -*- texinfo -*-
+@c %**start of header
+@setfilename orderless.info
+@settitle 
+@documentencoding UTF-8
+@documentlanguage en
+@c %**end of header
+
+@dircategory Emacs
+@direntry
+* Orderless: (orderless). Completion style for matching regexps in any order.
+@end direntry
+
+@finalout
+@titlepage
+@title 
+@author Omar Antolín Camarena
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top 
+@end ifnottex
+
+@menu
+* Overview::
+* Customization::
+* Integration with other completion UIs::
+* Related packages::
+
+@detailmenu
+--- The Detailed Node Listing ---
+
+Customization
+
+* Component matching styles::
+* Component separator regexp::
+* Faces for component matches::
+* Pattern compiler::
+* Interactively changing the configuration::
+
+Component matching styles
+
+* Style dispatchers::
+
+Integration with other completion UIs
+
+* Ivy::
+* Selectrum::
+* Company::
+
+Related packages
+
+* Ivy and Helm::
+* Prescient::
+* Restricting to current matches: Icicles, Ido and Ivy: Restricting to current matches Icicles Ido and Ivy. 
+
+@end detailmenu
+@end menu
+
+@node Overview
+@chapter Overview
+
+This package provides an @samp{orderless} @emph{completion style} that divides the
+pattern into space-separated components, and matches candidates that
+match all of the components in any order. Each component can match in
+any one of several ways: literally, as a regexp, as an initialism, in
+the flex style, or as multiple word prefixes. By default, regexp and
+initialism matches are enabled.
+
+A completion style is a back-end for completion and is used from a
+front-end that provides a completion UI@. Any completion style can be
+used with the default Emacs completion UI (sometimes called minibuffer
+tab completion) or with the built-in Icomplete package (which is
+similar to the more well-known Ido Mode). To use a completion style in
+this fashion simply add it as an entry in the variables
+@samp{completion-styles} and @samp{completion-category-overrides} (see their
+documentation).
+
+With a bit of effort, it might still be possible to use @samp{orderless} with
+other completion UIs, even if those UIs don't support the standard
+Emacs completion styles. Currently there is support for @uref{https://github.com/abo-abo/swiper, Ivy} and
+@uref{https://github.com/raxod502/selectrum, Selectrum} (see below).
+
+If you use MELPA, the easiest way to install @samp{orderless} is via
+@samp{package-install}. If you use both MELPA and @samp{use-package}, you can use:
+
+@lisp
+(use-package orderless
+  :ensure t
+  :init (icomplete-mode) ; optional but recommended!
+  :custom (completion-styles '(orderless)))
+@end lisp
+
+Alternatively, put @samp{orderless.el} somewhere on your @samp{load-path}, and use
+the following configuration:
+
+@lisp
+(require 'orderless)
+(setq completion-styles '(orderless))
+(icomplete-mode) ; optional but recommended!
+@end lisp
+
+(And of course, if you use another completion framework such as Ivy or
+Helm, disable it.)
+
+If you like the experience of using @samp{orderless} with Icomplete, but wish
+the candidates displayed vertically, you can use @uref{https://github.com/oantolin/icomplete-vertical, icomplete-vertical}.
+
+Bug reports are highly welcome and appreciated!
+
+See also the @uref{https://github.com/oantolin/orderless/, package webpage}, which includes a @uref{https://github.com/oantolin/orderless/#screenshot, screenshot}.
+
+@node Customization
+@chapter Customization
+
+@menu
+* Component matching styles::
+* Component separator regexp::
+* Faces for component matches::
+* Pattern compiler::
+* Interactively changing the configuration::
+@end menu
+
+@node Component matching styles
+@section Component matching styles
+
+Each component of a pattern can match in any of several matching
+styles. A matching style is simply a function from strings to strings
+that maps a component to a regexp to match against, so it is easy to
+define new matching styles. The predefined ones are:
+
+@table @asis
+@item orderless-regexp
+the component is treated as a regexp that must
+match somewhere in the candidate.
+
+This is simply the identity function!
+
+@item orderless-literal
+the component is treated as a literal string
+that must occur in the candidate.
+
+This is just @samp{regexp-quote}.
+
+@item @strong{orderless-without-literal}
+the component is a treated as a literal
+string that must @strong{not} occur in the candidate.
+
+Note that nothing is highlighted for this matching style. You
+probably don't want to use this style directly in
+@samp{orderless-matching-styles} but with a style dispatcher instead. There
+is an example in the section on style dispatchers.
+
+@item orderless-prefixes
+the component is split at word endings and
+each piece must match at a word boundary in the candidate, occurring
+in that order.
+
+This is similar to the built-in @samp{partial-completion} completion-style.
+For example, @samp{re-re} matches @samp{query-replace-regexp}, @samp{recode-region} and
+@samp{magit-remote-list-refs}; @samp{f-d.t} matches @samp{final-draft.txt}.
+
+@item orderless-initialism
+each character of the component should appear
+as the beginning of a word in the candidate, in order.
+
+This maps @samp{abc} to @samp{\<a.*\<b.*\c}.
+
+@item orderless-strict-initialism
+like initialism but only allow
+non-letters in between the matched words.
+
+For example @samp{fb} would match @samp{foo-bar} but not @samp{foo-qux-bar}.
+
+@item orderless-strict-leading-initialism
+like strict-initialism but
+require the first initial to match the candidate's first word.
+
+For example @samp{bb} would match @samp{bar-baz} but not @samp{foo-bar-baz}.
+
+@item orderless-strict-full-initialism
+like strict-initialism but
+require the first initial to match the candidate's first word and the
+last initial to be at the final word.
+
+For example @samp{fbb} would match @samp{foo-bar-baz} but not @samp{foo-bar-baz-qux}.
+
+@item orderless-flex
+the characters of the component should appear in
+that order in the candidate, but not necessarily consecutively.
+
+This maps @samp{abc} to @samp{a.*b.*c}.
+
+@item orderless-prefixes
+the component is split at word endings and
+each piece must match at a word boundary in the candidate, occurring
+in that order.
+
+This is similar to the built-in @samp{partial-completion} completion-style.
+For example, @samp{re-re} matches @samp{query-replace-regexp}, @samp{recode-region} and
+@samp{magit-remote-list-refs}; @samp{f-d.t} matches @samp{final-draft.txt}.
+@end table
+
+The variable @samp{orderless-matching-styles} can be set to a list of the
+desired matching styles to use. By default it enables the regexp and
+initialism styles.
+
+@menu
+* Style dispatchers::
+@end menu
+
+@node Style dispatchers
+@subsection Style dispatchers
+
+For more fine-grained control on which matching styles to use for
+each component of the input string, you can customize the variable
+@samp{orderless-style-dispatchers}.
+
+Style dispatchers are functions which take a component, its index in
+the list of components (starting from 0), and the total number of
+components, and are used to determine the matching styles used for
+that specific component, overriding the default matching styles.
+
+A style dispatcher can either decline to handle the input string or
+component, or it can return which matching styles to use. It can
+also, if desired, additionally return a new string to use in place of
+the given one. Consult the documentation of @samp{orderless-dispatch} for
+full details.
+
+As an example, say you wanted the following setup:
+
+@itemize
+@item
+you normally want components to match as regexps,
+@item
+except for the first component, which should always match as an
+initialism ---this is pretty useful for, say,
+@samp{execute-extended-command} (@samp{M-x}) or @samp{describe-function} (@samp{C-h f}),
+@item
+later components ending in @samp{~} should match (the characters
+other than the final @samp{~}) in the flex style, and
+@item
+later components starting with @samp{!} should indicate the rest of the
+component is a literal string not contained in the candidate.
+@end itemize
+
+You can achieve this with the following configuration:
+
+@lisp
+(defun flex-if-twiddle (pattern _index _total)
+  (when (string-suffix-p "~" pattern)
+    `(orderless-flex . ,(substring pattern 0 -1))))
+
+(defun first-initialism (pattern index _total)
+  (if (= index 0) 'orderless-initialism))
+
+(defun without-if-bang (pattern _index _total)
+  (when (string-prefix-p "!" pattern)
+    `(orderless-without-literal . ,(substring pattern 1))))
+
+(setq orderless-matching-styles '(orderless-regexp)
+      orderless-style-dispatchers '(first-initialism
+                                    flex-if-twiddle
+                                    without-if-bang))
+@end lisp
+
+@node Component separator regexp
+@section Component separator regexp
+
+The pattern components are space-separated by default: this is
+controlled by the variable @samp{orderless-component-separator}, which should
+be set either to a regexp that matches the desired component
+separator, or to a function that takes a string and returns the list
+of components. The default value is a regexp matches a non-empty
+sequence of spaces. It may be useful to add hyphens or slashes (or
+both), to match symbols or file paths, respectively.
+
+ Even if you want to split on spaces you might want to be able to
+escape those spaces or to enclose space in double quotes (as in shell
+argument parsing). For backslash-escaped spaces set
+@samp{orderless-component-separator} to the function
+@samp{orderless-escapable-split-on-space}; for shell-like double-quotable
+space, set it to the standard Emacs function @samp{split-string-and-unquote}.
+
+If you are implementing a command for which you know you want a
+different separator for the components, bind
+@samp{orderless-component-separator} in a @samp{let} form.
+
+@node Faces for component matches
+@section Faces for component matches
+
+The portions of a candidate matching each component get highlighted in
+one of four faces, @samp{orderless-match-face-?} where @samp{?} is a number from 0
+to 3. If the pattern has more than four components, the faces get
+reused cyclically.
+
+If your @samp{completion-styles} (or @samp{completion-category-overrides} for some
+particular category) has more than one entry, remember than Emacs
+tries each completion style in turn and uses the first one returning
+matches. You will only see these particular faces when the @samp{orderless}
+completion is the one that ends up being used, of course.
+
+@node Pattern compiler
+@section Pattern compiler
+
+The default mechanism for turning an input string into a list of
+regexps to match against, configured using @samp{orderless-matching-styles},
+is probably flexible enough for the vast majority of users. But if you
+want to completely change the mechanism, customize the
+@samp{orderless-pattern-compiler}. It's value should be a function from
+string to lists of regexps. You might find it convenient to use
+@samp{orderless-default-pattern-compiler} as a subroutine in your own pattern
+compiler, it conveniently accepts optional arguments that specify
+lists to use instead of @samp{orderless-matching-styles}.
+
+@node Interactively changing the configuration
+@section Interactively changing the configuration
+
+You might want to change the separator or the matching style
+configuration on the fly while matching. There many possible UIs for
+this: you could toggle between two chosen configurations, cycle among
+several, have a keymap where each key sets a different configurations,
+have a set of named configurations and be prompted (with completion)
+for one of them, popup a @uref{https://github.com/abo-abo/hydra, hydra} to choose a configuration, etc.
+
+Rather than include commands for any of those on-the-fly configuration
+changes, @samp{orderless} provides a general mechanism to make it easy to
+write such commands yourself. For each variable you might to
+temporarily change there is a corresponding @emph{transient} variable that
+overrides it when the transient variable is non-nil. You can write
+your own commands to set these transient variable to the desired value
+without clobbering the value of the variables they override. To reset
+the transient variables to @samp{nil} again after each completion session,
+use the following configuration:
+
+@lisp
+(add-hook 'minibuffer-exit-hook
+          #'orderless-remove-transient-configuration)
+@end lisp
+
+The transient variables provided are:
+
+@itemize
+@item
+@samp{orderless-transient-component-separator}
+@item
+@samp{orderless-transient-matching-styles}
+@item
+@samp{orderless-transient-style-dispatchers}
+@end itemize
+
+For example, say you want to use the keybinding @samp{C-l} to make all
+components match literally. You could use the following configuration:
+
+@lisp
+(defun my/match-components-literally ()
+  "Components match literally for the rest of the session."
+  (interactive)
+  (setq orderless-transient-matching-styles '(orderless-literal)
+        orderless-transient-style-dispatchers '(ignore)))
+
+(add-hook 'minibuffer-exit-hook
+          #'orderless-remove-transient-configuration)
+
+(define-key minibuffer-local-completion-map (kbd "C-l")
+  #'my/match-components-literally)
+@end lisp
+
+Note that we also set @samp{orderless-transient-style-dispatchers} to
+@samp{'(ignore)}, to ensure no style dispatchers are used so the literal
+matching does not get overridden. You may want to allow the
+dispatchers in @samp{orderless-style-dispatchers} to override, in which case
+you'd set @samp{orderless-transient-style-dispatchers} to @samp{nil} or simply
+remove that assignment.
+
+@node Integration with other completion UIs
+@chapter Integration with other completion UIs
+
+Several excellent completion UIs exist for Emacs in third party
+packages. They do have a tendency to forsake standard Emacs APIs, so
+integration with them must be done on a case by case basis.
+
+If you manage to use @samp{orderless} with a completion UI not listed here,
+please file an issue or make a pull request so others can benefit from
+your effort. The functions @samp{orderless-filter},
+@samp{orderless-highlight-matches}, @samp{orderless--highlight} and
+@samp{orderless--component-regexps} are likely to help with the
+integration.
+
+@menu
+* Ivy::
+* Selectrum::
+* Company::
+@end menu
+
+@node Ivy
+@section Ivy
+
+To use @samp{orderless} from Ivy add this to your Ivy configuration:
+
+@lisp
+(setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
+@end lisp
+
+@node Selectrum
+@section Selectrum
+
+To use @samp{orderless} from Selectrum add this to your Selectrum
+configuration:
+
+@lisp
+(setq selectrum-refine-candidates-function #'orderless-filter)
+(setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
+@end lisp
+
+@node Company
+@section Company
+
+Company comes with a @samp{company-capf} backend that uses the
+completion-at-point functions, which in turn use completion styles.
+This means that the @samp{company-capf} backend will automatically use
+@samp{orderless}, no configuration necessary!
+
+But there are a couple of points of discomfort:
+
+@enumerate
+@item
+Pressing SPC takes you out of completion, so with the default
+separator you are limited to one component, which is no fun. To fix
+this add a separator that is allowed to occur in identifiers, for
+example, for Emacs Lisp code you could use an ampersand:
+
+@lisp
+(setq orderless-component-separator "[ &]")
+@end lisp
+
+@item
+The matching portions of candidates aren't highlighted. That's
+because @samp{company-capf} is hard-coded to look for the
+@samp{completions-common-part} face, and it only use one face,
+@samp{company-echo-common} to highlight candidates.
+
+So, while you can't get different faces for different components,
+you can at least get the matches highlighted in the sole available
+face with this configuration:
+
+@lisp
+(defun just-one-face (fn &rest args)
+  (let ((orderless-match-faces [completions-common-part]))
+    (apply fn args)))
+
+(advice-add 'company-capf--candidates :around #'just-one-face)
+@end lisp
+
+(Aren't dynamically scoped variables and the advice system nifty?)
+@end enumerate
+
+@node Related packages
+@chapter Related packages
+
+@menu
+* Ivy and Helm::
+* Prescient::
+* Restricting to current matches: Icicles, Ido and Ivy: Restricting to current matches Icicles Ido and Ivy. 
+@end menu
+
+@node Ivy and Helm
+@section Ivy and Helm
+
+The well-known and hugely powerful completion frameworks @uref{https://github.com/abo-abo/swiper, Ivy} and @uref{https://github.com/emacs-helm/helm, Helm}
+also provide for matching space-separated component regexps in any
+order. In Ivy, this is done with the @samp{ivy--regex-ignore-order} matcher.
+In Helm, it is the default, called ``multi pattern matching''.
+
+This package is significantly smaller than either of those because it
+solely defines a completion style, meant to be used with the built-in
+Icomplete completion UI, while both of those provide their own
+completion UI (and many other cool features!).
+
+It is worth pointing out that Helm does provide its multi pattern
+matching as a completion style which could be used with Icomplete! (Ivy
+does not.) So, Icomplete users could, instead of using this package,
+install Helm and configure Icomplete to use it as follows:
+
+@lisp
+(require 'helm)
+(setq completion-styles '(helm))
+(icomplete-mode)
+@end lisp
+
+(Of course, if you install Helm, you might as well use the Helm UI in
+@samp{helm-mode} rather than Icomplete.)
+
+@node Prescient
+@section Prescient
+
+The @uref{https://github.com/raxod502/prescient.el, prescient.el} library also provides matching of space-separated
+components in any order and it can be used with either the @uref{https://github.com/raxod502/selectrum, Selectrum}
+or @uref{https://github.com/abo-abo/swiper, Ivy} completion UIs (it does not offer a completion-style that
+could be used with Emacs' default completion UI or with Icomplete).
+The components can be matched literally, as regexps, as initialisms or
+in the flex style (called ``fuzzy'' in prescient). In addition to
+matching, @samp{prescient.el} also supports sorting of candidates (@samp{orderless}
+leaves that up to the candidate source and the completion UI).
+
+@node Restricting to current matches Icicles Ido and Ivy
+@section Restricting to current matches: Icicles, Ido and Ivy
+
+An effect equivalent to matching multiple components in any order can
+be achieved in completion frameworks that provide a way to restrict
+further matching to the current list of candidates. If you use the
+keybinding for restriction instead of @samp{SPC} to separate your components,
+you get out of order matching!
+
+@itemize
+@item
+@uref{https://www.emacswiki.org/emacs/Icicles, Icicles} calls this @emph{progressive completion} and uses the
+@samp{icicle-apropos-complete-and-narrow} command, bound to @samp{S-SPC}, to do it.
+
+@item
+Ido has @samp{ido-restrict-to-matches} and binds it to @samp{C-SPC}.
+
+@item
+Ivy has @samp{ivy-restrict-to-matches}, bound to @samp{S-SPC}, so you can get the
+effect of out of order matching without using @samp{ivy--regex-ignore-order}.
+@end itemize
+
+@bye
