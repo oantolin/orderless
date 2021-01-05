@@ -1,10 +1,14 @@
+#+TITLE: Orderless
 #+EXPORT_FILE_NAME: orderless.texi
 #+TEXINFO_DIR_CATEGORY: Emacs
 #+TEXINFO_DIR_TITLE: Orderless: (orderless).
 #+TEXINFO_DIR_DESC: Completion style for matching regexps in any order
+#+OPTIONS: d:nil
 
+:BADGES:
 [[https://melpa.org/#/orderless][file:https://melpa.org/packages/orderless-badge.svg]]
 [[https://stable.melpa.org/#/orderless][file:https://stable.melpa.org/packages/orderless-badge.svg]]
+:END:
 
 * Overview
 :PROPERTIES:
@@ -78,7 +82,7 @@ Bug reports are highly welcome and appreciated!
   - [[#restricting-to-current-matches-icicles-ido-and-ivy][Restricting to current matches: Icicles, Ido and Ivy]]
 :END:
 
-** Screenshot
+** Screenshot :noexport:
 
 This is what it looks like to use =describe-function= (bound by default
 to =C-h f=) to match =eis ff=. Notice that in this particular case =eis=
@@ -408,7 +412,7 @@ in the flex style (called "fuzzy" in prescient). In addition to
 matching, =prescient.el= also supports sorting of candidates (=orderless=
 leaves that up to the candidate source and the completion UI).
 
-** Restricting to current matches: Icicles, Ido and Ivy
+** Restricting to current matches in Icicles, Ido and Ivy
 
 An effect equivalent to matching multiple components in any order can
 be achieved in completion frameworks that provide a way to restrict

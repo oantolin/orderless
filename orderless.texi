@@ -1,7 +1,7 @@
 \input texinfo    @c -*- texinfo -*-
 @c %**start of header
 @setfilename orderless.info
-@settitle 
+@settitle Orderless
 @documentencoding UTF-8
 @documentlanguage en
 @c %**end of header
@@ -13,7 +13,7 @@
 
 @finalout
 @titlepage
-@title 
+@title Orderless
 @author Omar Antolín Camarena
 @end titlepage
 
@@ -21,7 +21,7 @@
 
 @ifnottex
 @node Top
-@top 
+@top Orderless
 @end ifnottex
 
 @menu
@@ -55,7 +55,7 @@ Related packages
 
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches: Icicles, Ido and Ivy: Restricting to current matches Icicles Ido and Ivy. 
+* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
 
 @end detailmenu
 @end menu
@@ -110,8 +110,6 @@ If you like the experience of using @samp{orderless} with Icomplete, but wish
 the candidates displayed vertically, you can use @uref{https://github.com/oantolin/icomplete-vertical, icomplete-vertical}.
 
 Bug reports are highly welcome and appreciated!
-
-See also the @uref{https://github.com/oantolin/orderless/, package webpage}, which includes a @uref{https://github.com/oantolin/orderless/#screenshot, screenshot}.
 
 @node Customization
 @chapter Customization
@@ -193,15 +191,6 @@ the characters of the component should appear in
 that order in the candidate, but not necessarily consecutively.
 
 This maps @samp{abc} to @samp{a.*b.*c}.
-
-@item orderless-prefixes
-the component is split at word endings and
-each piece must match at a word boundary in the candidate, occurring
-in that order.
-
-This is similar to the built-in @samp{partial-completion} completion-style.
-For example, @samp{re-re} matches @samp{query-replace-regexp}, @samp{recode-region} and
-@samp{magit-remote-list-refs}; @samp{f-d.t} matches @samp{final-draft.txt}.
 @end table
 
 The variable @samp{orderless-matching-styles} can be set to a list of the
@@ -464,7 +453,7 @@ face with this configuration:
 @menu
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches: Icicles, Ido and Ivy: Restricting to current matches Icicles Ido and Ivy. 
+* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
 @end menu
 
 @node Ivy and Helm
@@ -506,8 +495,8 @@ in the flex style (called ``fuzzy'' in prescient). In addition to
 matching, @samp{prescient.el} also supports sorting of candidates (@samp{orderless}
 leaves that up to the candidate source and the completion UI).
 
-@node Restricting to current matches Icicles Ido and Ivy
-@section Restricting to current matches: Icicles, Ido and Ivy
+@node Restricting to current matches in Icicles Ido and Ivy
+@section Restricting to current matches in Icicles, Ido and Ivy
 
 An effect equivalent to matching multiple components in any order can
 be achieved in completion frameworks that provide a way to restrict
