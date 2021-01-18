@@ -10,7 +10,7 @@
 [[https://stable.melpa.org/#/orderless][file:https://stable.melpa.org/packages/orderless-badge.svg]]
 :END:
 
-* COMMENT Overview
+* Overview
 :PROPERTIES:
 :TOC: :include all :ignore this
 :END:
