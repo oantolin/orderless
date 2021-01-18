@@ -79,7 +79,7 @@ Bug reports are highly welcome and appreciated!
 - [[#related-packages][Related packages]]
   - [[#ivy-and-helm][Ivy and Helm]]
   - [[#prescient][Prescient]]
-  - [[#restricting-to-current-matches-icicles-ido-and-ivy][Restricting to current matches: Icicles, Ido and Ivy]]
+  - [[#restricting-to-current-matches-in-icicles-ido-and-ivy][Restricting to current matches: Icicles, Ido and Ivy]]
 :END:
 
 ** Screenshot :noexport:
