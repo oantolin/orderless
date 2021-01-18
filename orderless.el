@@ -415,22 +415,54 @@ DISPATCHERS decline to handle the component, then the list of
 matching STYLES is used.  See `orderless-dispatch' for details on
 dispatchers.
 
-The STYLES default to `orderless-matching-styles', and the
-DISPATCHERS default to `orderless-dipatchers'.  Since nil gets you
-the default, if want to no dispatchers to be run, use '(ignore)
-as the value of DISPATCHERS.
+If the variable `orderless-transient-component-separator' is
+non-nil, it is used in place of `orderless-component-separator'.
 
-The `orderless-transient-*' variables, when non-nil, override the
-corresponding value among `orderless-component-separator', STYLES
-and DISPATCHERS.
+When STYLES is nil, it defaults to a list computed as follows:
+
+- if the value of `orderless-transient-matching-styles' is
+  non-nil, this value is used;
+
+- next, the category of the current minibuffer completion session
+  is looked up in `completion-category-overrides' and if the
+  alist associated to it has an `orderless-matching-styles' key,
+  the corresponding value is used;
+
+- otherwise, STYLES defaults to the value of the variable
+  `orderless-matching-styles'.
+
+The analogous process is used if DISPATCHERS is nil. Since nil
+gets you this default, if want to no dispatchers to be run, use
+'(ignore) as the value of DISPATCHERS.
 
 This function is the default for `orderless-pattern-compiler' and
 might come in handy as a subroutine to implement other pattern
 compilers."
-  (unless styles (setq styles orderless-matching-styles))
-  (setq styles (or orderless-transient-matching-styles styles))
-  (unless dispatchers (setq dispatchers orderless-style-dispatchers))
-  (setq dispatchers (or orderless-transient-style-dispatchers dispatchers))
+
+  ;; figure out defaults for styles and dispatchers
+  (let ((overrides
+         (unless (or (not minibuffer-completion-table)
+                     (and (or styles orderless-transient-matching-styles)
+                          (or dispatchers orderless-transient-style-dispatchers)))
+           ;; we are in minibuffer completion and at least one out of
+           ;; styles and dispachers might be overridden in
+           ;; completion-category-overrides
+           (let* ((metadata (completion-metadata
+                             (buffer-substring-no-properties
+                              (field-beginning) (point))
+                             minibuffer-completion-table
+                             minibuffer-completion-predicate))
+                  (category (completion-metadata-get metadata 'category)))
+             (cdr (assq category completion-category-overrides))))))
+    (setq styles (or styles
+                     orderless-transient-matching-styles
+                     (cdr (assq 'orderless-matching-styles overrides))
+                     orderless-matching-styles))
+    (setq dispatchers (or dispatchers
+                          orderless-transient-style-dispatchers
+                          (cdr (assq 'orderless-style-dispatchers overrides))
+                          orderless-style-dispatchers)))
+  
   (cl-loop
    with splitter = (or orderless-transient-component-separator
                        orderless-component-separator)
