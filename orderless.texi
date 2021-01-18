@@ -25,7 +25,6 @@
 @end ifnottex
 
 @menu
-* Overview::
 * Customization::
 * Integration with other completion UIs::
 * Related packages::
@@ -59,57 +58,6 @@ Related packages
 
 @end detailmenu
 @end menu
-
-@node Overview
-@chapter Overview
-
-This package provides an @samp{orderless} @emph{completion style} that divides the
-pattern into space-separated components, and matches candidates that
-match all of the components in any order. Each component can match in
-any one of several ways: literally, as a regexp, as an initialism, in
-the flex style, or as multiple word prefixes. By default, regexp and
-initialism matches are enabled.
-
-A completion style is a back-end for completion and is used from a
-front-end that provides a completion UI@. Any completion style can be
-used with the default Emacs completion UI (sometimes called minibuffer
-tab completion) or with the built-in Icomplete package (which is
-similar to the more well-known Ido Mode). To use a completion style in
-this fashion simply add it as an entry in the variables
-@samp{completion-styles} and @samp{completion-category-overrides} (see their
-documentation).
-
-With a bit of effort, it might still be possible to use @samp{orderless} with
-other completion UIs, even if those UIs don't support the standard
-Emacs completion styles. Currently there is support for @uref{https://github.com/abo-abo/swiper, Ivy} and
-@uref{https://github.com/raxod502/selectrum, Selectrum} (see below).
-
-If you use MELPA, the easiest way to install @samp{orderless} is via
-@samp{package-install}. If you use both MELPA and @samp{use-package}, you can use:
-
-@lisp
-(use-package orderless
-  :ensure t
-  :init (icomplete-mode) ; optional but recommended!
-  :custom (completion-styles '(orderless)))
-@end lisp
-
-Alternatively, put @samp{orderless.el} somewhere on your @samp{load-path}, and use
-the following configuration:
-
-@lisp
-(require 'orderless)
-(setq completion-styles '(orderless))
-(icomplete-mode) ; optional but recommended!
-@end lisp
-
-(And of course, if you use another completion framework such as Ivy or
-Helm, disable it.)
-
-If you like the experience of using @samp{orderless} with Icomplete, but wish
-the candidates displayed vertically, you can use @uref{https://github.com/oantolin/icomplete-vertical, icomplete-vertical}.
-
-Bug reports are highly welcome and appreciated!
 
 @node Customization
 @chapter Customization
@@ -421,8 +369,9 @@ To use @samp{orderless} from Ivy add this to your Ivy configuration:
 @node Selectrum
 @section Selectrum
 
-To use @samp{orderless} from Selectrum add this to your Selectrum
-configuration:
+Recent versions of Selectrum use your configured completion styles by
+default! To use @samp{orderless} from Selectrum, you can either stick to that
+default or add this to your Selectrum configuration:
 
 @lisp
 (setq selectrum-refine-candidates-function #'orderless-filter)
