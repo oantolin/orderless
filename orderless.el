@@ -514,6 +514,42 @@ This function is part of the `orderless' completion style."
                orderless-try-completion orderless-all-completions
                "Completion of multiple components, in any order."))
 
+(defmacro orderless-define-completion-style
+    (name docstrings &rest configuration)
+  "Define an orderless completion style with given CONFIGURATION.
+The CONFIGURATION should be a list of bindings that you could use
+with `let' to configure orderless.  You can include bindings for
+`orderless-matching-styles' and `orderless-style-dispatchers',
+for example.
+
+The completion style consists of two functions that this macro
+defines for you, NAME-try-completion and NAME-all-completions.
+This macro registers those in `completion-styles-alist' as
+forming the completion style NAME.
+
+The DOCSTRINGS argument should be a list of between 0 to 3
+strings.  The strings present are used as the documentation
+string for the completion style, NAME-try-completion, and
+NAME-all-completions, respectively."
+  (declare (indent defun))
+  (let* ((fn-name (lambda (string) (intern (concat (symbol-name name) string))))
+         (try-completion  (funcall fn-name "-try-completion"))
+         (all-completions (funcall fn-name "-all-completions")))
+  `(progn
+     (defun ,try-completion (string table pred point)
+       ,(cadr docstrings)
+       (let ,configuration
+         (orderless-all-completions string table pred point)))
+
+     (defun ,all-completions (string table pred point)
+       ,(caddr docstrings)
+       (let ,configuration
+         (orderless-all-completions string table pred point)))
+
+     (add-to-list 'completion-styles-alist
+                  '(,name ,try-completion ,all-completions
+                          ,(car docstrings))))))
+
 ;;; Ivy integration
 
 (defvar ivy-regex)
