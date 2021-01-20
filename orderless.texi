@@ -197,16 +197,6 @@ The variable @samp{orderless-matching-styles} can be set to a list of the
 desired matching styles to use. By default it enables the regexp and
 initialism styles.
 
-If you want to use certain matching styles only for completion of
-certain categories, you can add an entry to the built-in variable
-@samp{completion-category-overrides}. For example, to use @samp{orderless-flex} to
-complete buffer names, you could use:
-
-@lisp
-(add-to-list 'completion-category-overrides
-             '(buffer (orderless-matching-styles orderless-flex)))
-@end lisp
-
 @menu
 * Style dispatchers::
 @end menu
@@ -264,20 +254,6 @@ You can achieve this with the following configuration:
       orderless-style-dispatchers '(first-initialism
                                     flex-if-twiddle
                                     without-if-bang))
-@end lisp
-
-As with matching styles, you can set which style dispatchers to use
-for specific completion catgories using the
-@samp{completion-category-overrides} variable. For example, if you wanted to
-match buffer using the @samp{orderless-flex} matching style except for
-components starting with @samp{!}, which you want to treat as excluded terms,
-you could use the following configuration (which relies on the above
-@samp{without-if-bang} dispatcher):
-
-@lisp
-(add-to-list 'completion-category-overrides
-             '(buffer (orderless-matching-styles orderless-flex)
-                      (orderless-style-dispatchers without-if-bang)))
 @end lisp
 
 @node Component separator regexp

@@ -157,16 +157,6 @@ The variable =orderless-matching-styles= can be set to a list of the
 desired matching styles to use. By default it enables the regexp and
 initialism styles.
 
-If you want to use certain matching styles only for completion of
-certain categories, you can add an entry to the built-in variable
-=completion-category-overrides=. For example, to use =orderless-flex= to
-complete buffer names, you could use:
-
-#+begin_src emacs-lisp
-  (add-to-list 'completion-category-overrides
-               '(buffer (orderless-matching-styles orderless-flex)))
-#+end_src
-
 *** Style dispatchers
 
  For more fine-grained control on which matching styles to use for
@@ -214,21 +204,6 @@ complete buffer names, you could use:
                                        flex-if-twiddle
                                        without-if-bang))
  #+end_src
-
-As with matching styles, you can set which style dispatchers to use
-for specific completion catgories using the
-=completion-category-overrides= variable. For example, if you wanted to
-match buffer using the =orderless-flex= matching style except for
-components starting with =!=, which you want to treat as excluded terms,
-you could use the following configuration (which relies on the above
-=without-if-bang= dispatcher):
-
-#+begin_src emacs-lisp
-  (add-to-list 'completion-category-overrides
-               '(buffer (orderless-matching-styles orderless-flex)
-                        (orderless-style-dispatchers without-if-bang)))
-#+end_src
-
 
 ** Component separator regexp
 
