@@ -103,17 +103,6 @@ or a function of a single string argument."
                  (function : tag "Custom function"))
   :group 'orderless)
 
-(defvar-local orderless-transient-component-separator nil
-  "Component separator regexp override.
-This variabel, if non-nil, overrides `orderless-component-separator'.
-It is meant to be set by commands that interactively change the
-separator.  No such commands are provided with this package, but
-this variable is meant to make writing them simple.  If you do
-use this variable you are likely to want to reset it to nil after
-every completion session, which can be achieved by adding the
-function `orderless-remove-transient-configuration' to the
-`minibuffer-exit-hook'.")
-
 (defcustom orderless-match-faces
   [orderless-match-face-0
    orderless-match-face-1
@@ -166,30 +155,6 @@ information on how this variable is used, see
 `orderless-default-pattern-compiler'."
   :type 'hook
   :group 'orderless)
-
-(defvar-local orderless-transient-matching-styles nil
-  "Component matching styles override.
-This variable, if non-nil, overrides `orderless-matching-styles'.
-It is meant to be set by commands that interactively change the
-matching style configuration.  No such commands are provided with
-this package, but this variable is meant to make writing them
-simple.  If you do use this variable you are likely to want to
-reset it to nil after every completion session, which can be
-achieved by adding the function
-`orderless-remove-transient-configuration' to the
-`minibuffer-exit-hook'.")
-
-(defvar-local orderless-transient-style-dispatchers nil
-  "Component style dispatchers override.
-This variable, if non-nil, overrides `orderless-style-dispatchers'.
-It is meant to be set by commands that interactively change the
-matching style configuration.  No such commands are provided with
-this package, but this variable is meant to make writing them
-simple.  If you do use this variable you are likely to want to
-reset it to nil after every completion session, which can be
-achieved by adding the function
-`orderless-remove-transient-configuration' to the
-`minibuffer-exit-hook'.")
 
 (defcustom orderless-pattern-compiler #'orderless-default-pattern-compiler
   "The `orderless' pattern compiler.
@@ -355,12 +320,6 @@ converted to a list of regexps according to the value of
    (lambda (piece) (replace-regexp-in-string (string 0) " " piece))
    (split-string (replace-regexp-in-string "\\\\ " (string 0) string) " ")))
 
-(defun orderless-remove-transient-configuration ()
-  "Remove all transient orderless configuration.
-Meant to be added to `exit-minibuffer-hook'."
-  (setq orderless-transient-matching-styles nil
-        orderless-transient-component-separator nil))
-
 (defun orderless-dispatch (dispatchers default string &rest args)
   "Run DISPATCHERS to compute matching styles for STRING.
 
@@ -420,23 +379,15 @@ DISPATCHERS default to `orderless-dipatchers'.  Since nil gets you
 the default, if want to no dispatchers to be run, use '(ignore)
 as the value of DISPATCHERS.
 
-The `orderless-transient-*' variables, when non-nil, override the
-corresponding value among `orderless-component-separator', STYLES
-and DISPATCHERS.
-
 This function is the default for `orderless-pattern-compiler' and
 might come in handy as a subroutine to implement other pattern
 compilers."
   (unless styles (setq styles orderless-matching-styles))
-  (setq styles (or orderless-transient-matching-styles styles))
   (unless dispatchers (setq dispatchers orderless-style-dispatchers))
-  (setq dispatchers (or orderless-transient-style-dispatchers dispatchers))
   (cl-loop
-   with splitter = (or orderless-transient-component-separator
-                       orderless-component-separator)
-   with components = (if (functionp splitter)
-                         (funcall splitter pattern)
-                       (split-string pattern splitter))
+   with components = (if (functionp orderless-component-separator)
+                         (funcall orderless-component-separator pattern)
+                       (split-string pattern orderless-component-separator))
    with total = (length components)
    for component in components and index from 0
    for (newstyles . newcomp) = (orderless-dispatch
@@ -537,7 +488,7 @@ string for the completion style."
          (try-completion  (funcall fn-name "-try-completion"))
          (all-completions (funcall fn-name "-all-completions"))
          (doc-fmt "`%s' function for the %s completion style.
-This configures orderless according to the %s completion style and 
+This configures orderless according to the %s completion style and
 delegates to `orderless-%s'.")
          (fn-doc (lambda (fn) (format doc-fmt fn name name fn))))
   `(progn

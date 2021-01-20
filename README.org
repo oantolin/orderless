@@ -254,56 +254,31 @@ lists to use instead of =orderless-matching-styles=.
 ** Interactively changing the configuration
 
 You might want to change the separator or the matching style
-configuration on the fly while matching. There many possible UIs for
-this: you could toggle between two chosen configurations, cycle among
-several, have a keymap where each key sets a different configurations,
-have a set of named configurations and be prompted (with completion)
-for one of them, popup a [[https://github.com/abo-abo/hydra][hydra]] to choose a configuration, etc.
-
-Rather than include commands for any of those on-the-fly configuration
-changes, =orderless= provides a general mechanism to make it easy to
-write such commands yourself. For each variable you might to
-temporarily change there is a corresponding /transient/ variable that
-overrides it when the transient variable is non-nil. You can write
-your own commands to set these transient variable to the desired value
-without clobbering the value of the variables they override. To reset
-the transient variables to =nil= again after each completion session,
-use the following configuration:
-
-#+begin_src emacs-lisp
-  (add-hook 'minibuffer-exit-hook
-            #'orderless-remove-transient-configuration)
-#+end_src
-
-The transient variables provided are:
-
-- =orderless-transient-component-separator=
-- =orderless-transient-matching-styles=
-- =orderless-transient-style-dispatchers=
+configuration on the fly while matching. There many possible user
+interfaces for this: you could toggle between two chosen
+configurations, cycle among several, have a keymap where each key sets
+a different configurations, have a set of named configurations and be
+prompted (with completion) for one of them, popup a [[https://github.com/abo-abo/hydra][hydra]] to choose a
+configuration, etc. Since there are so many possible UIs and which to
+use is mostly a matter of taste, =orderless= does not provide any such
+commands. But it's easy to write your own!
 
 For example, say you want to use the keybinding =C-l= to make all
-components match literally. You could use the following configuration:
+components match literally. You could use the following code:
 
 #+begin_src emacs-lisp
   (defun my/match-components-literally ()
     "Components match literally for the rest of the session."
     (interactive)
-    (setq orderless-transient-matching-styles '(orderless-literal)
-          orderless-transient-style-dispatchers '(ignore)))
-
-  (add-hook 'minibuffer-exit-hook
-            #'orderless-remove-transient-configuration)
+    (setq-local orderless-matching-styles '(orderless-literal)
+                orderless-style-dispatchers nil))
 
   (define-key minibuffer-local-completion-map (kbd "C-l")
     #'my/match-components-literally)
 #+end_src
 
-Note that we also set =orderless-transient-style-dispatchers= to
-='(ignore)=, to ensure no style dispatchers are used so the literal
-matching does not get overridden. You may want to allow the
-dispatchers in =orderless-style-dispatchers= to override, in which case
-you'd set =orderless-transient-style-dispatchers= to =nil= or simply
-remove that assignment.
+Using =setq-local= to assign to the configuration variables ensures the
+values are only used for that minibuffer completion session.
 
 * Integration with other completion UIs
 
