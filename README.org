@@ -10,7 +10,7 @@
 [[https://stable.melpa.org/#/orderless][file:https://stable.melpa.org/packages/orderless-badge.svg]]
 :END:
 
-* COMMENT Overview
+* Overview
 :PROPERTIES:
 :TOC: :include all :ignore this
 :END:
@@ -28,45 +28,38 @@ used with the default Emacs completion UI (sometimes called minibuffer
 tab completion) or with the built-in Icomplete package (which is
 similar to the more well-known Ido Mode). To use a completion style in
 this fashion simply add it as an entry in the variables
-=completion-styles= or =completion-category-overrides= (see their
-documentation). Note that there is also the variable
-=completion-category-defaults= which configures some completion styles
-for special kinds of completion by default. If you want to use /only/
-orderless, set that variable to nil.
+=completion-styles= and =completion-category-overrides= (see their
+documentation).
 
 With a bit of effort, it might still be possible to use =orderless= with
 other completion UIs, even if those UIs don't support the standard
-Emacs completion styles. Currently there is support for [[https://github.com/raxod502/selectrum][Selectrum]] and
-[[https://github.com/abo-abo/swiper][Ivy]] (see below).
-
-#+begin_src emacs-lisp
-  (use-package orderless
-    :ensure t
-    :init (icomplete-mode) ; optional but recommended 
-    :custom
-    (completion-styles '(orderless)) 
-    (completion-category-defaults nil)) ; optional
-#+end_src
-
-Alternatively, put =orderless.el= somewhere on your =load-path=, and use
-the following configuration:
+Emacs completion styles. Currently there is support for [[https://github.com/abo-abo/swiper][Ivy]] and
+[[https://github.com/raxod502/selectrum][Selectrum]] (see below).
 
 If you use MELPA, the easiest way to install =orderless= is via
 =package-install=. If you use both MELPA and =use-package=, you can use:
 
 #+begin_src emacs-lisp
-  (require 'orderless)
-  (setq completion-styles '(orderless)
-        completion-category-defaults nil) ; optional
-  (icomplete-mode) ; optional but recommended
+  (use-package orderless
+    :ensure t
+    :init (icomplete-mode) ; optional but recommended!
+    :custom (completion-styles '(orderless)))
+#+end_src
+
+Alternatively, put =orderless.el= somewhere on your =load-path=, and use
+the following configuration:
+
+#+begin_src emacs-lisp
+(require 'orderless)
+(setq completion-styles '(orderless))
+(icomplete-mode) ; optional but recommended!
 #+end_src
 
 (And of course, if you use another completion framework such as Ivy or
 Helm, disable it.)
 
 If you like the experience of using =orderless= with Icomplete, but wish
-the candidates displayed vertically, you can use [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]],
-[[https://github.com/raxod502/selectrum][Selectrum]] or [[https://github.com/abo-abo/swiper][Ivy]].
+the candidates displayed vertically, you can use [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]].
 
 Bug reports are highly welcome and appreciated!
 
@@ -360,9 +353,8 @@ To use =orderless= from Ivy add this to your Ivy configuration:
 
 ** Selectrum
 
-Recent versions of Selectrum use your configured completion styles by
-default! To use =orderless= from Selectrum, you can either stick to that
-default or add this to your Selectrum configuration:
+To use =orderless= from Selectrum add this to your Selectrum
+configuration:
 
 #+begin_src emacs-lisp
   (setq selectrum-refine-candidates-function #'orderless-filter)
