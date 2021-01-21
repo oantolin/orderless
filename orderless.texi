@@ -73,16 +73,16 @@ initialism matches are enabled.
 A completion style is a back-end for completion and is used from a
 front-end that provides a completion UI@. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
-tab completion) or with the built-in Icomplete package (which is
-similar to the more well-known Ido Mode). To use a completion style in
-this fashion simply add it as an entry in the variables
-@samp{completion-styles} and @samp{completion-category-overrides} (see their
-documentation).
+tab completion), with the built-in Icomplete package (which is similar
+to the more well-known Ido Mode), or with some third party completion
+frameworks such as @uref{https://github.com/raxod502/selectrum, Selectrum}. To use a completion style in this
+fashion simply add it as an entry in the variables @samp{completion-styles}
+and @samp{completion-category-overrides} (see their documentation).
 
 With a bit of effort, it might still be possible to use @samp{orderless} with
 other completion UIs, even if those UIs don't support the standard
-Emacs completion styles. Currently there is support for @uref{https://github.com/abo-abo/swiper, Ivy} and
-@uref{https://github.com/raxod502/selectrum, Selectrum} (see below).
+Emacs completion styles. Currently there is support for @uref{https://github.com/abo-abo/swiper, Ivy} (see
+below).
 
 If you use MELPA, the easiest way to install @samp{orderless} is via
 @samp{package-install}. If you use both MELPA and @samp{use-package}, you can use:
@@ -309,61 +309,31 @@ lists to use instead of @samp{orderless-matching-styles}.
 @section Interactively changing the configuration
 
 You might want to change the separator or the matching style
-configuration on the fly while matching. There many possible UIs for
-this: you could toggle between two chosen configurations, cycle among
-several, have a keymap where each key sets a different configurations,
-have a set of named configurations and be prompted (with completion)
-for one of them, popup a @uref{https://github.com/abo-abo/hydra, hydra} to choose a configuration, etc.
-
-Rather than include commands for any of those on-the-fly configuration
-changes, @samp{orderless} provides a general mechanism to make it easy to
-write such commands yourself. For each variable you might to
-temporarily change there is a corresponding @emph{transient} variable that
-overrides it when the transient variable is non-nil. You can write
-your own commands to set these transient variable to the desired value
-without clobbering the value of the variables they override. To reset
-the transient variables to @samp{nil} again after each completion session,
-use the following configuration:
-
-@lisp
-(add-hook 'minibuffer-exit-hook
-          #'orderless-remove-transient-configuration)
-@end lisp
-
-The transient variables provided are:
-
-@itemize
-@item
-@samp{orderless-transient-component-separator}
-@item
-@samp{orderless-transient-matching-styles}
-@item
-@samp{orderless-transient-style-dispatchers}
-@end itemize
+configuration on the fly while matching. There many possible user
+interfaces for this: you could toggle between two chosen
+configurations, cycle among several, have a keymap where each key sets
+a different configurations, have a set of named configurations and be
+prompted (with completion) for one of them, popup a @uref{https://github.com/abo-abo/hydra, hydra} to choose a
+configuration, etc. Since there are so many possible UIs and which to
+use is mostly a matter of taste, @samp{orderless} does not provide any such
+commands. But it's easy to write your own!
 
 For example, say you want to use the keybinding @samp{C-l} to make all
-components match literally. You could use the following configuration:
+components match literally. You could use the following code:
 
 @lisp
 (defun my/match-components-literally ()
   "Components match literally for the rest of the session."
   (interactive)
-  (setq orderless-transient-matching-styles '(orderless-literal)
-        orderless-transient-style-dispatchers '(ignore)))
-
-(add-hook 'minibuffer-exit-hook
-          #'orderless-remove-transient-configuration)
+  (setq-local orderless-matching-styles '(orderless-literal)
+              orderless-style-dispatchers nil))
 
 (define-key minibuffer-local-completion-map (kbd "C-l")
   #'my/match-components-literally)
 @end lisp
 
-Note that we also set @samp{orderless-transient-style-dispatchers} to
-@samp{'(ignore)}, to ensure no style dispatchers are used so the literal
-matching does not get overridden. You may want to allow the
-dispatchers in @samp{orderless-style-dispatchers} to override, in which case
-you'd set @samp{orderless-transient-style-dispatchers} to @samp{nil} or simply
-remove that assignment.
+Using @samp{setq-local} to assign to the configuration variables ensures the
+values are only used for that minibuffer completion session.
 
 @node Integration with other completion UIs
 @chapter Integration with other completion UIs
@@ -397,13 +367,16 @@ To use @samp{orderless} from Ivy add this to your Ivy configuration:
 @node Selectrum
 @section Selectrum
 
-To use @samp{orderless} from Selectrum add this to your Selectrum
-configuration:
+Recent versions of Selectrum default to using whatever completion
+styles you have configured. You can use @samp{orderless} that way, or you can use this configuration:
 
 @lisp
 (setq selectrum-refine-candidates-function #'orderless-filter)
 (setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
 @end lisp
+
+If you use the above configuration, only the visible candidates are
+highlighted, which is a litte more efficient.
 
 @node Company
 @section Company

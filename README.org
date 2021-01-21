@@ -25,16 +25,16 @@ initialism matches are enabled.
 A completion style is a back-end for completion and is used from a
 front-end that provides a completion UI. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
-tab completion) or with the built-in Icomplete package (which is
-similar to the more well-known Ido Mode). To use a completion style in
-this fashion simply add it as an entry in the variables
-=completion-styles= and =completion-category-overrides= (see their
-documentation).
+tab completion), with the built-in Icomplete package (which is similar
+to the more well-known Ido Mode), or with some third party completion
+frameworks such as [[https://github.com/raxod502/selectrum][Selectrum]]. To use a completion style in this
+fashion simply add it as an entry in the variables =completion-styles=
+and =completion-category-overrides= (see their documentation).
 
 With a bit of effort, it might still be possible to use =orderless= with
 other completion UIs, even if those UIs don't support the standard
-Emacs completion styles. Currently there is support for [[https://github.com/abo-abo/swiper][Ivy]] and
-[[https://github.com/raxod502/selectrum][Selectrum]] (see below).
+Emacs completion styles. Currently there is support for [[https://github.com/abo-abo/swiper][Ivy]] (see
+below).
 
 If you use MELPA, the easiest way to install =orderless= is via
 =package-install=. If you use both MELPA and =use-package=, you can use:
@@ -303,13 +303,17 @@ To use =orderless= from Ivy add this to your Ivy configuration:
 
 ** Selectrum
 
-To use =orderless= from Selectrum add this to your Selectrum
-configuration:
+Recent versions of Selectrum default to using whatever completion
+styles you have configured. You can use =orderless= that way, or you can
+use this configuration:
 
 #+begin_src emacs-lisp
   (setq selectrum-refine-candidates-function #'orderless-filter)
   (setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
 #+end_src
+
+If you use the above configuration, only the visible candidates are
+highlighted, which is a litte more efficient.
 
 ** Company
 
