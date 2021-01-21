@@ -29,7 +29,10 @@ tab completion), with the built-in Icomplete package (which is similar
 to the more well-known Ido Mode), or with some third party completion
 frameworks such as [[https://github.com/raxod502/selectrum][Selectrum]]. To use a completion style in this
 fashion simply add it as an entry in the variables =completion-styles=
-and =completion-category-overrides= (see their documentation).
+and =completion-category-overrides= (see their documentation). You may
+also want to modify the =completion-category-defaults= variable, which
+serves as a default value for =completion-category-overrides=: if you
+want to use =orderless= exclusively, set both variables to =nil=.
 
 With a bit of effort, it might still be possible to use =orderless= with
 other completion UIs, even if those UIs don't support the standard
