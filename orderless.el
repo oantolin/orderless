@@ -435,7 +435,7 @@ This function is part of the `orderless' completion style."
                    (orderless--prefix+pattern string table pred))
                   (skip-highlighting
                    (if (functionp orderless-skip-highlighting)
-                       (orderless-skip-highlighting)
+                       (funcall orderless-skip-highlighting)
                      orderless-skip-highlighting)))
         (nconc
          (if skip-highlighting
