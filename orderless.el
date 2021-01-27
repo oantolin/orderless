@@ -106,6 +106,13 @@ or a function of a single string argument."
   "Vector of faces used (cyclically) for component matches."
   :type '(vector face))
 
+(defcustom orderless-skip-highlighting nil
+  "Skip highlighting the matching parts of candidates?
+If this is set to a function, the function is called to decide
+whether to skip higlighting the matches.  Any non-function non-nil
+value means highlighting is skipped."
+  :type '(choice boolean function))
+
 (defcustom orderless-matching-styles
   '(orderless-regexp orderless-initialism)
   "List of component matching styles.
@@ -425,9 +432,15 @@ This function is part of the `orderless' completion style."
   (let ((completions (orderless-filter string table pred)))
     (when completions
       (pcase-let ((`(,prefix . ,pattern)
-                   (orderless--prefix+pattern string table pred)))
+                   (orderless--prefix+pattern string table pred))
+                  (skip-highlighting
+                   (if (functionp orderless-skip-highlighting)
+                       (orderless-skip-highlighting)
+                     orderless-skip-highlighting)))
         (nconc
-         (orderless-highlight-matches pattern completions)
+         (if skip-highlighting
+             completions
+           (orderless-highlight-matches pattern completions))
          (length prefix))))))
 
 ;;;###autoload
