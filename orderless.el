@@ -63,32 +63,28 @@
     (((class color) (min-colors 88) (background dark)) :foreground "#72a4ff")
     (((class color) (min-colors 88) (background light)) :foreground "#223fbf")
     (t :foreground "blue"))
-  "Face for matches of components numbered 0 mod 4."
-  :group 'orderless)
+  "Face for matches of components numbered 0 mod 4.")
 
 (defface orderless-match-face-1
   '((default :weight bold)
     (((class color) (min-colors 88) (background dark)) :foreground "#ed92f8")
     (((class color) (min-colors 88) (background light)) :foreground "#8f0075")
     (t :foreground "magenta"))
-  "Face for matches of components numbered 1 mod 4."
-  :group 'orderless)
+  "Face for matches of components numbered 1 mod 4.")
 
 (defface orderless-match-face-2
   '((default :weight bold)
     (((class color) (min-colors 88) (background dark)) :foreground "#90d800")
     (((class color) (min-colors 88) (background light)) :foreground "#145a00")
     (t :foreground "green"))
-  "Face for matches of components numbered 2 mod 4."
-  :group 'orderless)
+  "Face for matches of components numbered 2 mod 4.")
 
 (defface orderless-match-face-3
   '((default :weight bold)
     (((class color) (min-colors 88) (background dark)) :foreground "#f0ce43")
     (((class color) (min-colors 88) (background light)) :foreground "#804000")
     (t :foreground "yellow"))
-  "Face for matches of components numbered 3 mod 4."
-  :group 'orderless)
+  "Face for matches of components numbered 3 mod 4.")
 
 (defcustom orderless-component-separator " +"
   "Component separators for orderless completion.
@@ -100,8 +96,7 @@ or a function of a single string argument."
                         orderless-escapable-split-on-space)
                  (const :tag "Quotable spaces" split-string-and-unquote)
                  (regexp :tag "Custom regexp")
-                 (function : tag "Custom function"))
-  :group 'orderless)
+                 (function : tag "Custom function")))
 
 (defcustom orderless-match-faces
   [orderless-match-face-0
@@ -109,8 +104,7 @@ or a function of a single string argument."
    orderless-match-face-2
    orderless-match-face-3]
   "Vector of faces used (cyclically) for component matches."
-  :type '(vector face)
-  :group 'orderless)
+  :type '(vector face))
 
 (defcustom orderless-matching-styles
   '(orderless-regexp orderless-initialism)
@@ -131,8 +125,7 @@ a list of them."
              orderless-strict-leading-initialism
              orderless-strict-full-initialism
              orderless-prefixes
-             orderless-flex)
-  :group 'orderless)
+             orderless-flex))
 
 (defcustom orderless-style-dispatchers nil
   "List of style dispatchers.
@@ -153,8 +146,7 @@ arrange for a component starting with `?' to match the rest of
 the component in the `orderless-flex' style.  For more
 information on how this variable is used, see
 `orderless-default-pattern-compiler'."
-  :type 'hook
-  :group 'orderless)
+  :type 'hook)
 
 (defcustom orderless-pattern-compiler #'orderless-default-pattern-compiler
   "The `orderless' pattern compiler.
@@ -169,8 +161,7 @@ The documentation for `orderless-matching-styles' is written
 assuming the default pattern compiler is used, if you change the
 pattern compiler it can, of course, do anything and need not
 consult this variable at all."
-  :type 'function
-  :group 'orderless)
+  :type 'function)
 
 (defcustom orderless-smart-case t
   "Whether to use smart case.
@@ -184,8 +175,7 @@ On the other hand, if this variable is nil, then case-sensitivity
 is determined by the values of `completion-ignore-case',
 `read-file-name-completion-ignore-case' and
 `read-buffer-completion-ignore-case', as usual for completion."
-  :type 'boolean
-  :group 'orderless)
+  :type 'boolean)
 
 ;;; Matching styles
 
