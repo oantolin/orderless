@@ -75,12 +75,13 @@ front-end that provides a completion UI@. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
 tab completion), with the built-in Icomplete package (which is similar
 to the more well-known Ido Mode), or with some third party completion
-frameworks such as @uref{https://github.com/raxod502/selectrum, Selectrum}. To use a completion style in this
-fashion simply add it as an entry in the variables @samp{completion-styles}
-and @samp{completion-category-overrides} (see their documentation). You may
-also want to modify the @samp{completion-category-defaults} variable, which
-serves as a default value for @samp{completion-category-overrides}: if you
-want to use @samp{orderless} exclusively, set both variables to @samp{nil}.
+frameworks such as @uref{https://github.com/raxod502/selectrum, Selectrum} or @uref{https://github.com/oantolin/icomplete-vertical, icomplete-vertical}. To use a
+completion style in this fashion simply add it as an entry in the
+variables @samp{completion-styles} and @samp{completion-category-overrides} (see
+their documentation). You may also want to modify the
+@samp{completion-category-defaults} variable, which serves as a default value
+for @samp{completion-category-overrides}: if you want to use @samp{orderless}
+exclusively, set both variables to @samp{nil}.
 
 With a bit of effort, it might still be possible to use @samp{orderless} with
 other completion UIs, even if those UIs don't support the standard
@@ -93,7 +94,6 @@ If you use MELPA, the easiest way to install @samp{orderless} is via
 @lisp
 (use-package orderless
   :ensure t
-  :init (icomplete-mode) ; optional but recommended!
   :custom (completion-styles '(orderless)))
 @end lisp
 
@@ -103,14 +103,7 @@ the following configuration:
 @lisp
 (require 'orderless)
 (setq completion-styles '(orderless))
-(icomplete-mode) ; optional but recommended!
 @end lisp
-
-(And of course, if you use another completion framework such as Ivy or
-Helm, disable it.)
-
-If you like the experience of using @samp{orderless} with Icomplete, but wish
-the candidates displayed vertically, you can use @uref{https://github.com/oantolin/icomplete-vertical, icomplete-vertical}.
 
 Bug reports are highly welcome and appreciated!
 
@@ -442,13 +435,14 @@ order. In Ivy, this is done with the @samp{ivy--regex-ignore-order} matcher.
 In Helm, it is the default, called ``multi pattern matching''.
 
 This package is significantly smaller than either of those because it
-solely defines a completion style, meant to be used with the built-in
-Icomplete completion UI, while both of those provide their own
+solely defines a completion style, meant to be used with any completion UI supporting completion styles while both of those provide their own
 completion UI (and many other cool features!).
 
 It is worth pointing out that Helm does provide its multi pattern
-matching as a completion style which could be used with Icomplete! (Ivy
-does not.) So, Icomplete users could, instead of using this package,
+matching as a completion style which could be used with default tab
+completion, Icomplete, Selectrum or other UIs supporting completion
+styles! (Ivy does not provide a completion style to my knowledge.) So,
+for example, Icomplete users could, instead of using this package,
 install Helm and configure Icomplete to use it as follows:
 
 @lisp
