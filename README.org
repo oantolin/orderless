@@ -363,7 +363,7 @@ completion UI (and many other cool features!).
 
 It is worth pointing out that Helm does provide its multi pattern
 matching as a completion style which could be used with default tab
-copletion, Icomplete, Selectrum or other UIs supporting completion
+completion, Icomplete, Selectrum or other UIs supporting completion
 styles! (Ivy does not provide a completion style to my knowledge.) So,
 for example, Icomplete users could, instead of using this package,
 install Helm and configure Icomplete to use it as follows:
