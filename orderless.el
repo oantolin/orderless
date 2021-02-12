@@ -235,7 +235,7 @@ words of the candidate, respectively."
   (orderless--separated-by
    '(seq (zero-or-more word) word-end (zero-or-more (not alpha)))
    (cl-loop for char across component collect `(seq word-start ,char))
-   (when anchored '(seq buffer-start (zero-or-more (not alpha))))
+   (when anchored '(seq (group buffer-start) (zero-or-more (not alpha))))
    (when (eq anchored 'both)
      '(seq (zero-or-more word) word-end (zero-or-more (not alpha)) eol))))
 
