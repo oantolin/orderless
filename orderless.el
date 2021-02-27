@@ -444,7 +444,7 @@ This function is part of the `orderless' completion style."
          (length prefix))))))
 
 ;;;###autoload
-(defun orderless-try-completion (string table pred point &optional _metadata)
+(defun orderless-try-completion (string table pred point)
   "Complete STRING to unique matching entry in TABLE.
 This uses `orderless-all-completions' to find matches for STRING
 in TABLE among entries satisfying PRED.  If there is only one
