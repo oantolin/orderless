@@ -411,19 +411,17 @@ The predicate PRED is used to constrain the entries in TABLE."
 (defun orderless-filter (string table &optional pred)
   "Split STRING into components and find entries TABLE matching all.
 The predicate PRED is used to constrain the entries in TABLE."
-  (condition-case nil
-      (save-match-data
-        (pcase-let* ((`(,prefix . ,pattern)
-                      (orderless--prefix+pattern string table pred))
-                     (completion-regexp-list
-                      (funcall orderless-pattern-compiler pattern))
-                     (completion-ignore-case
-                      (if orderless-smart-case
-                          (cl-loop for regexp in completion-regexp-list
-                                   always (isearch-no-upper-case-p regexp t))
-                        completion-ignore-case)))
-          (all-completions prefix table pred)))
-    (invalid-regexp nil)))
+  (save-match-data
+    (pcase-let* ((`(,prefix . ,pattern)
+                  (orderless--prefix+pattern string table pred))
+                 (completion-regexp-list
+                  (funcall orderless-pattern-compiler pattern))
+                 (completion-ignore-case
+                  (if orderless-smart-case
+                      (cl-loop for regexp in completion-regexp-list
+                               always (isearch-no-upper-case-p regexp t))
+                    completion-ignore-case)))
+      (all-completions prefix table pred))))
 
 ;;;###autoload
 (defun orderless-all-completions (string table pred _point)
