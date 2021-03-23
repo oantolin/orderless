@@ -100,11 +100,8 @@ define new matching styles. The predefined ones are:
 - orderless-regexp :: the component is treated as a regexp that must
   match somewhere in the candidate.
 
-  If the component is not a valid regexp, it matches literally.
-  (Having the component be invalid is actually pretty common while you
-  are typing, so be prepared for the results to be a little funny
-  before you close a bracket or parentheses, etc.)
-  
+  If the component is not a valid regexp, it is ignored.
+
 - orderless-literal :: the component is treated as a literal string
   that must occur in the candidate.
 
@@ -117,7 +114,7 @@ define new matching styles. The predefined ones are:
   probably don't want to use this style directly in
   =orderless-matching-styles= but with a style dispatcher instead. There
   is an example in the section on style dispatchers.
-  
+
 - orderless-prefixes :: the component is split at word endings and
   each piece must match at a word boundary in the candidate, occurring
   in that order.
@@ -406,4 +403,3 @@ you get out of order matching!
 
 - Ivy has =ivy-restrict-to-matches=, bound to =S-SPC=, so you can get the
   effect of out of order matching without using =ivy--regex-ignore-order=.
-
