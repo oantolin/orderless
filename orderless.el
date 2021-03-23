@@ -187,10 +187,10 @@ is determined by the values of `completion-ignore-case',
 ;;; Matching styles
 
 (defun orderless-regexp (component)
-  "Match a component as a regexp."
+  "Match COMPONENT as a regexp."
   (condition-case nil
       (progn (string-match-p component "") component)
-    (invalid-regexp (regexp-quote component))))
+    (invalid-regexp "\0")))
 
 (defalias 'orderless-literal #'regexp-quote
   "Match a component as a literal string.
