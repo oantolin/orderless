@@ -391,15 +391,11 @@ compilers."
    for component in components and index from 0
    for (newstyles . newcomp) = (orderless-dispatch
                                 dispatchers styles component index total)
-   collect
-   (if (functionp newstyles)
-       (funcall newstyles newcomp)
-     (rx-to-string
-      `(or
-        ,@(cl-loop for style in newstyles
-                   for result = (funcall style newcomp)
-                   if result
-                   collect `(regexp ,result)))))))
+   when (functionp newstyles) do (setq newstyles (list newstyles))
+   for regexps = (cl-loop for style in newstyles
+                          for result = (funcall style newcomp)
+                          when result collect `(regexp ,result))
+   when regexps collect (rx-to-string `(or ,@regexps))))
 
 ;;; Completion style implementation
 
