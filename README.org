@@ -100,8 +100,12 @@ define new matching styles. The predefined ones are:
 - orderless-regexp :: the component is treated as a regexp that must
   match somewhere in the candidate.
 
-  This is simply the identity function!
-
+  If the component is not a valid regexp, it matches literally.
+  (Having the component be invalid is actually pretty common while you
+  are typing, so be prepared for the results to be a little funny
+  before you close a bracket or parentheses, etc.)
+  
+  
 - orderless-literal :: the component is treated as a literal string
   that must occur in the candidate.
 
