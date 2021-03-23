@@ -135,10 +135,7 @@ If the component is not a valid regexp, it matches literally.
 (Having the component be invalid is actually pretty common while you
 are typing, so be prepared for the results to be a little funny
 before you close a bracket or parentheses, etc.)
-@end table
 
-
-@table @asis
 @item orderless-literal
 the component is treated as a literal string
 that must occur in the candidate.
@@ -196,8 +193,8 @@ This maps @samp{abc} to @samp{a.*b.*c}.
 @end table
 
 The variable @samp{orderless-matching-styles} can be set to a list of the
-desired matching styles to use. By default it enables the regexp and
-initialism styles.
+desired matching styles to use. By default it enables the literal,
+regexp and initialism styles.
 
 @menu
 * Style dispatchers::

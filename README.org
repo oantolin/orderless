@@ -105,7 +105,6 @@ define new matching styles. The predefined ones are:
   are typing, so be prepared for the results to be a little funny
   before you close a bracket or parentheses, etc.)
   
-  
 - orderless-literal :: the component is treated as a literal string
   that must occur in the candidate.
 
@@ -154,8 +153,8 @@ define new matching styles. The predefined ones are:
   This maps =abc= to =a.*b.*c=.
 
 The variable =orderless-matching-styles= can be set to a list of the
-desired matching styles to use. By default it enables the regexp and
-initialism styles.
+desired matching styles to use. By default it enables the literal,
+regexp and initialism styles.
 
 *** Style dispatchers
 
