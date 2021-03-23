@@ -186,9 +186,11 @@ is determined by the values of `completion-ignore-case',
 
 ;;; Matching styles
 
-(defalias 'orderless-regexp #'identity
-  "Match a component as a regexp.
-This is simply the identity function.")
+(defun orderless-regexp (component)
+  "Match a component as a regexp."
+  (condition-case nil
+      (progn (string-match-p component "") component)
+    (invalid-regexp (regexp-quote component))))
 
 (defalias 'orderless-literal #'regexp-quote
   "Match a component as a literal string.
