@@ -190,7 +190,7 @@ is determined by the values of `completion-ignore-case',
   "Match COMPONENT as a regexp."
   (condition-case nil
       (progn (string-match-p component "") component)
-    (invalid-regexp "\0")))
+    (invalid-regexp nil)))
 
 (defalias 'orderless-literal #'regexp-quote
   "Match a component as a literal string.
@@ -397,7 +397,9 @@ compilers."
      (rx-to-string
       `(or
         ,@(cl-loop for style in newstyles
-                   collect `(regexp ,(funcall style newcomp))))))))
+                   for result = (funcall style newcomp)
+                   if result
+                   collect `(regexp ,result)))))))
 
 ;;; Completion style implementation
 
