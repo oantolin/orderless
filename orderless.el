@@ -152,23 +152,8 @@ match as literals.  As another example, a style dispatcher could
 arrange for a component starting with `?' to match the rest of
 the component in the `orderless-flex' style.  For more
 information on how this variable is used, see
-`orderless-default-pattern-compiler'."
+`orderless-pattern-compiler'."
   :type 'hook)
-
-(defcustom orderless-pattern-compiler #'orderless-default-pattern-compiler
-  "The `orderless' pattern compiler.
-This should be a function that takes an input pattern and returns
-a list of regexps that must all match a candidate in order for
-the candidate to be considered a completion of the pattern.
-
-The default pattern compiler is probably flexible enough for most
-users.  See `orderless-default-pattern-compiler' for details.
-
-The documentation for `orderless-matching-styles' is written
-assuming the default pattern compiler is used, if you change the
-pattern compiler it can, of course, do anything and need not
-consult this variable at all."
-  :type 'function)
 
 (defcustom orderless-smart-case t
   "Whether to use smart case.
@@ -306,7 +291,7 @@ For the user's convenience, if REGEXPS is a string, it is
 converted to a list of regexps according to the value of
 `orderless-matching-styles'."
     (when (stringp regexps)
-      (setq regexps (funcall orderless-pattern-compiler regexps)))
+      (setq regexps (orderless-pattern-compiler regexps)))
     (cl-loop for original in strings
              for string = (copy-sequence original)
              collect (orderless--highlight regexps string)))
@@ -362,7 +347,7 @@ DEFAULT as the list of styles."
            when result return (cons result string)
            finally (return (cons default string))))
 
-(defun orderless-default-pattern-compiler (pattern &optional styles dispatchers)
+(defun orderless-pattern-compiler (pattern &optional styles dispatchers)
   "Build regexps to match the components of PATTERN.
 Split PATTERN on `orderless-component-separator' and compute
 matching styles for each component.  For each component the style
@@ -376,11 +361,7 @@ dispatchers.
 The STYLES default to `orderless-matching-styles', and the
 DISPATCHERS default to `orderless-dipatchers'.  Since nil gets you
 the default, if want to no dispatchers to be run, use '(ignore)
-as the value of DISPATCHERS.
-
-This function is the default for `orderless-pattern-compiler' and
-might come in handy as a subroutine to implement other pattern
-compilers."
+as the value of DISPATCHERS."
   (unless styles (setq styles orderless-matching-styles))
   (unless dispatchers (setq dispatchers orderless-style-dispatchers))
   (cl-loop
@@ -413,7 +394,7 @@ The predicate PRED is used to constrain the entries in TABLE."
     (pcase-let* ((`(,prefix . ,pattern)
                   (orderless--prefix+pattern string table pred))
                  (completion-regexp-list
-                  (funcall orderless-pattern-compiler pattern))
+                  (orderless-pattern-compiler pattern))
                  (completion-ignore-case
                   (if orderless-smart-case
                       (cl-loop for regexp in completion-regexp-list
@@ -515,7 +496,7 @@ delegates to `orderless-%s'.")
 This function is for integration of orderless with ivy, use it as
 a value in `ivy-re-builders-alist'."
   (or (mapcar (lambda (x) (cons x t))
-              (funcall orderless-pattern-compiler str))
+              (orderless-pattern-compiler str))
       ""))
 
 (defun orderless-ivy-highlight (str)
