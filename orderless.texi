@@ -14,7 +14,6 @@
 @finalout
 @titlepage
 @title Orderless
-@author Omar Antolín Camarena
 @end titlepage
 
 @contents
@@ -55,7 +54,7 @@ Related packages
 
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
+* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy.
 
 @end detailmenu
 @end menu
@@ -131,10 +130,7 @@ define new matching styles. The predefined ones are:
 the component is treated as a regexp that must
 match somewhere in the candidate.
 
-If the component is not a valid regexp, it matches literally.
-(Having the component be invalid is actually pretty common while you
-are typing, so be prepared for the results to be a little funny
-before you close a bracket or parentheses, etc.)
+If the component is not a valid regexp, it is ignored.
 
 @item orderless-literal
 the component is treated as a literal string
@@ -294,15 +290,12 @@ completion is the one that ends up being used, of course.
 @node Pattern compiler
 @section Pattern compiler
 
-The default mechanism for turning an input string into a list of
-regexps to match against, configured using @samp{orderless-matching-styles},
-is probably flexible enough for the vast majority of users. But if you
-want to completely change the mechanism, customize the
-@samp{orderless-pattern-compiler}. It's value should be a function from
-string to lists of regexps. You might find it convenient to use
-@samp{orderless-default-pattern-compiler} as a subroutine in your own pattern
-compiler, it conveniently accepts optional arguments that specify
-lists to use instead of @samp{orderless-matching-styles}.
+The default mechanism for turning an input string into a list of regexps to
+match against, configured using @samp{orderless-matching-styles}, is probably
+flexible enough for the vast majority of users. The patterns are compiled by the
+@samp{orderless-pattern-compiler}. Under special circumstances it may be useful to
+implement a custom pattern compiler by advising the
+@samp{orderless-pattern-compiler}.
 
 @node Interactively changing the configuration
 @section Interactively changing the configuration
@@ -426,7 +419,7 @@ face with this configuration:
 @menu
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
+* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy.
 @end menu
 
 @node Ivy and Helm
@@ -435,7 +428,7 @@ face with this configuration:
 The well-known and hugely powerful completion frameworks @uref{https://github.com/abo-abo/swiper, Ivy} and @uref{https://github.com/emacs-helm/helm, Helm}
 also provide for matching space-separated component regexps in any
 order. In Ivy, this is done with the @samp{ivy--regex-ignore-order} matcher.
-In Helm, it is the default, called ``multi pattern matching''.
+In Helm, it is the default, called "multi pattern matching".
 
 This package is significantly smaller than either of those because it
 solely defines a completion style, meant to be used with any completion UI supporting completion styles while both of those provide their own
@@ -465,7 +458,7 @@ components in any order and it can be used with either the @uref{https://github.
 or @uref{https://github.com/abo-abo/swiper, Ivy} completion UIs (it does not offer a completion-style that
 could be used with Emacs' default completion UI or with Icomplete).
 The components can be matched literally, as regexps, as initialisms or
-in the flex style (called ``fuzzy'' in prescient). In addition to
+in the flex style (called "fuzzy" in prescient). In addition to
 matching, @samp{prescient.el} also supports sorting of candidates (@samp{orderless}
 leaves that up to the candidate source and the completion UI).
 

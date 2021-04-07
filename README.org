@@ -237,15 +237,12 @@ completion is the one that ends up being used, of course.
 
 ** Pattern compiler
 
-The default mechanism for turning an input string into a list of
-regexps to match against, configured using =orderless-matching-styles=,
-is probably flexible enough for the vast majority of users. But if you
-want to completely change the mechanism, customize the
-=orderless-pattern-compiler=. It's value should be a function from
-string to lists of regexps. You might find it convenient to use
-=orderless-default-pattern-compiler= as a subroutine in your own pattern
-compiler, it conveniently accepts optional arguments that specify
-lists to use instead of =orderless-matching-styles=.
+The default mechanism for turning an input string into a list of regexps to
+match against, configured using =orderless-matching-styles=, is probably
+flexible enough for the vast majority of users. The patterns are compiled by the
+=orderless-pattern-compiler=. Under special circumstances it may be useful to
+implement a custom pattern compiler by advising the
+=orderless-pattern-compiler=.
 
 ** Interactively changing the configuration
 
