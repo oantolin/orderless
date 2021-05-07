@@ -477,7 +477,7 @@ delegates to `orderless-%s'.")
      (defun ,try-completion (string table pred point)
        ,(funcall fn-doc "try-completion")
        (let ,configuration
-         (orderless-all-completions string table pred point)))
+         (orderless-try-completion string table pred point)))
      (defun ,all-completions (string table pred point)
        ,(funcall fn-doc "all-completions")
        (let ,configuration
