@@ -36,6 +36,7 @@ Customization
 
 * Component matching styles::
 * Component separator regexp::
+* Defining custom orderless styles::
 * Faces for component matches::
 * Pattern compiler::
 * Interactively changing the configuration::
@@ -67,7 +68,7 @@ pattern into space-separated components, and matches candidates that
 match all of the components in any order. Each component can match in
 any one of several ways: literally, as a regexp, as an initialism, in
 the flex style, or as multiple word prefixes. By default, regexp and
-initialism matches are enabled.
+literal matches are enabled.
 
 A completion style is a back-end for completion and is used from a
 front-end that provides a completion UI@. Any completion style can be
@@ -112,6 +113,7 @@ Bug reports are highly welcome and appreciated!
 @menu
 * Component matching styles::
 * Component separator regexp::
+* Defining custom orderless styles::
 * Faces for component matches::
 * Pattern compiler::
 * Interactively changing the configuration::
@@ -189,8 +191,8 @@ This maps @samp{abc} to @samp{a.*b.*c}.
 @end table
 
 The variable @samp{orderless-matching-styles} can be set to a list of the
-desired matching styles to use. By default it enables the literal,
-regexp and initialism styles.
+desired matching styles to use. By default it enables the literal and
+regexp styles.
 
 @menu
 * Style dispatchers::
@@ -242,8 +244,11 @@ You can achieve this with the following configuration:
   (if (= index 0) 'orderless-initialism))
 
 (defun without-if-bang (pattern _index _total)
-  (when (string-prefix-p "!" pattern)
-    `(orderless-without-literal . ,(substring pattern 1))))
+  (cond
+   ((equal "!" pattern)
+    '(orderless-literal . ""))
+   ((string-prefix-p "!" pattern)
+    `(orderless-without-literal . ,(substring pattern 1)))))
 
 (setq orderless-matching-styles '(orderless-regexp)
       orderless-style-dispatchers '(first-initialism
@@ -272,6 +277,30 @@ space, set it to the standard Emacs function @samp{split-string-and-unquote}.
 If you are implementing a command for which you know you want a
 different separator for the components, bind
 @samp{orderless-component-separator} in a @samp{let} form.
+
+@node Defining custom orderless styles
+@section Defining custom orderless styles
+
+Orderless allows the definition of custom completion styles using the
+@code{orderless-define-completion-style} macro. Any Orderless configuration
+variable can be adjusted locally for the new style, e.g.,
+@code{orderless-matching-styles}.
+
+By default Orderless only enables the regexp and literal matching
+styles. In the following example an @code{orderless+initialism} style is
+defined, which additionally enables initialism matching. This completion
+style can then used when matching candidates of the symbol or command
+completion category.
+
+@lisp
+(orderless-define-completion-style orderless+initialism
+  (orderless-matching-styles '(orderless-initialism
+                               orderless-literal
+                               orderless-regexp)))
+(setq completion-category-overrides
+      '((command (styles orderless+initialism))
+        (symbol (styles orderless+initialism))))
+@end lisp
 
 @node Faces for component matches
 @section Faces for component matches
