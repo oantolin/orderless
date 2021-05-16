@@ -14,6 +14,7 @@
 @finalout
 @titlepage
 @title Orderless
+@author Omar Antolín Camarena
 @end titlepage
 
 @contents
@@ -55,7 +56,7 @@ Related packages
 
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy.
+* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
 
 @end detailmenu
 @end menu
@@ -302,6 +303,17 @@ completion category.
         (symbol (styles orderless+initialism))))
 @end lisp
 
+Note that in order for the @samp{orderless+initialism} style to kick-in with
+the above configuration, you'd need to use commands whose metadata
+indicates that the completion candidates are commands or symbols. In
+Emacs 28, @samp{execute-extended-command} has metadata indicating you are
+selecting a command, but earlier versions of Emacs lack this metadata.
+Activating @samp{marginalia-mode} from the @uref{https://github.com/minad/marginalia, Marginalia} package provides this
+metadata automatically for many built-in commands and is recommended
+if you use the above example configuration, or other similarly
+fine-grained control of completion styles according to completion
+category.
+
 @node Faces for component matches
 @section Faces for component matches
 
@@ -448,7 +460,7 @@ face with this configuration:
 @menu
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy.
+* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
 @end menu
 
 @node Ivy and Helm
@@ -457,7 +469,7 @@ face with this configuration:
 The well-known and hugely powerful completion frameworks @uref{https://github.com/abo-abo/swiper, Ivy} and @uref{https://github.com/emacs-helm/helm, Helm}
 also provide for matching space-separated component regexps in any
 order. In Ivy, this is done with the @samp{ivy--regex-ignore-order} matcher.
-In Helm, it is the default, called "multi pattern matching".
+In Helm, it is the default, called ``multi pattern matching''.
 
 This package is significantly smaller than either of those because it
 solely defines a completion style, meant to be used with any completion UI supporting completion styles while both of those provide their own
@@ -487,7 +499,7 @@ components in any order and it can be used with either the @uref{https://github.
 or @uref{https://github.com/abo-abo/swiper, Ivy} completion UIs (it does not offer a completion-style that
 could be used with Emacs' default completion UI or with Icomplete).
 The components can be matched literally, as regexps, as initialisms or
-in the flex style (called "fuzzy" in prescient). In addition to
+in the flex style (called ``fuzzy'' in prescient). In addition to
 matching, @samp{prescient.el} also supports sorting of candidates (@samp{orderless}
 leaves that up to the candidate source and the completion UI).
 

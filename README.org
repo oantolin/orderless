@@ -248,6 +248,17 @@ completion category.
           (symbol (styles orderless+initialism))))
 #+end_src
 
+Note that in order for the =orderless+initialism= style to kick-in with
+the above configuration, you'd need to use commands whose metadata
+indicates that the completion candidates are commands or symbols. In
+Emacs 28, =execute-extended-command= has metadata indicating you are
+selecting a command, but earlier versions of Emacs lack this metadata.
+Activating =marginalia-mode= from the [[https://github.com/minad/marginalia][Marginalia]] package provides this
+metadata automatically for many built-in commands and is recommended
+if you use the above example configuration, or other similarly
+fine-grained control of completion styles according to completion
+category.
+
 ** Faces for component matches
 
 The portions of a candidate matching each component get highlighted in
