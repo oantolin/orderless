@@ -367,7 +367,7 @@ as the value of DISPATCHERS."
   (cl-loop
    with components = (if (functionp orderless-component-separator)
                          (funcall orderless-component-separator pattern)
-                       (split-string pattern orderless-component-separator))
+                       (split-string pattern orderless-component-separator t))
    with total = (length components)
    for component in components and index from 0
    for (newstyles . newcomp) = (orderless-dispatch
