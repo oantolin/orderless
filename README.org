@@ -245,7 +245,8 @@ completion category.
                                  orderless-regexp)))
   (setq completion-category-overrides
         '((command (styles orderless+initialism))
-          (symbol (styles orderless+initialism))))
+          (symbol (styles orderless+initialism))
+          (variable (styles orderless+initialism))))
 #+end_src
 
 Note that in order for the =orderless+initialism= style to kick-in with
