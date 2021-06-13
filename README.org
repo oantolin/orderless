@@ -27,13 +27,17 @@ front-end that provides a completion UI. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
 tab completion), with the built-in Icomplete package (which is similar
 to the more well-known Ido Mode), or with some third party completion
-frameworks such as [[https://github.com/raxod502/selectrum][Selectrum]] or [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]]. To use a
-completion style in this fashion simply add it as an entry in the
-variables =completion-styles= and =completion-category-overrides= (see
-their documentation). You may also want to modify the
-=completion-category-defaults= variable, which serves as a default value
-for =completion-category-overrides=: if you want to use =orderless=
-exclusively, set both variables to =nil=.
+frameworks such as [[https://github.com/minad/vertico][Vertico]], [[https://github.com/raxod502/selectrum][Selectrum]] (in its default configuration),
+or [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]] (note there is also a /built-in/ package named
+icomplete-vertical in the unreleased version 28 of Emacs, which will
+eventually make the third party icomplete-vertical obsolete
+---orderless works equally well with both icomplete-vertical
+packages). To use a completion style with any of these completion UIs
+simply add it as an entry in the variables =completion-styles= and
+=completion-category-overrides= (see their documentation). You may also
+want to modify the =completion-category-defaults= variable, which serves
+as a default value for =completion-category-overrides=: if you want to
+use =orderless= exclusively, set both variables to =nil=.
 
 With a bit of effort, it might still be possible to use =orderless= with
 other completion UIs, even if those UIs don't support the standard
@@ -335,8 +339,9 @@ To use =orderless= from Ivy add this to your Ivy configuration:
 ** Selectrum
 
 Recent versions of Selectrum default to using whatever completion
-styles you have configured. You can use =orderless= that way, or you can
-use this configuration:
+styles you have configured. If you stick with that default
+configuration you can use =orderless= just by adding it to
+=completion-styles=. Alternatively, you can use this configuration:
 
 #+begin_src emacs-lisp
   (setq selectrum-refine-candidates-function #'orderless-filter)
