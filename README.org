@@ -387,6 +387,19 @@ But there are a couple of points of discomfort:
    #+end_src
 
    (Aren't dynamically scoped variables and the advice system nifty?)
+   
+   If you would like to use different =completion-styles= with =company-capf= instead, you 
+   can add this to your config: 
+
+   #+begin_src emacs-lisp
+  ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
+  (advice-add 'company-capf
+              :around
+              (lambda (capf-fn &rest args)
+                (let ((completion-styles '(basic partial-completion)))
+                  (apply capf-fn args))))
+   #+end_src
+
 
 * Related packages
 
