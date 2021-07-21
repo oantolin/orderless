@@ -56,7 +56,7 @@
 
 (defgroup orderless nil
   "Completion method that matches space-separated regexps in any order."
-  :group 'completion)
+  :group 'minibuffer)
 
 (defface orderless-match-face-0
   '((default :weight bold)
