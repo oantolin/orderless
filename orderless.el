@@ -376,7 +376,7 @@ as the value of DISPATCHERS."
    for regexps = (cl-loop for style in newstyles
                           for result = (funcall style newcomp)
                           when result collect `(regexp ,result))
-   when regexps collect (rx-to-string `(or ,@regexps))))
+   when regexps collect (rx-to-string `(or ,@(delete-dups regexps)))))
 
 ;;; Completion style implementation
 
