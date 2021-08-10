@@ -276,7 +276,7 @@ at a word boundary in the candidate.  This is similar to the
            for regexp in regexps and i from 0
            when (string-match regexp string) do
            (cl-loop
-            for (x y) on (or (cddr (match-data)) (match-data)) by #'cddr
+            for (x y) on (let ((m (match-data))) (or (cddr m) m)) by #'cddr
             when x do
             (add-face-text-property
              x y
@@ -302,7 +302,11 @@ converted to a list of regexps according to the value of
   "Split STRING on spaces, which can be escaped with backslash."
   (mapcar
    (lambda (piece) (replace-regexp-in-string (string 0) " " piece))
-   (split-string (replace-regexp-in-string "\\\\ " (string 0) string) " ")))
+   (split-string (replace-regexp-in-string
+                  "\\\\\\\\\\|\\\\ "
+                  (lambda (x) (if (equal x "\\ ") (string 0) x))
+                  string)
+                 " +" t)))
 
 (defun orderless-dispatch (dispatchers default string &rest args)
   "Run DISPATCHERS to compute matching styles for STRING.
