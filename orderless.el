@@ -305,7 +305,7 @@ converted to a list of regexps according to the value of
    (split-string (replace-regexp-in-string
                   "\\\\\\\\\\|\\\\ "
                   (lambda (x) (if (equal x "\\ ") (string 0) x))
-                  string)
+                  string 'fixedcase 'literal)
                  " +" t)))
 
 (defun orderless-dispatch (dispatchers default string &rest args)
