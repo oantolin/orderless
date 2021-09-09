@@ -399,11 +399,19 @@ The predicate PRED is used to constrain the entries in TABLE."
                   (orderless--prefix+pattern string table pred))
                  (completion-regexp-list
                   (orderless-pattern-compiler pattern))
+                 (initial
+                  ;; try to find a regexp of the form \(?:^literal\)
+                  (cl-find "\\`\\\\(\\?:\\^[^$*+.?[\\^]*\\\\)\\'"
+                           completion-regexp-list
+                           :test #'string-match-p))
                  (completion-ignore-case
                   (if orderless-smart-case
                       (cl-loop for regexp in completion-regexp-list
                                always (isearch-no-upper-case-p regexp t))
                     completion-ignore-case)))
+      (when initial
+        (setq prefix (concat prefix (substring initial 5 -2))
+              completion-regexp-list (delete initial completion-regexp-list)))
       (all-completions prefix table pred))))
 
 ;;;###autoload
