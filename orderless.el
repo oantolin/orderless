@@ -390,6 +390,22 @@ The predicate PRED is used to constrain the entries in TABLE."
   (let ((limit (car (completion-boundaries string table pred ""))))
     (cons (substring string 0 limit) (substring string limit))))
 
+;; Thanks to @jakanakaevangeli for writing a version of this function:
+;; https://github.com/oantolin/orderless/issues/79#issuecomment-916073526
+(defun orderless--anchored-quoted-regexp (regexp)
+  "Determine if REGEXP is a quoted regexp anchored at the beginning.
+If REGEXP is of the form \"\\(?:^q\\)\" for q = (regexp-quote u),
+then return (cons REGEXP u); else return nil."
+  (when (and (string-prefix-p "\\(?:^" regexp) (string-suffix-p "\\)" regexp))
+    (let ((trimmed (substring regexp 5 -2)))
+      (unless (string-match-p "[$*+.?[\\^]"
+                              (replace-regexp-in-string
+                               "\\\\[$*+.?[\\^]" "" trimmed
+                               'fixedcase 'literal))
+        (cons regexp
+              (replace-regexp-in-string "\\\\\\([$*+.?[\\^]\\)" "\\1"
+                                        trimmed 'fixedcase))))))
+
 ;;;###autoload
 (defun orderless-filter (string table &optional pred)
   "Split STRING into components and find entries TABLE matching all.
@@ -399,19 +415,18 @@ The predicate PRED is used to constrain the entries in TABLE."
                   (orderless--prefix+pattern string table pred))
                  (completion-regexp-list
                   (orderless-pattern-compiler pattern))
-                 (initial
-                  ;; try to find a regexp of the form \(?:^literal\)
-                  (cl-find "\\`\\\\(\\?:\\^[^$*+.?[\\^]*\\\\)\\'"
-                           completion-regexp-list
-                           :test #'string-match-p))
                  (completion-ignore-case
                   (if orderless-smart-case
                       (cl-loop for regexp in completion-regexp-list
                                always (isearch-no-upper-case-p regexp t))
                     completion-ignore-case)))
-      (when initial
-        (setq prefix (concat prefix (substring initial 5 -2))
-              completion-regexp-list (delete initial completion-regexp-list)))
+      ;; If there is a regexp of the form \(?:^quoted-regexp\) then
+      ;; remove the first such and add the unquoted form to the prefix.
+      (pcase (cl-some #'orderless--anchored-quoted-regexp
+                      completion-regexp-list)
+        (`(,regexp . ,literal)
+         (setq prefix (concat prefix literal)
+               completion-regexp-list (delete regexp completion-regexp-list))))
       (all-completions prefix table pred))))
 
 ;;;###autoload
