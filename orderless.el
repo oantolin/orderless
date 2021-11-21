@@ -462,10 +462,12 @@ This function is part of the `orderless' completion style."
     (cond
      ((null all) nil)
      ((null (cdr all))
-      (let ((full (concat
-                   (car (orderless--prefix+pattern string table pred))
-                   (car all))))
-        (cons full (length full))))
+      (if (equal string (car all))
+          t                             ; unique exact match
+        (let ((full (concat
+                     (car (orderless--prefix+pattern string table pred))
+                     (car all))))
+          (cons full (length full)))))
      (t (cons string point)))))
 
 ;;;###autoload
