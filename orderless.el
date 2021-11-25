@@ -464,11 +464,14 @@ This function is part of the `orderless' completion style."
       ;; Should be more or less allocation-free since our "predicate"
       ;; always returns nil.
       (orderless-filter string table
-                        (lambda (str)
-                          (when (or (not pred) (funcall pred str))
+                        ;; key/value for hash tables
+                        (lambda (&rest args)
+                          (when (or (not pred) (apply pred args))
                             (when one
                               (throw 'orderless--many (cons string point)))
-                            (setq one str))
+                            (setq one (car args) ;; first argument is key
+                                  one (if (consp args) (car args) args) ;; alist
+                                  one (if (symbolp one) (symbol-name one) one)))
                           nil))
       (when one
         (if (equal string one)
