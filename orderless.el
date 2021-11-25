@@ -469,10 +469,8 @@ This function is part of the `orderless' completion style."
                           (when (or (not pred) (apply pred args))
                             (when one
                               (throw 'orderless--many (cons string point)))
-                            (setq one (pcase-exhaustive args
-                                        (`((,key . ,_val)) key) ;; alists
-                                        (`(,str) str) ;; strings/symbols
-                                        (`(,key ,_val) key)) ;; hash tables
+                            (setq one (car args) ;; first argument is key
+                                  one (if (consp args) (car args) args) ;; alist
                                   one (if (symbolp one) (symbol-name one) one)))
                           nil))
       (when one
