@@ -26,14 +26,24 @@ A completion style is a back-end for completion and is used from a
 front-end that provides a completion UI. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
 tab completion), with the built-in Icomplete package (which is similar
-to the more well-known Ido Mode), or with some third party completion
-frameworks such as [[https://github.com/minad/vertico][Vertico]], [[https://github.com/raxod502/selectrum][Selectrum]] (in its default configuration),
-or [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]] (note there is also a /built-in/ package named
-icomplete-vertical in the unreleased version 28 of Emacs, which will
-eventually make the third party icomplete-vertical obsolete
----orderless works equally well with both icomplete-vertical
-packages). To use a completion style with any of these completion UIs
-simply add it as an entry in the variables =completion-styles= and
+to the more well-known Ido Mode), or with some third party minibuffer
+completion frameworks such as [[https://github.com/minad/vertico][Vertico]], [[https://github.com/raxod502/selectrum][Selectrum]] (in its default
+configuration), or [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]] (note there is also a /built-in/
+package named icomplete-vertical in the unreleased version 28 of
+Emacs, which will eventually make the third party icomplete-vertical
+obsolete ---orderless works equally well with both icomplete-vertical
+packages).
+
+All the completion UIs just mentioned are for minibuffer completion,
+used when Emacs commands prompt the user in the minibuffer for some
+input, but there is also completion at point in normal buffers,
+typically used for identifiers in programming languages. Completion
+styles can also be used for that purpose by completion at point UIs
+such as [[https://github.com/minad/corfu][Corfu]], the function =consult-completion-in-region= from [[https://github.com/minad/consult][Consult]]
+or [[https://company-mode.github.io/][Company]].
+
+To use a completion style with any of the above mentioned completion
+UIs simply add it as an entry in the variables =completion-styles= and
 =completion-category-overrides= (see their documentation). You may also
 want to modify the =completion-category-defaults= variable, which serves
 as a default value for =completion-category-overrides=: if you want to
@@ -42,7 +52,9 @@ use =orderless= exclusively, set both variables to =nil=.
 With a bit of effort, it might still be possible to use =orderless= with
 other completion UIs, even if those UIs don't support the standard
 Emacs completion styles. Currently there is support for [[https://github.com/abo-abo/swiper][Ivy]] (see
-below).
+below). Also, while Company does support completion styles directly,
+pressing =SPC= takes you out of completion, so comfortably using
+=orderless= with it takes a bit of configuration (see below).
 
 If you use MELPA, the easiest way to install =orderless= is via
 =package-install=. If you use both MELPA and =use-package=, you can use:
