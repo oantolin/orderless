@@ -39,8 +39,8 @@ used when Emacs commands prompt the user in the minibuffer for some
 input, but there is also completion at point in normal buffers,
 typically used for identifiers in programming languages. Completion
 styles can also be used for that purpose by completion at point UIs
-such as [[https://github.com/minad/corfu][Corfu]], the function =consult-completion-in-region= from [[https://github.com/minad/consult][Consult]]
-or [[https://company-mode.github.io/][Company]].
+such as [[https://github.com/minad/corfu][Corfu]], [[https://company-mode.github.io/][Company]] or the function =consult-completion-in-region=
+from [[https://github.com/minad/consult][Consult]].
 
 To use a completion style with any of the above mentioned completion
 UIs simply add it as an entry in the variables =completion-styles= and
