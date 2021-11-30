@@ -470,7 +470,7 @@ This function is part of the `orderless' completion style."
                             (when one
                               (throw 'orderless--many (cons string point)))
                             (setq one (car args) ;; first argument is key
-                                  one (if (consp args) (car args) args) ;; alist
+                                  one (if (consp one) (car one) one) ;; alist
                                   one (if (symbolp one) (symbol-name one) one)))
                           nil))
       (when one
