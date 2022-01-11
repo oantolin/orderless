@@ -181,25 +181,6 @@ as the beginning of a word in the candidate, in order.
 
 This maps @samp{abc} to @samp{\<a.*\<b.*\c}.
 
-@item orderless-strict-initialism
-like initialism but only allow
-non-letters in between the matched words.
-
-For example @samp{fb} would match @samp{foo-bar} but not @samp{foo-qux-bar}.
-
-@item orderless-strict-leading-initialism
-like strict-initialism but
-require the first initial to match the candidate's first word.
-
-For example @samp{bb} would match @samp{bar-baz} but not @samp{foo-bar-baz}.
-
-@item orderless-strict-full-initialism
-like strict-initialism but
-require the first initial to match the candidate's first word and the
-last initial to be at the final word.
-
-For example @samp{fbb} would match @samp{foo-bar-baz} but not @samp{foo-bar-baz-qux}.
-
 @item orderless-flex
 the characters of the component should appear in
 that order in the candidate, but not necessarily consecutively.
