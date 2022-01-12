@@ -5,10 +5,10 @@
 #+TEXINFO_DIR_TITLE: Orderless: (orderless).
 #+TEXINFO_DIR_DESC: Completion style for matching regexps in any order
 
-:BADGES:
-[[https://melpa.org/#/orderless][file:https://melpa.org/packages/orderless-badge.svg]]
-[[https://stable.melpa.org/#/orderless][file:https://stable.melpa.org/packages/orderless-badge.svg]]
-:END:
+#+html: <a href="http://elpa.gnu.org/packages/orderless.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/orderless.svg"/></a>
+#+html: <a href="http://elpa.gnu.org/devel/orderless.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/orderless.svg"/></a>
+#+html: <a href="https://melpa.org/#/orderless"><img alt="MELPA" src="https://melpa.org/packages/orderless-badge.svg"/></a>
+#+html: <a href="https://stable.melpa.org/#/orderless"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/orderless-badge.svg"/></a>
 
 * Overview
 :PROPERTIES:
@@ -56,8 +56,8 @@ below). Also, while Company does support completion styles directly,
 pressing =SPC= takes you out of completion, so comfortably using
 =orderless= with it takes a bit of configuration (see below).
 
-If you use MELPA, the easiest way to install =orderless= is via
-=package-install=. If you use both MELPA and =use-package=, you can use:
+If you use ELPA or MELPA, the easiest way to install =orderless= is via
+=package-install=. If you use =use-package=, you can use:
 
 #+begin_src emacs-lisp
   (use-package orderless

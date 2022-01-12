@@ -105,8 +105,8 @@ below). Also, while Company does support completion styles directly,
 pressing @samp{SPC} takes you out of completion, so comfortably using
 @samp{orderless} with it takes a bit of configuration (see below).
 
-If you use MELPA, the easiest way to install @samp{orderless} is via
-@samp{package-install}. If you use both MELPA and @samp{use-package}, you can use:
+If you use ELPA or MELPA, the easiest way to install @samp{orderless} is via
+@samp{package-install}. If you use @samp{use-package}, you can use:
 
 @lisp
 (use-package orderless
