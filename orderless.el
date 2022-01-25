@@ -506,6 +506,7 @@ This function is for integration of orderless with ivy."
 
 ;;;###autoload
 (with-eval-after-load 'ivy
+  (defvar ivy-highlight-functions-alist)
   (add-to-list 'ivy-highlight-functions-alist
                '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 
