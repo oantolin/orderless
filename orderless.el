@@ -469,10 +469,11 @@ string for the completion style."
   (let* ((fn-name (lambda (string) (intern (concat (symbol-name name) string))))
          (try-completion  (funcall fn-name "-try-completion"))
          (all-completions (funcall fn-name "-all-completions"))
-         (doc-fmt "`%s' function for the %s completion style.
-This configures orderless according to the %s completion style and
-delegates to `orderless-%s'.")
-         (fn-doc (lambda (fn) (format doc-fmt fn name name fn))))
+         (doc-fmt "`%s' function for the %s style.
+This function delegates to `orderless-%s'.
+The orderless configuration is locally modified
+specifically for the %s style.")
+         (fn-doc (lambda (fn) (format doc-fmt fn name fn name name))))
   `(progn
      (defun ,try-completion (string table pred point)
        ,(funcall fn-doc "try-completion")
