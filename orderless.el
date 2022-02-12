@@ -186,6 +186,7 @@ This is simply `regexp-quote'.")
 If BEFORE is specified, add it to the beginning of the rx
 sequence.  If AFTER is specified, add it to the end of the rx
 sequence."
+  (declare (indent 1))
   (rx-to-string
    `(seq
      ,(or before "")
@@ -199,14 +200,14 @@ sequence."
 This means the characters in COMPONENT must occur in the
 candidate in that order, but not necessarily consecutively."
   (orderless--separated-by '(zero-or-more nonl)
-   (cl-loop for char across component collect char)))
+    (cl-loop for char across component collect char)))
 
 (defun orderless-initialism (component)
   "Match a component as an initialism.
 This means the characters in COMPONENT must occur in the
 candidate, in that order, at the beginning of words."
   (orderless--separated-by '(zero-or-more nonl)
-   (cl-loop for char across component collect `(seq word-start ,char))))
+    (cl-loop for char across component collect `(seq word-start ,char))))
 
 (defun orderless-prefixes (component)
   "Match a component as multiple word prefixes.
@@ -214,8 +215,8 @@ The COMPONENT is split at word endings, and each piece must match
 at a word boundary in the candidate.  This is similar to the
 `partial-completion' completion style."
   (orderless--separated-by '(zero-or-more nonl)
-   (cl-loop for prefix in (split-string component "\\>")
-            collect `(seq word-boundary ,prefix))))
+    (cl-loop for prefix in (split-string component "\\>")
+             collect `(seq word-boundary ,prefix))))
 
 (defun orderless-without-literal (component)
   "Match strings that do *not* contain COMPONENT as a literal match."
