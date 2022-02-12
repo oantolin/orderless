@@ -488,9 +488,6 @@ specifically for the %s style.")
 
 ;;; Ivy integration
 
-(defvar ivy-regex)
-(defvar ivy-highlight-functions-alist)
-
 ;;;###autoload
 (defun orderless-ivy-re-builder (str)
   "Convert STR into regexps for use with ivy.
@@ -500,6 +497,7 @@ a value in `ivy-re-builders-alist'."
               (orderless-pattern-compiler str))
       ""))
 
+(defvar ivy-regex)
 (defun orderless-ivy-highlight (str)
   "Highlight a match in STR of each regexp in `ivy-regex'.
 This function is for integration of orderless with ivy."
@@ -507,6 +505,7 @@ This function is for integration of orderless with ivy."
 
 ;;;###autoload
 (with-eval-after-load 'ivy
+  (defvar ivy-highlight-functions-alist)
   (add-to-list 'ivy-highlight-functions-alist
                '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 
