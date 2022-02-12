@@ -469,10 +469,11 @@ string for the completion style."
   (let* ((fn-name (lambda (string) (intern (concat (symbol-name name) string))))
          (try-completion  (funcall fn-name "-try-completion"))
          (all-completions (funcall fn-name "-all-completions"))
-         (doc-fmt "`%s' function for the %s completion style.
-This configures orderless according to the %s completion style and
-delegates to `orderless-%s'.")
-         (fn-doc (lambda (fn) (format doc-fmt fn name name fn))))
+         (doc-fmt "`%s' function for the %s style.
+This function delegates to `orderless-%s'.
+The orderless configuration is locally modified
+specifically for the %s style.")
+         (fn-doc (lambda (fn) (format doc-fmt fn name fn name name))))
   `(progn
      (defun ,try-completion (string table pred point)
        ,(funcall fn-doc "try-completion")
@@ -487,9 +488,6 @@ delegates to `orderless-%s'.")
 
 ;;; Ivy integration
 
-(defvar ivy-regex)
-(defvar ivy-highlight-functions-alist)
-
 ;;;###autoload
 (defun orderless-ivy-re-builder (str)
   "Convert STR into regexps for use with ivy.
@@ -499,6 +497,7 @@ a value in `ivy-re-builders-alist'."
               (orderless-pattern-compiler str))
       ""))
 
+(defvar ivy-regex)
 (defun orderless-ivy-highlight (str)
   "Highlight a match in STR of each regexp in `ivy-regex'.
 This function is for integration of orderless with ivy."
@@ -506,6 +505,7 @@ This function is for integration of orderless with ivy."
 
 ;;;###autoload
 (with-eval-after-load 'ivy
+  (defvar ivy-highlight-functions-alist)
   (add-to-list 'ivy-highlight-functions-alist
                '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 
