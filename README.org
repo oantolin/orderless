@@ -330,6 +330,7 @@ To use =orderless= from Ivy add this to your Ivy configuration:
 
 #+begin_src emacs-lisp
   (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
+  (add-to-list 'ivy-highlight-functions-alist '(orderless-ivy-re-builder . orderless-ivy-highlight))
 #+end_src
 
 ** Selectrum

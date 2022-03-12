@@ -504,11 +504,5 @@ a value in `ivy-re-builders-alist'."
 This function is for integration of orderless with ivy."
   (orderless--highlight (mapcar #'car ivy-regex) str) str)
 
-;;;###autoload
-(with-eval-after-load 'ivy
-  (defvar ivy-highlight-functions-alist)
-  (add-to-list 'ivy-highlight-functions-alist
-               '(orderless-ivy-re-builder . orderless-ivy-highlight)))
-
 (provide 'orderless)
 ;;; orderless.el ends here
