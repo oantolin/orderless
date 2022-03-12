@@ -393,6 +393,7 @@ To use @samp{orderless} from Ivy add this to your Ivy configuration:
 
 @lisp
 (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
+(add-to-list 'ivy-highlight-functions-alist '(orderless-ivy-re-builder . orderless-ivy-highlight))
 @end lisp
 
 @node Selectrum
