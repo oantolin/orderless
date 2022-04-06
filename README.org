@@ -82,7 +82,7 @@ completion style needs to be tried /first/ (not as a fallback) for TRAMP
 hostname completion to work. In order to achieve that, we add an entry
 for the =file= completion category in the =completion-category-overrides=
 variable. In addition, the =partial-completion= style allows you to use
-wildcards for file completion and partial paths, e.g., ~/u/l/s~ for
+wildcards for file completion and partial paths, e.g., ~/u/s/l~ for
 ~/usr/share/local~.
 
 Bug reports are highly welcome and appreciated!
