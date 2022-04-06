@@ -76,7 +76,7 @@ front-end that provides a completion UI@. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
 tab completion), with the built-in Icomplete package (which is similar
 to the more well-known Ido Mode), or with some third party minibuffer
-completion frameworks such as @uref{https://github.com/minad/vertico, Vertico}, @uref{https://github.com/raxod502/selectrum, Selectrum} (in its default
+completion frameworks such as @uref{https://gitlab.com/protesilaos/mct, Mct}, @uref{https://github.com/minad/vertico, Vertico}, @uref{https://github.com/raxod502/selectrum, Selectrum} (in its default
 configuration), or @uref{https://github.com/oantolin/icomplete-vertical, icomplete-vertical} (note there is also a @emph{built-in}
 package named icomplete-vertical in the unreleased version 28 of
 Emacs, which will eventually make the third party icomplete-vertical
@@ -502,11 +502,11 @@ install Helm and configure Icomplete to use it as follows:
 The @uref{https://github.com/raxod502/prescient.el, prescient.el} library also provides matching of space-separated
 components in any order and it can be used with either the @uref{https://github.com/raxod502/selectrum, Selectrum} or
 @uref{https://github.com/abo-abo/swiper, Ivy} completion UIs (it does not offer a completion-style that could be
-used with Emacs' default completion UI, Vertico or with Icomplete). The
-components can be matched literally, as regexps, as initialisms or in
-the flex style (called "fuzzy" in prescient). In addition to matching,
-@samp{prescient.el} also supports sorting of candidates (@samp{orderless} leaves that
-up to the candidate source and the completion UI).
+used with Emacs' default completion UI, Mct, Vertico or with Icomplete).
+The components can be matched literally, as regexps, as initialisms or
+in the flex style (called "fuzzy" in prescient). In addition to
+matching, @samp{prescient.el} also supports sorting of candidates (@samp{orderless}
+leaves that up to the candidate source and the completion UI).
 
 @node Restricting to current matches in Icicles Ido and Ivy
 @section Restricting to current matches in Icicles, Ido and Ivy
