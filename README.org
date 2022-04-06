@@ -26,13 +26,11 @@ A completion style is a back-end for completion and is used from a
 front-end that provides a completion UI. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
 tab completion), with the built-in Icomplete package (which is similar
-to the more well-known Ido Mode), or with some third party minibuffer
-completion frameworks such as [[https://gitlab.com/protesilaos/mct][Mct]], [[https://github.com/minad/vertico][Vertico]], [[https://github.com/raxod502/selectrum][Selectrum]] (in its default
-configuration), or [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]] (note there is also a /built-in/
-package named icomplete-vertical in the unreleased version 28 of
-Emacs, which will eventually make the third party icomplete-vertical
-obsolete ---orderless works equally well with both icomplete-vertical
-packages).
+to the more well-known Ido Mode), the icomplete-vertical variant from
+Emacs 28 (see the external [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]] package to get that
+functionality on earlier versions of Emacs), or with some third party
+minibuffer completion frameworks such as [[https://gitlab.com/protesilaos/mct][Mct]], [[https://github.com/minad/vertico][Vertico]], or [[https://github.com/raxod502/selectrum][Selectrum]]
+(in its default configuration).
 
 All the completion UIs just mentioned are for minibuffer completion,
 used when Emacs commands prompt the user in the minibuffer for some
