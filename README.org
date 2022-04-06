@@ -62,7 +62,7 @@ If you use ELPA or MELPA, the easiest way to install =orderless= is via
 #+begin_src emacs-lisp
   (use-package orderless
     :ensure t
-    :custom (completion-styles '(orderless)))
+    :custom (completion-styles '(orderless basic)))
 #+end_src
 
 Alternatively, put =orderless.el= somewhere on your =load-path=, and use
@@ -70,8 +70,13 @@ the following configuration:
 
 #+begin_src emacs-lisp
 (require 'orderless)
-(setq completion-styles '(orderless))
+(setq completion-styles '(orderless basic))
 #+end_src
+
+The =basic= completion style is specified as fallback in addition to
+=orderless= in order to ensure that completion commands which rely on
+dynamic completion tables, e.g., ~completion-table-dynamic~ or
+~completion-table-in-turn~, work correctly.
 
 Bug reports are highly welcome and appreciated!
 
@@ -407,7 +412,7 @@ install Helm and configure Icomplete to use it as follows:
 
 #+begin_src emacs-lisp
   (require 'helm)
-  (setq completion-styles '(helm))
+  (setq completion-styles '(helm basic))
   (icomplete-mode)
 #+end_src
 
@@ -417,13 +422,13 @@ install Helm and configure Icomplete to use it as follows:
 ** Prescient
 
 The [[https://github.com/raxod502/prescient.el][prescient.el]] library also provides matching of space-separated
-components in any order and it can be used with either the [[https://github.com/raxod502/selectrum][Selectrum]]
-or [[https://github.com/abo-abo/swiper][Ivy]] completion UIs (it does not offer a completion-style that
-could be used with Emacs' default completion UI or with Icomplete).
-The components can be matched literally, as regexps, as initialisms or
-in the flex style (called "fuzzy" in prescient). In addition to
-matching, =prescient.el= also supports sorting of candidates (=orderless=
-leaves that up to the candidate source and the completion UI).
+components in any order and it can be used with either the [[https://github.com/raxod502/selectrum][Selectrum]] or
+[[https://github.com/abo-abo/swiper][Ivy]] completion UIs (it does not offer a completion-style that could be
+used with Emacs' default completion UI, Vertico or with Icomplete). The
+components can be matched literally, as regexps, as initialisms or in
+the flex style (called "fuzzy" in prescient). In addition to matching,
+=prescient.el= also supports sorting of candidates (=orderless= leaves that
+up to the candidate source and the completion UI).
 
 ** Restricting to current matches in Icicles, Ido and Ivy
 
