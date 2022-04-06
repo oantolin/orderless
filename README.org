@@ -62,21 +62,28 @@ If you use ELPA or MELPA, the easiest way to install =orderless= is via
 #+begin_src emacs-lisp
   (use-package orderless
     :ensure t
-    :custom (completion-styles '(orderless basic)))
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-overrides '((file (styles basic partial-completion)))))
 #+end_src
 
 Alternatively, put =orderless.el= somewhere on your =load-path=, and use
 the following configuration:
 
 #+begin_src emacs-lisp
-(require 'orderless)
-(setq completion-styles '(orderless basic))
+  (require 'orderless)
+  (setq completion-styles '(orderless basic)
+        completion-category-overrides '((file (styles basic partial-completion))))
 #+end_src
 
-The =basic= completion style is specified as fallback in addition to
-=orderless= in order to ensure that completion commands which rely on
-dynamic completion tables, e.g., ~completion-table-dynamic~ or
-~completion-table-in-turn~, work correctly.
+The =basic= completion style is specified as fallback in addition to =orderless= in
+order to ensure that completion commands which rely on dynamic completion
+tables, e.g., ~completion-table-dynamic~ or ~completion-table-in-turn~, work
+correctly. Furthermore the =basic= completion style is needed by Tramp hostname
+completion for the =file= completion category in the
+=completion-category-overrides=. In addition, the =partial-completion= style allows
+you to use wildcards for file completion and partial paths, e.g., ~/u/l/s~ for
+~/usr/share/local~.
 
 Bug reports are highly welcome and appreciated!
 

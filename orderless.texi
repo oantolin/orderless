@@ -111,7 +111,9 @@ If you use ELPA or MELPA, the easiest way to install @samp{orderless} is via
 @lisp
 (use-package orderless
   :ensure t
-  :custom (completion-styles '(orderless basic)))
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
 @end lisp
 
 Alternatively, put @samp{orderless.el} somewhere on your @samp{load-path}, and use
@@ -119,13 +121,18 @@ the following configuration:
 
 @lisp
 (require 'orderless)
-(setq completion-styles '(orderless basic))
+(setq completion-styles '(orderless basic)
+      completion-category-overrides '((file (styles basic partial-completion))))
 @end lisp
 
-The @samp{basic} completion style is specified as fallback in addition to
-@samp{orderless} in order to ensure that completion commands which rely on
-dynamic completion tables, e.g., @code{completion-table-dynamic} or
-@code{completion-table-in-turn}, work correctly.
+The @samp{basic} completion style is specified as fallback in addition to @samp{orderless} in
+order to ensure that completion commands which rely on dynamic completion
+tables, e.g., @code{completion-table-dynamic} or @code{completion-table-in-turn}, work
+correctly. Furthermore the @samp{basic} completion style is needed by Tramp hostname
+completion for the @samp{file} completion category in the
+@samp{completion-category-overrides}. In addition, the @samp{partial-completion} style allows
+you to use wildcards for file completion and partial paths, e.g., @code{/u/l/s} for
+@code{/usr/share/local}.
 
 Bug reports are highly welcome and appreciated!
 
