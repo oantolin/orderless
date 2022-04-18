@@ -6,7 +6,7 @@
 @documentlanguage en
 @c %**end of header
 
-@dircategory Emacs
+@dircategory Emacs misc features
 @direntry
 * Orderless: (orderless). Completion style for matching regexps in any order.
 @end direntry

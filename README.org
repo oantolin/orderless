@@ -1,7 +1,7 @@
 #+TITLE: Orderless
 #+OPTIONS: d:nil
 #+EXPORT_FILE_NAME: orderless.texi
-#+TEXINFO_DIR_CATEGORY: Emacs
+#+TEXINFO_DIR_CATEGORY: Emacs misc features
 #+TEXINFO_DIR_TITLE: Orderless: (orderless).
 #+TEXINFO_DIR_DESC: Completion style for matching regexps in any order
 
