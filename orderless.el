@@ -326,7 +326,7 @@ dispatchers.
 
 The STYLES default to `orderless-matching-styles', and the
 DISPATCHERS default to `orderless-dipatchers'.  Since nil gets you
-the default, if want to no dispatchers to be run, use '(ignore)
+the default, if want to no dispatchers to be run, use \\='(ignore)
 as the value of DISPATCHERS."
   (unless styles (setq styles orderless-matching-styles))
   (unless dispatchers (setq dispatchers orderless-style-dispatchers))
