@@ -428,14 +428,14 @@ install Helm and configure Icomplete to use it as follows:
 
 ** Prescient
 
-The [[https://github.com/raxod502/prescient.el][prescient.el]] library also provides matching of space-separated
-components in any order and it can be used with either the [[https://github.com/raxod502/selectrum][Selectrum]] or
-[[https://github.com/abo-abo/swiper][Ivy]] completion UIs (it does not offer a completion-style that could be
-used with Emacs' default completion UI, Mct, Vertico or with Icomplete).
-The components can be matched literally, as regexps, as initialisms or
-in the flex style (called "fuzzy" in prescient). In addition to
-matching, =prescient.el= also supports sorting of candidates (=orderless=
-leaves that up to the candidate source and the completion UI).
+The [[https://github.com/raxod502/prescient.el][prescient.el]] library also provides matching of space-separated components in
+any order. It offers a completion-style that can be used with Emacs' default
+completion UI, Mct, Vertico or with Icomplete. Furthermore Selectrum and Ivy are
+supported. The components can be matched literally, as regexps, as initialisms
+or in the flex style (called "fuzzy" in prescient). Prescient does not offer the
+same flexibility as Orderless with its style dispatchers. However in addition to
+matching, Prescient supports sorting of candidates, while Orderless leaves that
+up to the candidate source and the completion UI.
 
 ** Restricting to current matches in Icicles, Ido and Ivy
 
