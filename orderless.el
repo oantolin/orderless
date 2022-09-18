@@ -423,18 +423,20 @@ This function is part of the `orderless' completion style."
   (catch 'orderless--many
     (let (one)
       ;; Abuse all-completions/orderless-filter as a fast search loop.
-      ;; Should be more or less allocation-free since our "predicate"
-      ;; always returns nil.
-      (orderless-filter string table
-                        ;; key/value for hash tables
-                        (lambda (&rest args)
-                          (when (or (not pred) (apply pred args))
-                            (when one
-                              (throw 'orderless--many (cons string point)))
-                            (setq one (car args) ;; first argument is key
-                                  one (if (consp one) (car one) one) ;; alist
-                                  one (if (symbolp one) (symbol-name one) one)))
-                          nil))
+      ;; Should be almost allocation-free since our "predicate" is not
+      ;; called more than two times.
+      (orderless-filter
+       string table
+       ;; key/value for hash tables
+       (lambda (&rest args)
+         (when (or (not pred) (apply pred args))
+           (setq args (car args) ;; first argument is key
+                 args (if (consp args) (car args) args) ;; alist
+                 args (if (symbolp args) (symbol-name args) args))
+           (when (and one (not (equal one args)))
+             (throw 'orderless--many (cons string point)))
+           (setq one args)
+           t)))
       (when one
         (if (equal string one)
             t ;; unique exact match
