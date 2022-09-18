@@ -199,8 +199,10 @@ sequence."
   "Match a component in flex style.
 This means the characters in COMPONENT must occur in the
 candidate in that order, but not necessarily consecutively."
-  (orderless--separated-by '(zero-or-more nonl)
-    (cl-loop for char across component collect char)))
+  (rx-to-string
+   `(seq
+     ,@(cdr (cl-loop for char across component
+                     append `((zero-or-more (not ,char)) (group ,char)))))))
 
 (defun orderless-initialism (component)
   "Match a component as an initialism.
