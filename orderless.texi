@@ -466,6 +466,19 @@ face with this configuration:
 (Aren't dynamically scoped variables and the advice system nifty?)
 @end enumerate
 
+If you would like to use different @samp{completion-styles} with @samp{company-capf} instead, you 
+can add this to your config: 
+
+@lisp
+;; We follow a suggestion by company maintainer u/hvis:
+;; https://www.reddit.com/r/emacs/comments/nichkl/comment/gz1jr3s/
+(defun company-completion-styles (capf-fn &rest args)
+  (let ((completion-styles '(basic partial-completion)))
+    (apply capf-fn args))
+
+(advice-add 'company-capf :around #'company-completion-styles)
+@end lisp
+
 @node Related packages
 @chapter Related packages
 
