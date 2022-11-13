@@ -249,16 +249,21 @@ at a word boundary in the candidate.  This is similar to the
   string)
 
 (defun orderless-highlight-matches (regexps strings)
-    "Highlight a match of each of the REGEXPS in each of the STRINGS.
+  "Highlight a match of each of the REGEXPS in each of the STRINGS.
 Warning: only use this if you know all REGEXPs match all STRINGS!
 For the user's convenience, if REGEXPS is a string, it is
 converted to a list of regexps according to the value of
 `orderless-matching-styles'."
-    (when (stringp regexps)
-      (setq regexps (orderless-pattern-compiler regexps)))
+  (when (stringp regexps)
+    (setq regexps (orderless-pattern-compiler regexps)))
+  (let ((case-fold-search
+         (if orderless-smart-case
+             (cl-loop for regexp in regexps
+                      always (isearch-no-upper-case-p regexp t))
+           completion-ignore-case)))
     (cl-loop for original in strings
              for string = (copy-sequence original)
-             collect (orderless--highlight regexps string)))
+             collect (orderless--highlight regexps string))))
 
 ;;; Compiling patterns to lists of regexps
 
