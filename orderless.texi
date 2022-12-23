@@ -49,6 +49,7 @@ Component matching styles
 Integration with other completion UIs
 
 * Ivy::
+* Helm::
 * Selectrum::
 * Company::
 
@@ -394,6 +395,7 @@ integration.
 
 @menu
 * Ivy::
+* Helm::
 * Selectrum::
 * Company::
 @end menu
@@ -406,6 +408,17 @@ To use @samp{orderless} from Ivy add this to your Ivy configuration:
 @lisp
 (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
 (add-to-list 'ivy-highlight-functions-alist '(orderless-ivy-re-builder . orderless-ivy-highlight))
+@end lisp
+
+@node Helm
+@section Helm
+
+To use @samp{orderless} from Helm, simply configure @samp{orderless} as you would
+for completion UIs that use Emacs completion stlyes and add this to
+your Helm configuration:
+
+@lisp
+(setq helm-completion-style 'emacs)
 @end lisp
 
 @node Selectrum
@@ -424,6 +437,8 @@ configuration you can use @samp{orderless} just by adding it to
 If you use the above configuration, only the visible candidates are
 highlighted, which is a litte more efficient.
 
+Note that Selectrum has been deprecated in favor of Vertico.
+
 @node Company
 @section Company
 
@@ -440,11 +455,13 @@ Pressing SPC takes you out of completion, so with the default
 separator you are limited to one component, which is no fun. To fix
 this add a separator that is allowed to occur in identifiers, for
 example, for Emacs Lisp code you could use an ampersand:
+@end enumerate
 
 @lisp
 (setq orderless-component-separator "[ &]")
 @end lisp
 
+@enumerate
 @item
 The matching portions of candidates aren't highlighted. That's
 because @samp{company-capf} is hard-coded to look for the
@@ -454,6 +471,7 @@ because @samp{company-capf} is hard-coded to look for the
 So, while you can't get different faces for different components,
 you can at least get the matches highlighted in the sole available
 face with this configuration:
+@end enumerate
 
 @lisp
 (defun just-one-face (fn &rest args)
@@ -464,7 +482,6 @@ face with this configuration:
 @end lisp
 
 (Aren't dynamically scoped variables and the advice system nifty?)
-@end enumerate
 
 If you would like to use different @samp{completion-styles} with @samp{company-capf} instead, you 
 can add this to your config: 
@@ -497,8 +514,9 @@ order. In Ivy, this is done with the @samp{ivy--regex-ignore-order} matcher.
 In Helm, it is the default, called ``multi pattern matching''.
 
 This package is significantly smaller than either of those because it
-solely defines a completion style, meant to be used with any completion UI supporting completion styles while both of those provide their own
-completion UI (and many other cool features!).
+solely defines a completion style, meant to be used with any
+completion UI supporting completion styles while both of those provide
+their own completion UI (and many other cool features!).
 
 It is worth pointing out that Helm does provide its multi pattern
 matching as a completion style which could be used with default tab
@@ -519,14 +537,14 @@ install Helm and configure Icomplete to use it as follows:
 @node Prescient
 @section Prescient
 
-The @uref{https://github.com/raxod502/prescient.el, prescient.el} library also provides matching of space-separated
-components in any order and it can be used with either the @uref{https://github.com/raxod502/selectrum, Selectrum} or
-@uref{https://github.com/abo-abo/swiper, Ivy} completion UIs (it does not offer a completion-style that could be
-used with Emacs' default completion UI, Mct, Vertico or with Icomplete).
-The components can be matched literally, as regexps, as initialisms or
-in the flex style (called ``fuzzy'' in prescient). In addition to
-matching, @samp{prescient.el} also supports sorting of candidates (@samp{orderless}
-leaves that up to the candidate source and the completion UI).
+The @uref{https://github.com/raxod502/prescient.el, prescient.el} library also provides matching of space-separated components in
+any order. It offers a completion-style that can be used with Emacs' default
+completion UI, Mct, Vertico or with Icomplete. Furthermore Selectrum and Ivy are
+supported. The components can be matched literally, as regexps, as initialisms
+or in the flex style (called ``fuzzy'' in prescient). Prescient does not offer the
+same flexibility as Orderless with its style dispatchers. However in addition to
+matching, Prescient supports sorting of candidates, while Orderless leaves that
+up to the candidate source and the completion UI@.
 
 @node Restricting to current matches in Icicles Ido and Ivy
 @section Restricting to current matches in Icicles, Ido and Ivy

@@ -345,6 +345,16 @@ To use =orderless= from Ivy add this to your Ivy configuration:
   (add-to-list 'ivy-highlight-functions-alist '(orderless-ivy-re-builder . orderless-ivy-highlight))
 #+end_src
 
+** Helm
+
+To use =orderless= from Helm, simply configure =orderless= as you would
+for completion UIs that use Emacs completion stlyes and add this to
+your Helm configuration:
+
+#+begin_src emacs-lisp
+(setq helm-completion-style 'emacs)
+#+end_src
+
 ** Selectrum
 
 Recent versions of Selectrum default to using whatever completion
@@ -359,6 +369,8 @@ configuration you can use =orderless= just by adding it to
 
 If you use the above configuration, only the visible candidates are
 highlighted, which is a litte more efficient.
+
+Note that Selectrum has been deprecated in favor of Vertico.
 
 ** Company
 
@@ -410,7 +422,6 @@ can add this to your config:
   (advice-add 'company-capf :around #'company-completion-styles)
 #+end_src
 
-
 * Related packages
 
 ** Ivy and Helm
@@ -421,8 +432,9 @@ order. In Ivy, this is done with the =ivy--regex-ignore-order= matcher.
 In Helm, it is the default, called "multi pattern matching".
 
 This package is significantly smaller than either of those because it
-solely defines a completion style, meant to be used with any completion UI supporting completion styles while both of those provide their own
-completion UI (and many other cool features!).
+solely defines a completion style, meant to be used with any
+completion UI supporting completion styles while both of those provide
+their own completion UI (and many other cool features!).
 
 It is worth pointing out that Helm does provide its multi pattern
 matching as a completion style which could be used with default tab
