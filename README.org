@@ -175,9 +175,9 @@ regexp styles.
  =orderless-affix-dispatch= which enables a simple syntax based on
  special characters used as either a prefix or suffix:
 
- - =!= makes the rest of the component match match using the
+ - =!= makes the rest of the component match using
    =orderless-without-literal=, that is, both =!bad= and =bad!= will match
-   string that do /not/ contain the substring =bad=.
+   strings that do /not/ contain the substring =bad=.
  - =,= uses =orderless-initialism=.
  - === uses =orderless-literal=.
  - =~= uses =orderless-flex=.

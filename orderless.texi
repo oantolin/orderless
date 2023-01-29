@@ -222,9 +222,9 @@ special characters used as either a prefix or suffix:
 
 @itemize
 @item
-@samp{!} makes the rest of the component match match using the
+@samp{!} makes the rest of the component match using
 @samp{orderless-without-literal}, that is, both @samp{!bad} and @samp{bad!} will match
-string that do @emph{not} contain the substring @samp{bad}.
+strings that do @emph{not} contain the substring @samp{bad}.
 @item
 @samp{,} uses @samp{orderless-initialism}.
 @item
@@ -485,13 +485,11 @@ Pressing SPC takes you out of completion, so with the default
 separator you are limited to one component, which is no fun. To fix
 this add a separator that is allowed to occur in identifiers, for
 example, for Emacs Lisp code you could use an ampersand:
-@end enumerate
 
 @lisp
 (setq orderless-component-separator "[ &]")
 @end lisp
 
-@enumerate
 @item
 The matching portions of candidates aren't highlighted. That's
 because @samp{company-capf} is hard-coded to look for the
@@ -501,7 +499,6 @@ because @samp{company-capf} is hard-coded to look for the
 So, while you can't get different faces for different components,
 you can at least get the matches highlighted in the sole available
 face with this configuration:
-@end enumerate
 
 @lisp
 (defun just-one-face (fn &rest args)
@@ -512,6 +509,7 @@ face with this configuration:
 @end lisp
 
 (Aren't dynamically scoped variables and the advice system nifty?)
+@end enumerate
 
 If you would like to use different @samp{completion-styles} with @samp{company-capf} instead, you 
 can add this to your config: 
