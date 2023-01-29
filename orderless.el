@@ -166,7 +166,7 @@ is removed and the remainder of the COMPONENT is matched in the
 style associated to the character."
   (cond
    ;; Ignore single without-literal dispatcher
-   ((and (length= component 1)
+   ((and (= (length component) 1)
          (equal (aref component 0)
                 (car (rassq #'orderless-without-literal
                             orderless-affix-dispatch-alist))))
