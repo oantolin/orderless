@@ -134,7 +134,53 @@ a list of them."
              orderless-prefixes
              orderless-flex))
 
-(defcustom orderless-style-dispatchers nil
+(defcustom orderless-affix-dispatch-alist
+  `((?% . ,#'char-fold-to-regexp)
+    (?! . ,#'orderless-without-literal)
+    (?, . ,#'orderless-initialism)
+    (?= . ,#'orderless-literal)
+    (?~ . ,#'orderless-flex))
+  "Alist associating characters to matching styles.
+The function `orderless-affix-dispatch' uses this list to
+determine how to match a pattern component: if the component
+either starts or ends with a character used as a key in this
+alist, the character is removed from the component and the rest is
+matched according the style associated to it."
+  :type '(alist
+          :key-type character
+          :value-type (choice
+                       (const :tag "Literal" orderless-literal)
+                       (const :tag "Regexp" orderless-regexp)
+                       (const :tag "Without" orderless-without-literal)
+                       (const :tag "Flex" orderless-flex)
+                       (const :tag "Initialism" orderless-initialism)
+                       (const :tag "Prefixes" orderless-prefixes)
+                       (const :tag "Ignore diacritics" char-fold-to-regexp)
+                       (function :tag "Custom matching style"))))
+
+(defun orderless-affix-dispatch (component _index _total)
+  "Match COMPONENT according to the styles in `orderless-affix-dispatch-alist'.
+If the COMPONENT starts or ends with one of the characters used
+as a key in `orderless-affix-dispatch-alist', then that character
+is removed and the remainder of the COMPONENT is matched in the
+style associated to the character."
+  (cond
+   ;; Ignore single without-literal dispatcher
+   ((and (length= component 1)
+         (equal (aref component 0)
+                (car (rassq #'orderless-without-literal
+                            orderless-affix-dispatch-alist))))
+    '(orderless-literal . ""))
+   ;; Prefix
+   ((when-let ((style (alist-get (aref component 0)
+                                 orderless-affix-dispatch-alist)))
+      (cons style (substring component 1))))
+   ;; Suffix
+   ((when-let ((style (alist-get (aref component (1- (length component)))
+                                 orderless-affix-dispatch-alist)))
+      (cons style (substring component 0 -1))))))
+
+(defcustom orderless-style-dispatchers '(orderless-affix-dispatch)
   "List of style dispatchers.
 Style dispatchers are used to override the matching styles
 based on the actual component and its place in the list of

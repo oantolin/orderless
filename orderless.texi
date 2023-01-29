@@ -214,7 +214,35 @@ regexp styles.
 
 For more fine-grained control on which matching styles to use for
 each component of the input string, you can customize the variable
-@samp{orderless-style-dispatchers}.
+@samp{orderless-style-dispatchers}. You can use this feature to define your
+own ``query syntax''. For example, the default value of
+@samp{orderless-style-dispatchers} lists a single dispatcher called
+@samp{orderless-affix-dispatch} which enables a simple syntax based on
+special characters used as either a prefix or suffix:
+
+@itemize
+@item
+@samp{!} makes the rest of the component match match using the
+@samp{orderless-without-literal}, that is, both @samp{!bad} and @samp{bad!} will match
+string that do @emph{not} contain the substring @samp{bad}.
+@item
+@samp{,} uses @samp{orderless-initialism}.
+@item
+@samp{=} uses @samp{orderless-literal}.
+@item
+@samp{~} uses @samp{orderless-flex}.
+@item
+@samp{%} makes the string match ignoring diacritics and similar
+inflections on characters (it uses the function @samp{char-fold-to-regexp}
+to do this).
+@end itemize
+
+You can add, remove or change this mapping between affix characters
+and matching styles by customizing the user option
+@samp{orderless-affix-dispatch-alist}. Most users will probably find this
+type of customization sufficient for their query syntax needs, but
+for those desiring further control the rest of this section explains
+how to implement your own style dispatchers.
 
 Style dispatchers are functions which take a component, its index in
 the list of components (starting from 0), and the total number of
@@ -227,7 +255,8 @@ also, if desired, additionally return a new string to use in place of
 the given one. Consult the documentation of @samp{orderless-dispatch} for
 full details.
 
-As an example, say you wanted the following setup:
+As an example of writing your own dispatchers, say you wanted the
+following setup:
 
 @itemize
 @item
@@ -241,7 +270,8 @@ later components ending in @samp{~} should match (the characters
 other than the final @samp{~}) in the flex style, and
 @item
 later components starting with @samp{!} should indicate the rest of the
-component is a literal string not contained in the candidate.
+component is a literal string not contained in the candidate (this
+is part of the functionality of the default configuration).
 @end itemize
 
 You can achieve this with the following configuration:
