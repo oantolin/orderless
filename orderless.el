@@ -208,6 +208,10 @@ is determined by the values of `completion-ignore-case',
 `read-buffer-completion-ignore-case', as usual for completion."
   :type 'boolean)
 
+(defvar orderless-skip-highlighting nil)
+(make-obsolete-variable 'orderless-skip-highlighting
+                        "Use `orderless-filter' directly." "1.0")
+
 ;;; Matching styles
 
 (defun orderless-regexp (component)
