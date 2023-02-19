@@ -444,7 +444,7 @@ To use @samp{orderless} from Ivy add this to your Ivy configuration:
 @section Helm
 
 To use @samp{orderless} from Helm, simply configure @samp{orderless} as you would
-for completion UIs that use Emacs completion stlyes and add this to
+for completion UIs that use Emacs completion styles and add this to
 your Helm configuration:
 
 @lisp
@@ -465,7 +465,7 @@ configuration you can use @samp{orderless} just by adding it to
 @end lisp
 
 If you use the above configuration, only the visible candidates are
-highlighted, which is a litte more efficient.
+highlighted, which is a little more efficient.
 
 Note that Selectrum has been deprecated in favor of Vertico.
 
@@ -511,8 +511,8 @@ face with this configuration:
 (Aren't dynamically scoped variables and the advice system nifty?)
 @end enumerate
 
-If you would like to use different @samp{completion-styles} with @samp{company-capf} instead, you 
-can add this to your config: 
+If you would like to use different @samp{completion-styles} with @samp{company-capf} instead, you
+can add this to your configuration:
 
 @lisp
 ;; We follow a suggestion by company maintainer u/hvis:

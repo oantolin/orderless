@@ -114,7 +114,7 @@ matched as an initialism, and =ff= matched as a regexp. The completion
 UI in the screenshot is [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]] and the theme is
 Protesilaos Stavrou's lovely [[https://gitlab.com/protesilaos/modus-themes][modus-operandi]].
 
-[[images/describe-function-eis-ff.png]]
+[[https://github.com/oantolin/orderless/blob/dispatcher/images/describe-function-eis-ff.png?raw=true]]
 
 * Customization
 
@@ -371,7 +371,7 @@ To use =orderless= from Ivy add this to your Ivy configuration:
 ** Helm
 
 To use =orderless= from Helm, simply configure =orderless= as you would
-for completion UIs that use Emacs completion stlyes and add this to
+for completion UIs that use Emacs completion styles and add this to
 your Helm configuration:
 
 #+begin_src emacs-lisp
@@ -391,7 +391,7 @@ configuration you can use =orderless= just by adding it to
 #+end_src
 
 If you use the above configuration, only the visible candidates are
-highlighted, which is a litte more efficient.
+highlighted, which is a little more efficient.
 
 Note that Selectrum has been deprecated in favor of Vertico.
 
@@ -431,9 +431,9 @@ But there are a couple of points of discomfort:
    #+end_src
 
    (Aren't dynamically scoped variables and the advice system nifty?)
-   
-If you would like to use different =completion-styles= with =company-capf= instead, you 
-can add this to your config: 
+
+If you would like to use different =completion-styles= with =company-capf= instead, you
+can add this to your configuration:
 
 #+begin_src emacs-lisp
   ;; We follow a suggestion by company maintainer u/hvis:
