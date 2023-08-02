@@ -57,7 +57,7 @@ Related packages
 
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
+* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy.
 
 @end detailmenu
 @end menu
@@ -192,7 +192,7 @@ For example, @samp{re-re} matches @samp{query-replace-regexp}, @samp{recode-regi
 each character of the component should appear
 as the beginning of a word in the candidate, in order.
 
-This maps @samp{abc} to @samp{\<a.*\<b.*\c}.
+This maps @samp{abc} to @samp{\<a.*\<b.*\<c}.
 
 @item orderless-flex
 the characters of the component should appear in
@@ -530,7 +530,7 @@ can add this to your configuration:
 @menu
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
+* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy.
 @end menu
 
 @node Ivy and Helm
