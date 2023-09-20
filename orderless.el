@@ -199,7 +199,7 @@ information on how this variable is used, see
 If this variable is t, then case-sensitivity is decided as
 follows: if any component contains upper case letters, the
 matches are case sensitive; otherwise case-insensitive.  This
-like the behavior of `isearch' when `search-upper-case' is
+is like the behavior of `isearch' when `search-upper-case' is
 non-nil.
 
 On the other hand, if this variable is nil, then case-sensitivity
