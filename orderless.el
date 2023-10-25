@@ -477,10 +477,21 @@ This function is part of the `orderless' completion style."
            (setq one args)
            t)))
       (when one
+        ;; Prepend prefix if the candidate does not already have the same
+        ;; prefix.  This workaround is needed since the predicate may either
+        ;; receive an unprefixed or a prefixed candidate as argument.  Most
+        ;; completion tables consistently call the predicate with unprefixed
+        ;; candidates, for example `completion-file-name-table'.  In contrast,
+        ;; `completion-table-with-context' calls the predicate with prefixed
+        ;; candidates.  This could be an unintended bug or oversight in
+        ;; `completion-table-with-context'.
+        (let ((prefix (car (orderless--prefix+pattern string table pred))))
+          (unless (or (equal prefix "")
+                      (and (string-prefix-p prefix one)
+                           (test-completion one table pred)))
+            (setq one (concat prefix one))))
         (if (equal string one)
             t ;; unique exact match
-          (setq one (concat (car (orderless--prefix+pattern string table pred))
-                            one))
           (cons one (length one)))))))
 
 ;;;###autoload
