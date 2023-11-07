@@ -273,9 +273,11 @@ at a word boundary in the candidate.  This is similar to the
 
 ;;; Highlighting matches
 
-(defun orderless--highlight (regexps string)
-  "Propertize STRING to highlight a match of each of the REGEXPS."
-  (cl-loop with n = (length orderless-match-faces)
+(defun orderless--highlight (regexps ignore-case string)
+  "Destructively propertize STRING to highlight a match of each of the REGEXPS.
+The search is case insensitive if IGNORE-CASE is non-nil."
+  (cl-loop with case-fold-search = ignore-case
+           with n = (length orderless-match-faces)
            for regexp in regexps and i from 0
            when (string-match regexp string) do
            (cl-loop
@@ -295,14 +297,9 @@ converted to a list of regexps according to the value of
 `orderless-matching-styles'."
   (when (stringp regexps)
     (setq regexps (orderless-pattern-compiler regexps)))
-  (let ((case-fold-search
-         (if orderless-smart-case
-             (cl-loop for regexp in regexps
-                      always (isearch-no-upper-case-p regexp t))
-           completion-ignore-case)))
-    (cl-loop for original in strings
-             for string = (copy-sequence original)
-             collect (orderless--highlight regexps string))))
+  (cl-loop with ignore-case = (orderless--ignore-case-p regexps)
+           for str in strings
+           collect (orderless--highlight regexps ignore-case (substring str))))
 
 ;;; Compiling patterns to lists of regexps
 
@@ -414,6 +411,13 @@ then return (cons REGEXP u); else return nil."
               (replace-regexp-in-string "\\\\\\([$*+.?[\\^]\\)" "\\1"
                                         trimmed 'fixedcase))))))
 
+(defun orderless--ignore-case-p (regexps)
+  "Return non-nil if case should be ignored for REGEXPS."
+  (if orderless-smart-case
+      (cl-loop for regexp in regexps
+               always (isearch-no-upper-case-p regexp t))
+    completion-ignore-case))
+
 ;;;###autoload
 (defun orderless-filter (string table &optional pred)
   "Split STRING into components and find entries TABLE matching all.
@@ -424,10 +428,7 @@ The predicate PRED is used to constrain the entries in TABLE."
                  (completion-regexp-list
                   (orderless-pattern-compiler pattern))
                  (completion-ignore-case
-                  (if orderless-smart-case
-                      (cl-loop for regexp in completion-regexp-list
-                               always (isearch-no-upper-case-p regexp t))
-                    completion-ignore-case)))
+                  (orderless--ignore-case-p completion-regexp-list)))
       ;; If there is a regexp of the form \(?:^quoted-regexp\) then
       ;; remove the first such and add the unquoted form to the prefix.
       (pcase (cl-some #'orderless--anchored-quoted-regexp
@@ -443,12 +444,17 @@ The predicate PRED is used to constrain the entries in TABLE."
 The predicate PRED is used to constrain the entries in TABLE.  The
 matching portions of each candidate are highlighted.
 This function is part of the `orderless' completion style."
-  (let ((completions (orderless-filter string table pred)))
-    (when completions
-      (pcase-let ((`(,prefix . ,pattern)
-                   (orderless--prefix+pattern string table pred)))
-        (nconc (orderless-highlight-matches pattern completions)
-               (length prefix))))))
+  (defvar completion-lazy-hilit-fn)
+  (when-let ((completions (orderless-filter string table pred)))
+    (pcase-let ((`(,prefix . ,pattern)
+                 (orderless--prefix+pattern string table pred)))
+      (if (bound-and-true-p completion-lazy-hilit)
+          (let ((regexps (orderless-pattern-compiler pattern)))
+            (setq completion-lazy-hilit-fn
+                  (apply-partially #'orderless--highlight regexps
+                                   (orderless--ignore-case-p regexps))))
+        (setq completions (orderless-highlight-matches pattern completions)))
+      (nconc completions (length prefix)))))
 
 ;;;###autoload
 (defun orderless-try-completion (string table pred point)
@@ -554,7 +560,7 @@ a value in `ivy-re-builders-alist'."
 (defun orderless-ivy-highlight (str)
   "Highlight a match in STR of each regexp in `ivy-regex'.
 This function is for integration of orderless with ivy."
-  (orderless--highlight (mapcar #'car ivy-regex) str) str)
+  (orderless--highlight (mapcar #'car ivy-regex) t str) str)
 
 (provide 'orderless)
 ;;; orderless.el ends here
