@@ -55,7 +55,7 @@
 
 ;;; Code:
 
-(require 'cl-lib)
+(eval-when-compile (require 'cl-lib))
 
 (defgroup orderless nil
   "Completion method that matches space-separated regexps in any order."
@@ -431,8 +431,8 @@ The predicate PRED is used to constrain the entries in TABLE."
                   (orderless--ignore-case-p completion-regexp-list)))
       ;; If there is a regexp of the form \(?:^quoted-regexp\) then
       ;; remove the first such and add the unquoted form to the prefix.
-      (pcase (cl-some #'orderless--anchored-quoted-regexp
-                      completion-regexp-list)
+      (pcase (cl-loop for r in completion-regexp-list
+                      thereis (orderless--anchored-quoted-regexp r))
         (`(,regexp . ,literal)
          (setq prefix (concat prefix literal)
                completion-regexp-list (delete regexp completion-regexp-list))))
