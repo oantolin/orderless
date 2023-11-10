@@ -458,7 +458,7 @@ configure Icomplete to use it as follows:
 
 ** Prescient
 
-The [[https://github.com/raxod502/prescient.el][prescient.el]] library also provides matching of space-separated
+The [[https://github.com/radian-software/prescient.el][prescient.el]] library also provides matching of space-separated
 components in any order. It offers a completion-style that can be used
 with Emacs' default completion UI, Mct, Vertico or with Icomplete.
 Furthermore Ivy is supported. The components can be matched literally,
