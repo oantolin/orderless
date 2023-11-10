@@ -99,7 +99,7 @@ or a function of a single string argument."
                         orderless-escapable-split-on-space)
                  (const :tag "Quotable spaces" split-string-and-unquote)
                  (regexp :tag "Custom regexp")
-                 (function : tag "Custom function")))
+                 (function :tag "Custom function")))
 
 (defcustom orderless-match-faces
   [orderless-match-face-0
