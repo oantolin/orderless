@@ -93,11 +93,11 @@
   "Component separators for orderless completion.
 This can either be a string, which is passed to `split-string',
 or a function of a single string argument."
-  :type '(choice (const :tag "Spaces" " +")
+  :type `(choice (const :tag "Spaces" " +")
                  (const :tag "Spaces, hyphen or slash" " +\\|[-/]")
                  (const :tag "Escapable space"
-                        orderless-escapable-split-on-space)
-                 (const :tag "Quotable spaces" split-string-and-unquote)
+                        ,#'orderless-escapable-split-on-space)
+                 (const :tag "Quotable spaces" ,#'split-string-and-unquote)
                  (regexp :tag "Custom regexp")
                  (function :tag "Custom function")))
 
@@ -110,7 +110,7 @@ or a function of a single string argument."
   :type '(vector face))
 
 (defcustom orderless-matching-styles
-  '(orderless-literal orderless-regexp)
+  (list #'orderless-literal #'orderless-regexp)
   "List of component matching styles.
 If this variable is nil, regexp matching is assumed.
 
@@ -121,11 +121,11 @@ highlighted, otherwise just the captured groups are.  Several are
 provided with this package: try customizing this variable to see
 a list of them."
   :type 'hook
-  :options '(orderless-regexp
-             orderless-literal
-             orderless-initialism
-             orderless-prefixes
-             orderless-flex))
+  :options (list #'orderless-regexp
+                 #'orderless-literal
+                 #'orderless-initialism
+                 #'orderless-prefixes
+                 #'orderless-flex))
 
 (defcustom orderless-affix-dispatch-alist
   `((?% . ,#'char-fold-to-regexp)
@@ -139,16 +139,16 @@ determine how to match a pattern component: if the component
 either starts or ends with a character used as a key in this
 alist, the character is removed from the component and the rest is
 matched according the style associated to it."
-  :type '(alist
+  :type `(alist
           :key-type character
           :value-type (choice
-                       (const :tag "Literal" orderless-literal)
-                       (const :tag "Regexp" orderless-regexp)
-                       (const :tag "Without" orderless-without-literal)
-                       (const :tag "Flex" orderless-flex)
-                       (const :tag "Initialism" orderless-initialism)
-                       (const :tag "Prefixes" orderless-prefixes)
-                       (const :tag "Ignore diacritics" char-fold-to-regexp)
+                       (const :tag "Literal" ,#'orderless-literal)
+                       (const :tag "Regexp" ,#'orderless-regexp)
+                       (const :tag "Without" ,#'orderless-without-literal)
+                       (const :tag "Flex" ,#'orderless-flex)
+                       (const :tag "Initialism" ,#'orderless-initialism)
+                       (const :tag "Prefixes" ,#'orderless-prefixes)
+                       (const :tag "Ignore diacritics" ,#'char-fold-to-regexp)
                        (function :tag "Custom matching style"))))
 
 (defun orderless-affix-dispatch (component _index _total)
@@ -173,7 +173,7 @@ style associated to the character."
                                  orderless-affix-dispatch-alist)))
       (cons style (substring component 0 -1))))))
 
-(defcustom orderless-style-dispatchers '(orderless-affix-dispatch)
+(defcustom orderless-style-dispatchers (list #'orderless-affix-dispatch)
   "List of style dispatchers.
 Style dispatchers are used to override the matching styles
 based on the actual component and its place in the list of
