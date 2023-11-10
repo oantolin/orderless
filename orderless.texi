@@ -50,7 +50,6 @@ Integration with other completion UIs
 
 * Ivy::
 * Helm::
-* Selectrum::
 * Company::
 
 Related packages
@@ -79,8 +78,7 @@ tab completion), with the built-in Icomplete package (which is similar
 to the more well-known Ido Mode), the icomplete-vertical variant from
 Emacs 28 (see the external @uref{https://github.com/oantolin/icomplete-vertical, icomplete-vertical} package to get that
 functionality on earlier versions of Emacs), or with some third party
-minibuffer completion frameworks such as @uref{https://gitlab.com/protesilaos/mct, Mct}, @uref{https://github.com/minad/vertico, Vertico}, or @uref{https://github.com/raxod502/selectrum, Selectrum}
-(in its default configuration).
+minibuffer completion frameworks such as @uref{https://gitlab.com/protesilaos/mct, Mct} or @uref{https://github.com/minad/vertico, Vertico}.
 
 All the completion UIs just mentioned are for minibuffer completion,
 used when Emacs commands prompt the user in the minibuffer for some
@@ -192,7 +190,7 @@ For example, @samp{re-re} matches @samp{query-replace-regexp}, @samp{recode-regi
 each character of the component should appear
 as the beginning of a word in the candidate, in order.
 
-This maps @samp{abc} to @samp{\<a.*\<b.*\<c}.
+This maps @samp{abc} to @samp{\<a.*\<b.*\c}.
 
 @item orderless-flex
 the characters of the component should appear in
@@ -426,7 +424,6 @@ integration.
 @menu
 * Ivy::
 * Helm::
-* Selectrum::
 * Company::
 @end menu
 
@@ -450,24 +447,6 @@ your Helm configuration:
 @lisp
 (setq helm-completion-style 'emacs)
 @end lisp
-
-@node Selectrum
-@section Selectrum
-
-Recent versions of Selectrum default to using whatever completion
-styles you have configured. If you stick with that default
-configuration you can use @samp{orderless} just by adding it to
-@samp{completion-styles}. Alternatively, you can use this configuration:
-
-@lisp
-(setq selectrum-refine-candidates-function #'orderless-filter)
-(setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
-@end lisp
-
-If you use the above configuration, only the visible candidates are
-highlighted, which is a little more efficient.
-
-Note that Selectrum has been deprecated in favor of Vertico.
 
 @node Company
 @section Company
@@ -530,7 +509,7 @@ can add this to your configuration:
 @menu
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy.
+* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
 @end menu
 
 @node Ivy and Helm
@@ -548,10 +527,10 @@ their own completion UI (and many other cool features!).
 
 It is worth pointing out that Helm does provide its multi pattern
 matching as a completion style which could be used with default tab
-completion, Icomplete, Selectrum or other UIs supporting completion
-styles! (Ivy does not provide a completion style to my knowledge.) So,
-for example, Icomplete users could, instead of using this package,
-install Helm and configure Icomplete to use it as follows:
+completion, Icomplete or other UIs supporting completion styles! (Ivy
+does not provide a completion style to my knowledge.) So, for example,
+Icomplete users could, instead of using this package, install Helm and
+configure Icomplete to use it as follows:
 
 @lisp
 (require 'helm)
@@ -565,14 +544,15 @@ install Helm and configure Icomplete to use it as follows:
 @node Prescient
 @section Prescient
 
-The @uref{https://github.com/raxod502/prescient.el, prescient.el} library also provides matching of space-separated components in
-any order. It offers a completion-style that can be used with Emacs' default
-completion UI, Mct, Vertico or with Icomplete. Furthermore Selectrum and Ivy are
-supported. The components can be matched literally, as regexps, as initialisms
-or in the flex style (called ``fuzzy'' in prescient). Prescient does not offer the
-same flexibility as Orderless with its style dispatchers. However in addition to
-matching, Prescient supports sorting of candidates, while Orderless leaves that
-up to the candidate source and the completion UI@.
+The @uref{https://github.com/radian-software/prescient.el, prescient.el} library also provides matching of space-separated
+components in any order. It offers a completion-style that can be used
+with Emacs' default completion UI, Mct, Vertico or with Icomplete.
+Furthermore Ivy is supported. The components can be matched literally,
+as regexps, as initialisms or in the flex style (called ``fuzzy'' in
+prescient). Prescient does not offer the same flexibility as Orderless
+with its style dispatchers. However in addition to matching, Prescient
+supports sorting of candidates, while Orderless leaves that up to the
+candidate source and the completion UI@.
 
 @node Restricting to current matches in Icicles Ido and Ivy
 @section Restricting to current matches in Icicles, Ido and Ivy
