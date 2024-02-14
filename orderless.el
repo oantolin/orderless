@@ -389,11 +389,14 @@ as the value of DISPATCHERS."
 
 ;;; Completion style implementation
 
-(defun orderless--prefix+pattern (string table pred)
-  "Split STRING into prefix and pattern according to TABLE.
+(defun orderless--compile (string table pred)
+  "Compile STRING to a prefix and a list of regular expressions.
 The predicate PRED is used to constrain the entries in TABLE."
-  (let ((limit (car (completion-boundaries string table pred ""))))
-    (cons (substring string 0 limit) (substring string limit))))
+  (let* ((limit (car (completion-boundaries string table pred "")))
+         (prefix (substring string 0 limit))
+         (pattern (substring string limit))
+         (regexps (orderless-pattern-compiler pattern)))
+    (list prefix regexps (orderless--ignore-case-p regexps))))
 
 ;; Thanks to @jakanakaevangeli for writing a version of this function:
 ;; https://github.com/oantolin/orderless/issues/79#issuecomment-916073526
@@ -435,11 +438,8 @@ The matching should be case-insensitive if IGNORE-CASE is non-nil."
 (defun orderless-filter (string table &optional pred)
   "Split STRING into components and find entries TABLE matching all.
 The predicate PRED is used to constrain the entries in TABLE."
-  (pcase-let* ((`(,prefix . ,pattern)
-                (orderless--prefix+pattern string table pred))
-               (regexps
-                (orderless-pattern-compiler pattern))
-               (ignore-case (orderless--ignore-case-p regexps)))
+  (pcase-let ((`(,prefix ,regexps ,ignore-case)
+               (orderless--compile string table pred)))
     (orderless--filter prefix regexps ignore-case table pred)))
 
 ;;;###autoload
@@ -449,11 +449,8 @@ The predicate PRED is used to constrain the entries in TABLE.  The
 matching portions of each candidate are highlighted.
 This function is part of the `orderless' completion style."
   (defvar completion-lazy-hilit-fn)
-  (pcase-let* ((`(,prefix . ,pattern)
-                (orderless--prefix+pattern string table pred))
-               (regexps
-                (orderless-pattern-compiler pattern))
-               (ignore-case (orderless--ignore-case-p regexps)))
+  (pcase-let ((`(,prefix ,regexps ,ignore-case)
+               (orderless--compile string table pred)))
     (when-let ((completions (orderless--filter prefix regexps ignore-case table pred)))
       (if (bound-and-true-p completion-lazy-hilit)
           (setq completion-lazy-hilit-fn
@@ -472,12 +469,9 @@ returns nil.  In any other case it \"completes\" STRING to
 itself, without moving POINT.
 This function is part of the `orderless' completion style."
   (catch 'orderless--many
-    (pcase-let* ((`(,prefix . ,pattern)
-                  (orderless--prefix+pattern string table pred))
-                 (regexps
-                  (orderless-pattern-compiler pattern))
-                 (ignore-case (orderless--ignore-case-p regexps))
-                 (one nil))
+    (pcase-let ((`(,prefix ,regexps ,ignore-case)
+                 (orderless--compile string table pred))
+                (one nil))
       ;; Abuse all-completions/orderless--filter as a fast search loop.
       ;; Should be almost allocation-free since our "predicate" is not
       ;; called more than two times.
