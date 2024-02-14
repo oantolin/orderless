@@ -418,25 +418,29 @@ then return (cons REGEXP u); else return nil."
                always (isearch-no-upper-case-p regexp t))
     completion-ignore-case))
 
-;;;###autoload
+(defun orderless--filter (prefix regexps ignore-case table pred)
+  "Filter TABLE by PREFIX, REGEXPS and PRED.
+The matching should be case-insensitive if IGNORE-CASE is non-nil."
+  ;; If there is a regexp of the form \(?:^quoted-regexp\) then
+  ;; remove the first such and add the unquoted form to the prefix.
+  (pcase (cl-loop for r in regexps
+                  thereis (orderless--anchored-quoted-regexp r))
+    (`(,regexp . ,literal)
+     (setq prefix (concat prefix literal)
+           regexps (remove regexp regexps))))
+  (let ((completion-regexp-list regexps)
+        (completion-ignore-case ignore-case))
+    (all-completions prefix table pred)))
+
 (defun orderless-filter (string table &optional pred)
   "Split STRING into components and find entries TABLE matching all.
 The predicate PRED is used to constrain the entries in TABLE."
-  (save-match-data
-    (pcase-let* ((`(,prefix . ,pattern)
-                  (orderless--prefix+pattern string table pred))
-                 (completion-regexp-list
-                  (orderless-pattern-compiler pattern))
-                 (completion-ignore-case
-                  (orderless--ignore-case-p completion-regexp-list)))
-      ;; If there is a regexp of the form \(?:^quoted-regexp\) then
-      ;; remove the first such and add the unquoted form to the prefix.
-      (pcase (cl-loop for r in completion-regexp-list
-                      thereis (orderless--anchored-quoted-regexp r))
-        (`(,regexp . ,literal)
-         (setq prefix (concat prefix literal)
-               completion-regexp-list (delete regexp completion-regexp-list))))
-      (all-completions prefix table pred))))
+  (pcase-let* ((`(,prefix . ,pattern)
+                (orderless--prefix+pattern string table pred))
+               (regexps
+                (orderless-pattern-compiler pattern))
+               (ignore-case (orderless--ignore-case-p regexps)))
+    (orderless--filter prefix regexps ignore-case table pred)))
 
 ;;;###autoload
 (defun orderless-all-completions (string table pred _point)
@@ -445,15 +449,17 @@ The predicate PRED is used to constrain the entries in TABLE.  The
 matching portions of each candidate are highlighted.
 This function is part of the `orderless' completion style."
   (defvar completion-lazy-hilit-fn)
-  (when-let ((completions (orderless-filter string table pred)))
-    (pcase-let ((`(,prefix . ,pattern)
-                 (orderless--prefix+pattern string table pred)))
+  (pcase-let* ((`(,prefix . ,pattern)
+                (orderless--prefix+pattern string table pred))
+               (regexps
+                (orderless-pattern-compiler pattern))
+               (ignore-case (orderless--ignore-case-p regexps)))
+    (when-let ((completions (orderless--filter prefix regexps ignore-case table pred)))
       (if (bound-and-true-p completion-lazy-hilit)
-          (let ((regexps (orderless-pattern-compiler pattern)))
-            (setq completion-lazy-hilit-fn
-                  (apply-partially #'orderless--highlight regexps
-                                   (orderless--ignore-case-p regexps))))
-        (setq completions (orderless-highlight-matches pattern completions)))
+          (setq completion-lazy-hilit-fn
+                (apply-partially #'orderless--highlight regexps ignore-case))
+        (cl-loop for str in-ref completions do
+                 (setf str (orderless--highlight regexps ignore-case (substring str)))))
       (nconc completions (length prefix)))))
 
 ;;;###autoload
@@ -466,12 +472,17 @@ returns nil.  In any other case it \"completes\" STRING to
 itself, without moving POINT.
 This function is part of the `orderless' completion style."
   (catch 'orderless--many
-    (let (one)
-      ;; Abuse all-completions/orderless-filter as a fast search loop.
+    (pcase-let* ((`(,prefix . ,pattern)
+                  (orderless--prefix+pattern string table pred))
+                 (regexps
+                  (orderless-pattern-compiler pattern))
+                 (ignore-case (orderless--ignore-case-p regexps))
+                 (one nil))
+      ;; Abuse all-completions/orderless--filter as a fast search loop.
       ;; Should be almost allocation-free since our "predicate" is not
       ;; called more than two times.
-      (orderless-filter
-       string table
+      (orderless--filter
+       prefix regexps ignore-case table
        (lambda (arg &rest val) ;; val for hash table
          (when (or (not pred) (if val (funcall pred arg (car val)) (funcall pred arg)))
            ;; Normalize predicate argument
@@ -491,11 +502,10 @@ This function is part of the `orderless' completion style."
         ;; `completion-table-with-context' calls the predicate with prefixed
         ;; candidates.  This could be an unintended bug or oversight in
         ;; `completion-table-with-context'.
-        (let ((prefix (car (orderless--prefix+pattern string table pred))))
-          (unless (or (equal prefix "")
-                      (and (string-prefix-p prefix one)
-                           (test-completion one table pred)))
-            (setq one (concat prefix one))))
+        (unless (or (equal prefix "")
+                    (and (string-prefix-p prefix one)
+                         (test-completion one table pred)))
+          (setq one (concat prefix one)))
         (if (equal string one)
             t ;; unique exact match
           (cons one (length one)))))))
