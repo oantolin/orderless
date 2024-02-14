@@ -384,8 +384,8 @@ as the value of DISPATCHERS."
    when (functionp newstyles) do (setq newstyles (list newstyles))
    for regexps = (cl-loop for style in newstyles
                           for result = (funcall style newcomp)
-                          when result collect `(regexp ,result))
-   when regexps collect (rx-to-string `(or ,@(delete-dups regexps)))))
+                          when result collect result)
+   when regexps collect (string-join (delete-dups regexps) "\\|")))
 
 ;;; Completion style implementation
 
