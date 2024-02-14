@@ -472,15 +472,15 @@ This function is part of the `orderless' completion style."
       ;; called more than two times.
       (orderless-filter
        string table
-       ;; key/value for hash tables
-       (lambda (&rest args)
-         (when (or (not pred) (apply pred args))
-           (setq args (car args) ;; first argument is key
-                 args (if (consp args) (car args) args) ;; alist
-                 args (if (symbolp args) (symbol-name args) args))
-           (when (and one (not (equal one args)))
+       (lambda (arg &rest val) ;; val for hash table
+         (when (or (not pred) (if val (funcall pred arg (car val)) (funcall pred arg)))
+           ;; Normalize predicate argument
+           (setq arg (if (consp arg) (car arg) arg) ;; alist
+                 arg (if (symbolp arg) (symbol-name arg) arg)) ;; symbols
+           ;; Check if there is more than a single match (= many).
+           (when (and one (not (equal one arg)))
              (throw 'orderless--many (cons string point)))
-           (setq one args)
+           (setq one arg)
            t)))
       (when one
         ;; Prepend prefix if the candidate does not already have the same
