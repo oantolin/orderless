@@ -273,13 +273,14 @@ at a word boundary in the candidate.  This is similar to the
 
 (defun orderless-without-regexp (component)
   "Match strings that do *not* contain COMPONENT as a regexp match."
-  (unless (equal component "")
+  (when (and (not (equal component "")) (orderless-regexp component))
     (lambda (str)
       (not (string-match-p component str)))))
 
 (defun orderless-annotation (component)
   "Match candidates where the annotation matches COMPONENT as a regexp."
   (when-let (((not (equal component "")))
+             ((orderless-regexp component)) ;; valid regexp
              ((minibufferp))
              (table minibuffer-completion-table)
              (metadata (completion-metadata
