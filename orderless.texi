@@ -56,7 +56,7 @@ Related packages
 
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy.
+* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
 
 @end detailmenu
 @end menu
@@ -151,9 +151,10 @@ Bug reports are highly welcome and appreciated!
 @section Component matching styles
 
 Each component of a pattern can match in any of several matching
-styles. A matching style is simply a function from strings to strings
-that maps a component to a regexp to match against, so it is easy to
-define new matching styles. The predefined ones are:
+styles. A matching style is simply a function from strings to regexps,
+so it is easy to define new matching styles. The regexp returned by a
+matching style can be either a string or an s-expression in @samp{rx} syntax.
+The predefined matching styles are:
 
 @table @asis
 @item orderless-regexp
@@ -165,8 +166,6 @@ If the component is not a valid regexp, it is ignored.
 @item orderless-literal
 the component is treated as a literal string
 that must occur in the candidate.
-
-This is just @samp{regexp-quote}.
 
 @item @strong{orderless-without-literal}
 the component is a treated as a literal

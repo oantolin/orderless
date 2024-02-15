@@ -119,9 +119,10 @@ Protesilaos Stavrou's lovely [[https://gitlab.com/protesilaos/modus-themes][modu
 ** Component matching styles
 
 Each component of a pattern can match in any of several matching
-styles. A matching style is simply a function from strings to strings
-that maps a component to a regexp to match against, so it is easy to
-define new matching styles. The predefined ones are:
+styles. A matching style is simply a function from strings to regexps,
+so it is easy to define new matching styles. The regexp returned by a
+matching style can be either a string or an s-expression in =rx= syntax.
+The predefined matching styles are:
 
 - orderless-regexp :: the component is treated as a regexp that must
   match somewhere in the candidate.
@@ -130,8 +131,6 @@ define new matching styles. The predefined ones are:
 
 - orderless-literal :: the component is treated as a literal string
   that must occur in the candidate.
-
-  This is just =regexp-quote=.
 
 - *orderless-without-literal* :: the component is a treated as a literal
   string that must *not* occur in the candidate.

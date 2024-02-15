@@ -114,12 +114,12 @@ or a function of a single string argument."
   "List of component matching styles.
 If this variable is nil, regexp matching is assumed.
 
-A matching style is simply a function from strings to strings
-that takes a component to a regexp to match against.  If the
-resulting regexp has no capturing groups, the entire match is
-highlighted, otherwise just the captured groups are.  Several are
-provided with this package: try customizing this variable to see
-a list of them."
+A matching style is simply a function from strings to regexps.
+The returned regexps can be either strings or s-expressions in
+`rx' syntax.  If the resulting regexp has no capturing groups,
+the entire match is highlighted, otherwise just the captured
+groups are.  Several are provided with this package: try
+customizing this variable to see a list of them."
   :type 'hook
   :options (list #'orderless-regexp
                  #'orderless-literal
