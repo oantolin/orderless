@@ -226,22 +226,20 @@ If BEFORE is specified, add it to the beginning of the rx
 sequence.  If AFTER is specified, add it to the end of the rx
 sequence."
   (declare (indent 1))
-  (rx-to-string
-   `(seq
-     ,(or before "")
-     ,@(cl-loop for (sexp . more) on rxs
-                collect `(group ,sexp)
-                when more collect sep)
-     ,(or after ""))))
+  `(seq
+    ,(or before "")
+    ,@(cl-loop for (sexp . more) on rxs
+               collect `(group ,sexp)
+               when more collect sep)
+    ,(or after "")))
 
 (defun orderless-flex (component)
   "Match a component in flex style.
 This means the characters in COMPONENT must occur in the
 candidate in that order, but not necessarily consecutively."
-  (rx-to-string
-   `(seq
-     ,@(cdr (cl-loop for char across component
-                     append `((zero-or-more (not ,char)) (group ,char)))))))
+  `(seq
+    ,@(cdr (cl-loop for char across component
+                    append `((zero-or-more (not ,char)) (group ,char))))))
 
 (defun orderless-initialism (component)
   "Match a component as an initialism.
@@ -261,15 +259,14 @@ at a word boundary in the candidate.  This is similar to the
 
 (defun orderless-without-literal (component)
   "Match strings that do *not* contain COMPONENT as a literal match."
-  (rx-to-string
-   `(seq
-     (group string-start)               ; highlight nothing!
-     (zero-or-more
-      (or ,@(cl-loop for i below (length component)
-                     collect `(seq ,(substring component 0 i)
-                                   (or (not (any ,(aref component i)))
-                                       string-end)))))
-     string-end)))
+  `(seq
+    (group string-start)               ; highlight nothing!
+    (zero-or-more
+     (or ,@(cl-loop for i below (length component)
+                    collect `(seq ,(substring component 0 i)
+                                  (or (not (any ,(aref component i)))
+                                      string-end)))))
+    string-end))
 
 ;;; Highlighting matches
 
@@ -384,7 +381,8 @@ as the value of DISPATCHERS."
    when (functionp newstyles) do (setq newstyles (list newstyles))
    for regexps = (cl-loop for style in newstyles
                           for result = (funcall style newcomp)
-                          when result collect `(regexp ,result))
+                          when result collect
+                          (if (stringp result) `(regexp ,result) result))
    when regexps collect (rx-to-string `(or ,@(delete-dups regexps)))))
 
 ;;; Completion style implementation
