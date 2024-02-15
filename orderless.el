@@ -216,9 +216,9 @@ is determined by the values of `completion-ignore-case',
       (progn (string-match-p component "") component)
     (invalid-regexp nil)))
 
-(defalias 'orderless-literal #'regexp-quote
-  "Match a component as a literal string.
-This is simply `regexp-quote'.")
+(defun orderless-literal (component)
+  "Match COMPONENT as a literal string."
+  `(literal ,component))
 
 (defun orderless--separated-by (sep rxs &optional before after)
   "Return a regexp to match the rx-regexps RXS with SEP in between.
