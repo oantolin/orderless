@@ -7,7 +7,7 @@
 ;; Keywords: extensions
 ;; Version: 1.0
 ;; Homepage: https://github.com/oantolin/orderless
-;; Package-Requires: ((emacs "26.1"))
+;; Package-Requires: ((emacs "27.1"))
 
 ;; This file is part of GNU Emacs.
 
