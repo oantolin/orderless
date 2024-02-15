@@ -261,7 +261,10 @@ at a word boundary in the candidate.  This is similar to the
              collect `(seq word-boundary ,prefix))))
 
 (defun orderless-without-literal (component)
-  "Match strings that do *not* contain COMPONENT as a literal match."
+  "Match strings that do *not* contain COMPONENT as a literal match.
+You may prefer to use the more general `orderless-without'
+instead which compiles the input to a predicate instead of a
+regexp."
   `(seq
     (group string-start)               ; highlight nothing!
     (zero-or-more
