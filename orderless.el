@@ -129,7 +129,7 @@ customizing this variable to see a list of them."
 
 (defcustom orderless-affix-dispatch-alist
   `((?% . ,#'char-fold-to-regexp)
-    (?! . ,#'orderless-without-regexp)
+    (?! . ,#'orderless-without)
     (?@ . ,#'orderless-annotation)
     (?, . ,#'orderless-initialism)
     (?= . ,#'orderless-literal)
@@ -147,7 +147,7 @@ matched according the style associated to it."
                        (const :tag "Literal" ,#'orderless-literal)
                        (const :tag "Regexp" ,#'orderless-regexp)
                        (const :tag "Without literal" ,#'orderless-without-literal)
-                       (const :tag "Without regexp" ,#'orderless-without-regexp)
+                       (const :tag "Without regexp" ,#'orderless-without)
                        (const :tag "Flex" ,#'orderless-flex)
                        (const :tag "Initialism" ,#'orderless-initialism)
                        (const :tag "Prefixes" ,#'orderless-prefixes)
@@ -274,16 +274,16 @@ regexp."
                                       string-end)))))
     string-end))
 
-(defun orderless-without-regexp (component)
-  "Match strings that do *not* contain COMPONENT as a regexp match."
-  (when (and (not (equal component "")) (orderless-regexp component))
-    (lambda (str)
-      (not (string-match-p component str)))))
+(defun orderless-without (component)
+  "Match strings that do *not* match COMPONENT."
+  (unless (equal component "")
+    (let ((regexp (cdr (orderless--component-compiler component))))
+      (lambda (str)
+        (not (string-match-p regexp str))))))
 
 (defun orderless-annotation (component)
-  "Match candidates where the annotation matches COMPONENT as a regexp."
+  "Match candidates where the annotation matches COMPONENT."
   (when-let (((not (equal component "")))
-             ((orderless-regexp component)) ;; valid regexp
              ((minibufferp))
              (table minibuffer-completion-table)
              (metadata (completion-metadata
@@ -293,10 +293,11 @@ regexp."
                       (plist-get completion-extra-properties :annotation-function)
                       (when-let ((aff (or (completion-metadata-get metadata 'affixation-function)
                                           (plist-get completion-extra-properties :affixation-function))))
-                        (lambda (cand) (caddr (funcall aff (list cand))))))))
+                        (lambda (cand) (caddr (funcall aff (list cand)))))))
+             (regexp (cdr (orderless--component-compiler component))))
     (lambda (str)
       (when-let ((ann (funcall fun str)))
-        (string-match-p component ann)))))
+        (string-match-p regexp ann)))))
 
 ;;; Highlighting matches
 
@@ -383,6 +384,17 @@ DEFAULT as the list of styles."
            when result return (cons result string)
            finally (return (cons default string))))
 
+(defun orderless--component-compiler (component &optional styles)
+  "Compile COMPONENT with matching STYLES."
+  (unless styles (setq styles orderless-matching-styles))
+  (cl-loop
+   with pred = nil
+   for style in styles
+   for res = (funcall style component)
+   if (functionp res) do (cl-callf orderless--predicate-and pred res)
+   else if res collect (if (stringp res) `(regexp ,res) res) into regexps
+   finally return (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps)))))))
+
 (defun orderless-pattern-compiler (pattern &optional styles dispatchers predicate)
   "Build regexps to match the components of PATTERN.
 Split PATTERN on `orderless-component-separator' and compute
@@ -407,15 +419,12 @@ non-nil return a pair of a predicate function and the regexps."
                          (funcall orderless-component-separator pattern)
                        (split-string pattern orderless-component-separator t))
    with total = (length components)
-   for component in components and index from 0
-   for (newstyles . newcomp) = (orderless-dispatch
-                                dispatchers styles component index total)
+   for comp in components and idx from 0
+   for (newstyles . newcomp) = (orderless-dispatch dispatchers styles comp idx total)
    when (functionp newstyles) do (setq newstyles (list newstyles))
-   for regexps = (cl-loop for style in newstyles
-                          for res = (funcall style newcomp)
-                          if (functionp res) do (cl-callf orderless--predicate-and predicate-res res)
-                          else if res collect (if (stringp res) `(regexp ,res) res))
-   when regexps collect (rx-to-string `(or ,@(delete-dups regexps))) into regexps-res
+   for (pred . regexps) = (orderless--component-compiler newcomp newstyles)
+   when regexps collect regexps into regexps-res
+   when pred do (cl-callf orderless--predicate-and predicate-res pred)
    finally return (if predicate (cons predicate-res regexps-res) regexps-res)))
 
 ;;; Completion style implementation
