@@ -500,9 +500,8 @@ This function is part of the `orderless' completion style."
                     (and (string-prefix-p prefix one)
                          (test-completion one table pred)))
           (setq one (concat prefix one)))
-        (if (equal string one)
-            t ;; unique exact match
-          (cons one (length one)))))))
+        (or (equal string one) ;; Return t for unique exact match
+            (cons one (length one)))))))
 
 ;;;###autoload
 (add-to-list 'completion-styles-alist
