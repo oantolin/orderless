@@ -414,7 +414,7 @@ non-nil return a pair of a predicate function and the regexps."
    for pred = nil
    for regexps = (cl-loop for style in newstyles
                           for res = (funcall style newcomp)
-                          if (functionp res) do (cl-callf orderless--predicate-or pred res)
+                          if (functionp res) do (cl-callf orderless--predicate-and pred res)
                           else if res collect (if (stringp res) `(regexp ,res) res))
    when regexps collect (rx-to-string `(or ,@(delete-dups regexps))) into regexps-res
    when pred do (cl-callf orderless--predicate-and predicate-res pred)
@@ -442,10 +442,6 @@ normalized string as argument."
 (defun orderless--predicate-and (p q)
   "Combine two predicate functions P and Q with `and'."
   (or (and p q (lambda (x) (and (funcall p x) (funcall q x)))) p q))
-
-(defun orderless--predicate-or (p q)
-  "Combine two predicate functions P and Q with `or'."
-  (or (and p q (lambda (x) (or (funcall p x) (funcall q x)))) p q))
 
 (defun orderless--compile (string table pred)
   "Compile STRING to a prefix and a list of regular expressions.
