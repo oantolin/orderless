@@ -411,13 +411,11 @@ non-nil return a pair of a predicate function and the regexps."
    for (newstyles . newcomp) = (orderless-dispatch
                                 dispatchers styles component index total)
    when (functionp newstyles) do (setq newstyles (list newstyles))
-   for pred = nil
    for regexps = (cl-loop for style in newstyles
                           for res = (funcall style newcomp)
-                          if (functionp res) do (cl-callf orderless--predicate-and pred res)
+                          if (functionp res) do (cl-callf orderless--predicate-and predicate-res res)
                           else if res collect (if (stringp res) `(regexp ,res) res))
    when regexps collect (rx-to-string `(or ,@(delete-dups regexps))) into regexps-res
-   when pred do (cl-callf orderless--predicate-and predicate-res pred)
    finally return (if predicate (cons predicate-res regexps-res) regexps-res)))
 
 ;;; Completion style implementation
