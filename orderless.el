@@ -343,17 +343,18 @@ converted to a list of regexps according to the value of
                  " +" t)))
 
 (define-obsolete-function-alias 'orderless-dispatch 'orderless--dispatch "1.0")
-(defun orderless--dispatch (dispatchers default string &rest args)
+(defun orderless--dispatch (dispatchers default string index total)
   "Run DISPATCHERS to compute matching styles for STRING.
 
-A style dispatcher is a function that takes a string and possibly
-some extra arguments.  It should either return (a) nil to
-indicate the dispatcher will not handle the string, (b) a new
-string to replace the current string and continue dispatch,
-or (c) the matching styles to use and, if needed, a new string to
-use in place of the current one (for example, a dispatcher can
-decide which style to use based on a suffix of the string and
-then it must also return the component stripped of the suffix).
+A style dispatcher is a function that takes a STRING, component
+INDEX and the TOTAL number of components.  It should either
+return (a) nil to indicate the dispatcher will not handle the
+string, (b) a new string to replace the current string and
+continue dispatch, or (c) the matching styles to use and, if
+needed, a new string to use in place of the current one (for
+example, a dispatcher can decide which style to use based on a
+suffix of the string and then it must also return the component
+stripped of the suffix).
 
 More precisely, the return value of a style dispatcher can be of
 one of the following forms:
@@ -370,13 +371,12 @@ one of the following forms:
   whose `cdr' is a string (to replace the current one).
 
 This function tries all DISPATCHERS in sequence until one returns
-a list of styles (passing any extra ARGS to every style
-dispatcher).  When that happens it returns a `cons' of the list
-of styles and the possibly updated STRING.  If none of the
+a list of styles.  When that happens it returns a `cons' of the
+list of styles and the possibly updated STRING.  If none of the
 DISPATCHERS returns a list of styles, the return value will use
 DEFAULT as the list of styles."
   (cl-loop for dispatcher in dispatchers
-           for result = (apply dispatcher string args)
+           for result = (funcall dispatcher string index total)
            if (stringp result)
            do (setq string result result nil)
            else if (and (consp result) (null (car result)))
