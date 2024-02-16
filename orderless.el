@@ -110,7 +110,7 @@ or a function of a single string argument."
   :type '(vector face))
 
 (defcustom orderless-matching-styles
-  (list #'orderless-literal #'orderless-regexp)
+  (list #'orderless-affix #'orderless-literal #'orderless-regexp)
   "List of component matching styles.
 If this variable is nil, regexp matching is assumed.
 
@@ -127,7 +127,7 @@ customizing this variable to see a list of them."
                  #'orderless-prefixes
                  #'orderless-flex))
 
-(defcustom orderless-affix-dispatch-alist
+(defcustom orderless-affix-alist
   `((?% . ,#'char-fold-to-regexp)
     (?! . ,#'orderless-without)
     (?@ . ,#'orderless-annotation)
@@ -154,7 +154,7 @@ matched according the style associated to it."
                        (const :tag "Ignore diacritics" ,#'char-fold-to-regexp)
                        (function :tag "Custom matching style"))))
 
-(defun orderless-affix-dispatch (component _index _total)
+(defun orderless-affix (component index total compile)
   "Match COMPONENT according to the styles in `orderless-affix-dispatch-alist'.
 If the COMPONENT starts or ends with one of the characters used
 as a key in `orderless-affix-dispatch-alist', then that character
@@ -163,38 +163,16 @@ style associated to the character."
   (cond
    ;; Ignore single dispatcher character
    ((and (= (length component) 1) (alist-get (aref component 0)
-                                             orderless-affix-dispatch-alist))
-    #'ignore)
+                                             orderless-affix-alist))
+    '(:stop))
    ;; Prefix
    ((when-let ((style (alist-get (aref component 0)
-                                 orderless-affix-dispatch-alist)))
-      (cons style (substring component 1))))
+                                 orderless-affix-alist)))
+      (cons :stop (orderless--call-style style (substring component 1) index total compile))))
    ;; Suffix
    ((when-let ((style (alist-get (aref component (1- (length component)))
-                                 orderless-affix-dispatch-alist)))
-      (cons style (substring component 0 -1))))))
-
-(defcustom orderless-style-dispatchers (list #'orderless-affix-dispatch)
-  "List of style dispatchers.
-Style dispatchers are used to override the matching styles
-based on the actual component and its place in the list of
-components.  A style dispatcher is a function that takes a string
-and two integers as arguments, it gets called with a component,
-the 0-based index of the component and the total number of
-components.  It can decide what matching styles to use for the
-component and optionally replace the component with a different
-string, or it can decline to handle the component leaving it for
-future dispatchers.  For details see `orderless--dispatch'.
-
-For example, a style dispatcher could arrange for the first
-component to match as an initialism and subsequent components to
-match as literals.  As another example, a style dispatcher could
-arrange for a component starting with `~' to match the rest of
-the component in the `orderless-flex' style.  See
-`orderless-affix-dispatch' and `orderless-affix-dispatch-alist'
-for such a configuration.  For more information on how this
-variable is used, see `orderless-compile'."
-  :type 'hook)
+                                 orderless-affix-alist)))
+      (cons :stop (orderless--call-style style (substring component 0 -1) index total compile))))))
 
 (defcustom orderless-smart-case t
   "Whether to use smart case.
@@ -273,15 +251,15 @@ regexp."
                                       string-end)))))
     string-end))
 
-(defun orderless-without (component)
+(defun orderless-without (component _idx _total compile)
   "Match strings that do *not* match COMPONENT."
-  (pcase-let ((`(,pred . ,regexp) (orderless--compile-component component)))
+  (pcase-let ((`(,pred . ,regexp) (funcall compile component)))
     (when (or pred regexp)
       (lambda (str)
         (not (or (and pred (funcall pred str))
                  (and regexp (string-match-p regexp str))))))))
 
-(defun orderless-annotation (component)
+(defun orderless-annotation (component _idx _total compile)
   "Match candidates where the annotation matches COMPONENT."
   (when-let (((minibufferp))
              (table minibuffer-completion-table)
@@ -293,7 +271,7 @@ regexp."
                       (when-let ((aff (or (completion-metadata-get metadata 'affixation-function)
                                           (plist-get completion-extra-properties :affixation-function))))
                         (lambda (cand) (caddr (funcall aff (list cand))))))))
-    (pcase-let ((`(,pred . ,regexp) (orderless--compile-component component)))
+    (pcase-let ((`(,pred . ,regexp) (funcall compile component)))
       (when (or pred regexp)
         (lambda (str)
           (when-let ((ann (funcall fun str)))
@@ -342,70 +320,28 @@ converted to a list of regexps according to the value of
                   string 'fixedcase 'literal)
                  " +" t)))
 
-(define-obsolete-function-alias 'orderless-dispatch 'orderless--dispatch "1.0")
-(defun orderless--dispatch (dispatchers default string &rest args)
-  "Run DISPATCHERS to compute matching styles for STRING.
+(defun orderless--call-style (style component idx total compile)
+  (condition-case nil
+       (funcall style component)
+     (wrong-number-of-arguments (funcall style component idx total compile))))
 
-A style dispatcher is a function that takes a string and possibly
-some extra arguments.  It should either return (a) nil to
-indicate the dispatcher will not handle the string, (b) a new
-string to replace the current string and continue dispatch,
-or (c) the matching styles to use and, if needed, a new string to
-use in place of the current one (for example, a dispatcher can
-decide which style to use based on a suffix of the string and
-then it must also return the component stripped of the suffix).
-
-More precisely, the return value of a style dispatcher can be of
-one of the following forms:
-
-- nil (to continue dispatching)
-
-- a string (to replace the component and continue dispatching),
-
-- a matching style or non-empty list of matching styles to
-  return,
-
-- a `cons' whose `car' is either as in the previous case or
-  nil (to request returning the DEFAULT matching styles), and
-  whose `cdr' is a string (to replace the current one).
-
-This function tries all DISPATCHERS in sequence until one returns
-a list of styles (passing any extra ARGS to every style
-dispatcher).  When that happens it returns a `cons' of the list
-of styles and the possibly updated STRING.  If none of the
-DISPATCHERS returns a list of styles, the return value will use
-DEFAULT as the list of styles."
-  (cl-loop for dispatcher in dispatchers
-           for result = (apply dispatcher string args)
-           if (stringp result)
-           do (setq string result result nil)
-           else if (and (consp result) (null (car result)))
-           do (setf (car result) default)
-           else if (and (consp result) (stringp (cdr result)))
-           do (setq string (cdr result) result (car result))
-           when result return (cons result string)
-           finally (return (cons default string))))
-
-(defun orderless--compile-component (component &optional idx total styles dispatchers)
+(defun orderless--compile-component (component idx total styles)
   "Compile COMPONENT at IDX of TOTAL components with STYLES and DISPATCHERS."
-  (unless styles (setq styles orderless-matching-styles))
-  (unless dispatchers (setq dispatchers orderless-style-dispatchers))
-  (unless idx (setq idx 0))
-  (unless total (setq total 1))
-  (let ((dispatched (orderless--dispatch dispatchers styles component idx total)))
-    (setq styles (car dispatched)
-          component (cdr dispatched))
-    (when (functionp styles)
-      (setq styles (list styles))))
   (cl-loop
    with pred = nil
+   with compile = (lambda (c) (orderless--compile-component c idx total styles))
    for style in styles
-   for res = (funcall style component)
+   for res = (orderless--call-style style component idx total compile)
+   ;; TODO rework this ugly code
+   for stop = (when (eq (car-safe res) :stop)
+                (setq res (cdr res))
+                t)
    if (functionp res) do (cl-callf orderless--predicate-and pred res)
    else if res collect (if (stringp res) `(regexp ,res) res) into regexps
+   if stop return (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps)))))
    finally return (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps)))))))
 
-(defun orderless-compile (pattern &optional styles dispatchers)
+(defun orderless-compile (pattern &optional styles)
   "Build regexps to match the components of PATTERN.
 Split PATTERN on `orderless-component-separator' and compute
 matching styles for each component.  For each component the style
@@ -423,6 +359,7 @@ you the default, if you want no dispatchers to be run, use
 
 The return value is a pair of a predicate function and a list of
 regexps."
+  (unless styles (setq styles orderless-matching-styles))
   (cl-loop
    with predicate = nil
    with components = (if (functionp orderless-component-separator)
@@ -430,16 +367,10 @@ regexps."
                        (split-string pattern orderless-component-separator t))
    with total = (length components)
    for comp in components and idx from 0
-   for (pred . regexp) = (orderless--compile-component comp idx total styles dispatchers)
+   for (pred . regexp) = (orderless--compile-component comp idx total styles)
    when regexp collect regexp into regexps
    when pred do (cl-callf orderless--predicate-and predicate pred)
    finally return (cons predicate regexps)))
-
-(defun orderless-pattern-compiler (pattern &optional styles dispatchers)
-  "Obsolete function, use `orderless-compile' instead.
-See `orderless-compile' for the arguments PATTERN, STYLES and DISPATCHERS."
-  (cdr (orderless-compile pattern styles dispatchers)))
-(make-obsolete 'orderless-pattern-compiler 'orderless-compile "1.0")
 
 ;;; Completion style implementation
 
