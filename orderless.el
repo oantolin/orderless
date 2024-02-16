@@ -275,7 +275,7 @@ regexp."
 
 (defun orderless-without (component)
   "Match strings that do *not* match COMPONENT."
-  (let ((regexp (cdr (orderless--compile-component component))))
+  (when-let ((regexp (cdr (orderless--compile-component component))))
     (lambda (str)
       (not (string-match-p regexp str)))))
 
