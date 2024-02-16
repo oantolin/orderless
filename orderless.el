@@ -161,12 +161,10 @@ as a key in `orderless-affix-dispatch-alist', then that character
 is removed and the remainder of the COMPONENT is matched in the
 style associated to the character."
   (cond
-   ;; Ignore single without-literal dispatcher
-   ((and (= (length component) 1)
-         (equal (aref component 0)
-                (car (rassq #'orderless-without-literal
-                            orderless-affix-dispatch-alist))))
-    '(orderless-literal . ""))
+   ;; Ignore single dispatcher character
+   ((and (= (length component) 1) (alist-get (aref component 0)
+                                             orderless-affix-dispatch-alist))
+    #'ignore)
    ;; Prefix
    ((when-let ((style (alist-get (aref component 0)
                                  orderless-affix-dispatch-alist)))
@@ -276,15 +274,13 @@ regexp."
 
 (defun orderless-without (component)
   "Match strings that do *not* match COMPONENT."
-  (unless (equal component "")
-    (let ((regexp (cdr (orderless--component-compiler component))))
-      (lambda (str)
-        (not (string-match-p regexp str))))))
+  (let ((regexp (cdr (orderless--compile-component component))))
+    (lambda (str)
+      (not (string-match-p regexp str)))))
 
 (defun orderless-annotation (component)
   "Match candidates where the annotation matches COMPONENT."
-  (when-let (((not (equal component "")))
-             ((minibufferp))
+  (when-let (((minibufferp))
              (table minibuffer-completion-table)
              (metadata (completion-metadata
                         (buffer-substring-no-properties (minibuffer-prompt-end) (point))
