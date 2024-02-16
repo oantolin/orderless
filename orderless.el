@@ -275,6 +275,9 @@ regexp."
 
 (defun orderless-without (component)
   "Match strings that do *not* match COMPONENT."
+  ;; TODO I am not happy that we call the internal orderless--compile-component
+  ;; function here. Somehow we have not yet reached sufficient elegance here in
+  ;; this patch. :(
   (pcase-let ((`(,pred . ,regexp) (orderless--compile-component component)))
     (when (or pred regexp)
       (lambda (str)
@@ -293,6 +296,9 @@ regexp."
                       (when-let ((aff (or (completion-metadata-get metadata 'affixation-function)
                                           (plist-get completion-extra-properties :affixation-function))))
                         (lambda (cand) (caddr (funcall aff (list cand))))))))
+    ;; TODO I am not happy that we call the internal orderless--compile-component
+    ;; function here. Somehow we have not yet reached sufficient elegance here in
+    ;; this patch. :(
     (pcase-let ((`(,pred . ,regexp) (orderless--compile-component component)))
       (when (or pred regexp)
         (lambda (str)
