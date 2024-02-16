@@ -197,7 +197,7 @@ regexp styles.
  A style dispatcher can either decline to handle the input string or
  component, or it can return which matching styles to use. It can
  also, if desired, additionally return a new string to use in place of
- the given one. Consult the documentation of =orderless-dispatch= for
+ the given one. Consult the documentation of =orderless--dispatch= for
  full details.
 
  As an example of writing your own dispatchers, say you wanted the

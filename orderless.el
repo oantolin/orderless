@@ -186,7 +186,7 @@ the 0-based index of the component and the total number of
 components.  It can decide what matching styles to use for the
 component and optionally replace the component with a different
 string, or it can decline to handle the component leaving it for
-future dispatchers.  For details see `orderless-dispatch'.
+future dispatchers.  For details see `orderless--dispatch'.
 
 For example, a style dispatcher could arrange for the first
 component to match as an initialism and subsequent components to
@@ -341,7 +341,8 @@ converted to a list of regexps according to the value of
                   string 'fixedcase 'literal)
                  " +" t)))
 
-(defun orderless-dispatch (dispatchers default string &rest args)
+(define-obsolete-function-alias 'orderless-dispatch 'orderless--dispatch "1.0")
+(defun orderless--dispatch (dispatchers default string &rest args)
   "Run DISPATCHERS to compute matching styles for STRING.
 
 A style dispatcher is a function that takes a string and possibly
@@ -420,7 +421,7 @@ non-nil return a pair of a predicate function and the regexps."
                        (split-string pattern orderless-component-separator t))
    with total = (length components)
    for comp in components and idx from 0
-   for (newstyles . newcomp) = (orderless-dispatch dispatchers styles comp idx total)
+   for (newstyles . newcomp) = (orderless--dispatch dispatchers styles comp idx total)
    when (functionp newstyles) do (setq newstyles (list newstyles))
    for (pred . regexps) = (orderless--component-compiler newcomp newstyles)
    when regexps collect regexps into regexps-res
