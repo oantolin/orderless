@@ -273,18 +273,15 @@ regexp."
                                       string-end)))))
     string-end))
 
-(defun orderless-without (component)
+(defun orderless-without (component compile)
   "Match strings that do *not* match COMPONENT."
-  ;; TODO I am not happy that we call the internal orderless--compile-component
-  ;; function here. Somehow we have not yet reached sufficient elegance here in
-  ;; this patch. :(
-  (pcase-let ((`(,pred . ,regexp) (orderless--compile-component component)))
+  (pcase-let ((`(,pred . ,regexp) (funcall compile component)))
     (when (or pred regexp)
       (lambda (str)
         (not (or (and pred (funcall pred str))
                  (and regexp (string-match-p regexp str))))))))
 
-(defun orderless-annotation (component)
+(defun orderless-annotation (component compile)
   "Match candidates where the annotation matches COMPONENT."
   (when-let (((minibufferp))
              (table minibuffer-completion-table)
@@ -296,10 +293,7 @@ regexp."
                       (when-let ((aff (or (completion-metadata-get metadata 'affixation-function)
                                           (plist-get completion-extra-properties :affixation-function))))
                         (lambda (cand) (caddr (funcall aff (list cand))))))))
-    ;; TODO I am not happy that we call the internal orderless--compile-component
-    ;; function here. Somehow we have not yet reached sufficient elegance here in
-    ;; this patch. :(
-    (pcase-let ((`(,pred . ,regexp) (orderless--compile-component component)))
+    (pcase-let ((`(,pred . ,regexp) (funcall compile component)))
       (when (or pred regexp)
         (lambda (str)
           (when-let ((ann (funcall fun str)))
@@ -392,24 +386,21 @@ DEFAULT as the list of styles."
            when result return (cons result string)
            finally (return (cons default string))))
 
-(defun orderless--compile-component (component &optional idx total styles dispatchers)
+(defun orderless--compile-component (component idx total styles dispatchers)
   "Compile COMPONENT at IDX of TOTAL components with STYLES and DISPATCHERS."
-  (unless styles (setq styles orderless-matching-styles))
-  (unless dispatchers (setq dispatchers orderless-style-dispatchers))
-  (unless idx (setq idx 0))
-  (unless total (setq total 1))
-  (let ((dispatched (orderless--dispatch dispatchers styles component idx total)))
-    (setq styles (car dispatched)
-          component (cdr dispatched))
-    (when (functionp styles)
-      (setq styles (list styles))))
-  (cl-loop
-   with pred = nil
-   for style in styles
-   for res = (funcall style component)
-   if (functionp res) do (cl-callf orderless--predicate-and pred res)
-   else if res collect (if (stringp res) `(regexp ,res) res) into regexps
-   finally return (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps)))))))
+  (pcase-let ((compile (lambda (c) (orderless--compile-component c idx total styles dispatchers)))
+              (`(,newsty . ,newcomp) (orderless--dispatch dispatchers styles component idx total)))
+    (when (functionp newsty)
+      (setq newsty (list newsty)))
+    (cl-loop
+     with pred = nil
+     for style in newsty
+     for res = (condition-case nil
+                   (funcall style newcomp)
+                 (wrong-number-of-arguments (funcall style newcomp compile)))
+     if (functionp res) do (cl-callf orderless--predicate-and pred res)
+     else if res collect (if (stringp res) `(regexp ,res) res) into regexps
+     finally return (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps))))))))
 
 (defun orderless-compile (pattern &optional styles dispatchers)
   "Build regexps to match the components of PATTERN.
@@ -429,6 +420,8 @@ you the default, if you want no dispatchers to be run, use
 
 The return value is a pair of a predicate function and a list of
 regexps."
+  (unless styles (setq styles orderless-matching-styles))
+  (unless dispatchers (setq dispatchers orderless-style-dispatchers))
   (cl-loop
    with predicate = nil
    with components = (if (functionp orderless-component-separator)
