@@ -189,10 +189,11 @@ future dispatchers.  For details see `orderless--dispatch'.
 For example, a style dispatcher could arrange for the first
 component to match as an initialism and subsequent components to
 match as literals.  As another example, a style dispatcher could
-arrange for a component starting with `?' to match the rest of
-the component in the `orderless-flex' style.  For more
-information on how this variable is used, see
-`orderless-compile'."
+arrange for a component starting with `~' to match the rest of
+the component in the `orderless-flex' style.  See
+`orderless-affix-dispatch' and `orderless-affix-dispatch-alist'
+for such a configuration.  For more information on how this
+variable is used, see `orderless-compile'."
   :type 'hook)
 
 (defcustom orderless-smart-case t
