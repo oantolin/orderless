@@ -194,7 +194,7 @@ match as literals.  As another example, a style dispatcher could
 arrange for a component starting with `?' to match the rest of
 the component in the `orderless-flex' style.  For more
 information on how this variable is used, see
-`orderless-pattern-compiler'."
+`orderless-compile'."
   :type 'hook)
 
 (defcustom orderless-smart-case t
@@ -294,7 +294,7 @@ regexp."
                       (when-let ((aff (or (completion-metadata-get metadata 'affixation-function)
                                           (plist-get completion-extra-properties :affixation-function))))
                         (lambda (cand) (caddr (funcall aff (list cand)))))))
-             (regexp (cdr (orderless--component-compiler component))))
+             (regexp (cdr (orderless--compile-component component))))
     (lambda (str)
       (when-let ((ann (funcall fun str)))
         (string-match-p regexp ann)))))
@@ -324,7 +324,7 @@ For the user's convenience, if REGEXPS is a string, it is
 converted to a list of regexps according to the value of
 `orderless-matching-styles'."
   (when (stringp regexps)
-    (setq regexps (orderless-pattern-compiler regexps)))
+    (setq regexps (cdr (orderless-compile regexps))))
   (cl-loop with ignore-case = (orderless--ignore-case-p regexps)
            for str in strings
            collect (orderless--highlight regexps ignore-case (substring str))))
@@ -385,7 +385,7 @@ DEFAULT as the list of styles."
            when result return (cons result string)
            finally (return (cons default string))))
 
-(defun orderless--component-compiler (component &optional styles)
+(defun orderless--compile-component (component &optional styles)
   "Compile COMPONENT with matching STYLES."
   (unless styles (setq styles orderless-matching-styles))
   (cl-loop
@@ -396,7 +396,7 @@ DEFAULT as the list of styles."
    else if res collect (if (stringp res) `(regexp ,res) res) into regexps
    finally return (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps)))))))
 
-(defun orderless-pattern-compiler (pattern &optional styles dispatchers predicate)
+(defun orderless-compile (pattern &optional styles dispatchers)
   "Build regexps to match the components of PATTERN.
 Split PATTERN on `orderless-component-separator' and compute
 matching styles for each component.  For each component the style
@@ -404,14 +404,16 @@ DISPATCHERS are run to determine the matching styles to be used;
 they are called with arguments the component, the 0-based index
 of the component and the total number of components.  If the
 DISPATCHERS decline to handle the component, then the list of
-matching STYLES is used.  See `orderless-dispatch' for details on
-dispatchers.
+matching STYLES is used.  See `orderless--dispatch' for details
+on dispatchers.
 
 The STYLES default to `orderless-matching-styles', and the
 DISPATCHERS default to `orderless-dipatchers'.  Since nil gets
 you the default, if you want no dispatchers to be run, use
-\\='(ignore) as the value of DISPATCHERS.  If PREDICATE is
-non-nil return a pair of a predicate function and the regexps."
+\\='(ignore) as the value of DISPATCHERS.
+
+The return value is a pair of a predicate function and a list of
+regexps."
   (unless styles (setq styles orderless-matching-styles))
   (unless dispatchers (setq dispatchers orderless-style-dispatchers))
   (cl-loop
@@ -423,10 +425,16 @@ non-nil return a pair of a predicate function and the regexps."
    for comp in components and idx from 0
    for (newstyles . newcomp) = (orderless--dispatch dispatchers styles comp idx total)
    when (functionp newstyles) do (setq newstyles (list newstyles))
-   for (pred . regexps) = (orderless--component-compiler newcomp newstyles)
+   for (pred . regexps) = (orderless--compile-component newcomp newstyles)
    when regexps collect regexps into regexps-res
    when pred do (cl-callf orderless--predicate-and predicate-res pred)
-   finally return (if predicate (cons predicate-res regexps-res) regexps-res)))
+   finally return (cons predicate-res regexps-res)))
+
+(defun orderless-pattern-compiler (pattern &optional styles dispatchers)
+  "Obsolete function, use `orderless-compile' instead.
+See `orderless-compile' for the arguments PATTERN, STYLES and DISPATCHERS."
+  (cdr (orderless-compile pattern styles dispatchers)))
+(make-obsolete 'orderless-pattern-compiler 'orderless-compile "1.0")
 
 ;;; Completion style implementation
 
@@ -457,7 +465,7 @@ The predicate PRED is used to constrain the entries in TABLE."
   (pcase-let* ((limit (car (completion-boundaries string table pred "")))
                (prefix (substring string 0 limit))
                (pattern (substring string limit))
-               (`(,fun . ,regexps) (orderless-pattern-compiler pattern nil nil t)))
+               (`(,fun . ,regexps) (orderless-compile pattern)))
     (list prefix regexps (orderless--ignore-case-p regexps)
           (orderless--predicate-normalized-and pred fun))))
 
@@ -616,9 +624,7 @@ specifically for the %s style.")
   "Convert STR into regexps for use with ivy.
 This function is for integration of orderless with ivy, use it as
 a value in `ivy-re-builders-alist'."
-  (or (mapcar (lambda (x) (cons x t))
-              (orderless-pattern-compiler str))
-      ""))
+  (or (mapcar (lambda (x) (cons x t)) (cdr (orderless-compile str))) ""))
 
 (defvar ivy-regex)
 (defun orderless-ivy-highlight (str)

@@ -308,11 +308,10 @@ completion is the one that ends up being used, of course.
 ** Pattern compiler
 
 The default mechanism for turning an input string into a list of regexps to
-match against, configured using =orderless-matching-styles=, is probably
-flexible enough for the vast majority of users. The patterns are compiled by the
-=orderless-pattern-compiler=. Under special circumstances it may be useful to
-implement a custom pattern compiler by advising the
-=orderless-pattern-compiler=.
+match against, configured using =orderless-matching-styles=, is probably flexible
+enough for the vast majority of users. The patterns are compiled by the
+=orderless-compile=. Under special circumstances it may be useful to implement a
+custom pattern compiler by advising the =orderless-compile=.
 
 ** Interactively changing the configuration
 
