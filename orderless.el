@@ -283,12 +283,17 @@ which can invert any predicate or regexp."
   (when-let (((minibufferp))
              (table minibuffer-completion-table)
              (metadata (completion-metadata
-                        (buffer-substring-no-properties (minibuffer-prompt-end) (point))
+                        (buffer-substring-no-properties
+                         (minibuffer-prompt-end) (point))
                         table minibuffer-completion-predicate))
-             (fun (or (completion-metadata-get metadata 'annotation-function)
-                      (plist-get completion-extra-properties :annotation-function)
-                      (when-let ((aff (or (completion-metadata-get metadata 'affixation-function)
-                                          (plist-get completion-extra-properties :affixation-function))))
+             (fun (or (completion-metadata-get
+                       metadata 'annotation-function)
+                      (plist-get completion-extra-properties
+                                 :annotation-function)
+                      (when-let ((aff (or (completion-metadata-get
+                                           metadata 'affixation-function)
+                                          (plist-get completion-extra-properties
+                                                     :affixation-function))))
                         (lambda (cand) (caddr (funcall aff (list cand))))))))
     (lambda (str)
       (when-let ((ann (funcall fun str)))
@@ -381,21 +386,24 @@ DEFAULT as the list of styles."
            when result return (cons result string)
            finally (return (cons default string))))
 
-(defun orderless--compile-component (component idx total styles dispatchers)
-  "Compile COMPONENT at IDX of TOTAL components with STYLES and DISPATCHERS."
+(defun orderless--compile-component (component index total styles dispatchers)
+  "Compile COMPONENT at INDEX of TOTAL components with STYLES and DISPATCHERS."
   (cl-loop
    with pred = nil
-   with (newsty . newcomp) = (orderless--dispatch dispatchers styles component idx total)
+   with (newsty . newcomp) = (orderless--dispatch dispatchers styles
+                                                  component index total)
    for style in (if (functionp newsty) (list newsty) newsty)
    for res = (condition-case nil
                  (funcall style newcomp)
                (wrong-number-of-arguments
-                (when-let ((res (orderless--compile-component newcomp idx total styles dispatchers)))
+                (when-let ((res (orderless--compile-component
+                                 newcomp index total styles dispatchers)))
                   (funcall style (car res) (cdr res)))))
    if (functionp res) do (cl-callf orderless--predicate-and pred res)
    else if res collect (if (stringp res) `(regexp ,res) res) into regexps
    finally return
-   (and (or pred regexps) (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps))))))))
+   (when (or pred regexps)
+     (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps))))))))
 
 (defun orderless-compile (pattern &optional styles dispatchers)
   "Build regexps to match the components of PATTERN.
@@ -424,8 +432,9 @@ string as argument."
                          (funcall orderless-component-separator pattern)
                        (split-string pattern orderless-component-separator t))
    with total = (length components)
-   for comp in components and idx from 0
-   for (pred . regexp) = (orderless--compile-component comp idx total styles dispatchers)
+   for comp in components and index from 0
+   for (pred . regexp) = (orderless--compile-component
+                          comp index total styles dispatchers)
    when regexp collect regexp into regexps
    when pred do (cl-callf orderless--predicate-and predicate pred)
    finally return (cons predicate regexps)))
