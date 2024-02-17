@@ -414,7 +414,8 @@ you the default, if you want no dispatchers to be run, use
 \\='(ignore) as the value of DISPATCHERS.
 
 The return value is a pair of a predicate function and a list of
-regexps."
+regexps.  The predicate function can also be nil.  It takes a
+string as argument."
   (unless styles (setq styles orderless-matching-styles))
   (unless dispatchers (setq dispatchers orderless-style-dispatchers))
   (cl-loop
