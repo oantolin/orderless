@@ -383,21 +383,19 @@ DEFAULT as the list of styles."
 
 (defun orderless--compile-component (component idx total styles dispatchers)
   "Compile COMPONENT at IDX of TOTAL components with STYLES and DISPATCHERS."
-  (pcase-let ((`(,newsty . ,newcomp) (orderless--dispatch dispatchers styles component idx total)))
-    (when (functionp newsty)
-      (setq newsty (list newsty)))
-    (cl-loop
-     with pred = nil
-     for style in newsty
-     for res = (condition-case nil
-                   (funcall style newcomp)
-                 (wrong-number-of-arguments
-                  (when-let ((res (orderless--compile-component newcomp idx total styles dispatchers)))
-                    (funcall style (car res) (cdr res)))))
-     if (functionp res) do (cl-callf orderless--predicate-and pred res)
-     else if res collect (if (stringp res) `(regexp ,res) res) into regexps
-     finally return
-     (and (or pred regexps) (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps)))))))))
+  (cl-loop
+   with pred = nil
+   with (newsty . newcomp) = (orderless--dispatch dispatchers styles component idx total)
+   for style in (if (functionp newsty) (list newsty) newsty)
+   for res = (condition-case nil
+                 (funcall style newcomp)
+               (wrong-number-of-arguments
+                (when-let ((res (orderless--compile-component newcomp idx total styles dispatchers)))
+                  (funcall style (car res) (cdr res)))))
+   if (functionp res) do (cl-callf orderless--predicate-and pred res)
+   else if res collect (if (stringp res) `(regexp ,res) res) into regexps
+   finally return
+   (and (or pred regexps) (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps))))))))
 
 (defun orderless-compile (pattern &optional styles dispatchers)
   "Build regexps to match the components of PATTERN.
