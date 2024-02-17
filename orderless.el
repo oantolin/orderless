@@ -129,7 +129,7 @@ customizing this variable to see a list of them."
 
 (defcustom orderless-affix-dispatch-alist
   `((?% . ,#'char-fold-to-regexp)
-    (?! . ,#'orderless-without)
+    (?! . ,#'orderless-not)
     (?@ . ,#'orderless-annotation)
     (?, . ,#'orderless-initialism)
     (?= . ,#'orderless-literal)
@@ -147,7 +147,7 @@ matched according the style associated to it."
                        (const :tag "Literal" ,#'orderless-literal)
                        (const :tag "Regexp" ,#'orderless-regexp)
                        (const :tag "Without literal" ,#'orderless-without-literal)
-                       (const :tag "Without regexp" ,#'orderless-without)
+                       (const :tag "Not" ,#'orderless-not)
                        (const :tag "Flex" ,#'orderless-flex)
                        (const :tag "Initialism" ,#'orderless-initialism)
                        (const :tag "Prefixes" ,#'orderless-prefixes)
@@ -261,9 +261,8 @@ at a word boundary in the candidate.  This is similar to the
 
 (defun orderless-without-literal (component)
   "Match strings that do *not* contain COMPONENT as a literal match.
-You may prefer to use the more general `orderless-without'
-instead which compiles the input to a predicate instead of a
-regexp."
+You may prefer to use the more general `orderless-not' instead
+which can invert any predicate or regexp."
   `(seq
     (group string-start)               ; highlight nothing!
     (zero-or-more
@@ -273,7 +272,7 @@ regexp."
                                       string-end)))))
     string-end))
 
-(defun orderless-without (pred regexp)
+(defun orderless-not (pred regexp)
   "Match strings that do *not* match PRED or REGEXP."
   (lambda (str)
     (not (or (and pred (funcall pred str))
