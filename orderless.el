@@ -273,15 +273,14 @@ regexp."
                                       string-end)))))
     string-end))
 
-(defun orderless-without (component compile)
+(defun orderless-without (component)
   "Match strings that do *not* match COMPONENT."
-  (pcase-let ((`(,pred . ,regexp) (funcall compile component)))
-    (when (or pred regexp)
-      (lambda (str)
-        (not (or (and pred (funcall pred str))
-                 (and regexp (string-match-p regexp str))))))))
+  (pcase-let ((`(,pred . ,regexp) component))
+    (lambda (str)
+      (not (or (and pred (funcall pred str))
+               (and regexp (string-match-p regexp str)))))))
 
-(defun orderless-annotation (component compile)
+(defun orderless-annotation (component)
   "Match candidates where the annotation matches COMPONENT."
   (when-let (((minibufferp))
              (table minibuffer-completion-table)
@@ -293,12 +292,11 @@ regexp."
                       (when-let ((aff (or (completion-metadata-get metadata 'affixation-function)
                                           (plist-get completion-extra-properties :affixation-function))))
                         (lambda (cand) (caddr (funcall aff (list cand))))))))
-    (pcase-let ((`(,pred . ,regexp) (funcall compile component)))
-      (when (or pred regexp)
-        (lambda (str)
-          (when-let ((ann (funcall fun str)))
-            (and (or (not pred) (funcall pred ann))
-                 (or (not regexp) (string-match-p regexp ann)))))))))
+    (pcase-let ((`(,pred . ,regexp) component))
+      (lambda (str)
+        (when-let ((ann (funcall fun str)))
+          (and (or (not pred) (funcall pred ann))
+               (or (not regexp) (string-match-p regexp ann))))))))
 
 ;;; Highlighting matches
 
@@ -388,19 +386,24 @@ DEFAULT as the list of styles."
 
 (defun orderless--compile-component (component idx total styles dispatchers)
   "Compile COMPONENT at IDX of TOTAL components with STYLES and DISPATCHERS."
-  (pcase-let ((compile (lambda (c) (orderless--compile-component c idx total styles dispatchers)))
-              (`(,newsty . ,newcomp) (orderless--dispatch dispatchers styles component idx total)))
+  (pcase-let ((`(,newsty . ,newcomp) (orderless--dispatch dispatchers styles component idx total)))
     (when (functionp newsty)
       (setq newsty (list newsty)))
     (cl-loop
      with pred = nil
      for style in newsty
-     for res = (condition-case nil
-                   (funcall style newcomp)
-                 (wrong-number-of-arguments (funcall style newcomp compile)))
+     ;; TODO orderless-without and orderless-annotation are hardcoded here.
+     ;; Changed this such that orderless-affix-dispatch-alist contains a flag or
+     ;; introduce a new configuration variable.
+     for newcomp2 = (if (memq style '(orderless-without orderless-annotation))
+                        (orderless--compile-component newcomp idx total styles dispatchers)
+                      newcomp)
+     when newcomp2
+     for res = (funcall style newcomp2)
      if (functionp res) do (cl-callf orderless--predicate-and pred res)
      else if res collect (if (stringp res) `(regexp ,res) res) into regexps
-     finally return (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps))))))))
+     finally return
+     (and (or pred regexps) (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps)))))))))
 
 (defun orderless-compile (pattern &optional styles dispatchers)
   "Build regexps to match the components of PATTERN.
