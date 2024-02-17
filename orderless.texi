@@ -369,11 +369,11 @@ completion is the one that ends up being used, of course.
 @node Pattern compiler
 @section Pattern compiler
 
-The default mechanism for turning an input string into a list of regexps to
-match against, configured using @samp{orderless-matching-styles}, is probably flexible
-enough for the vast majority of users. The patterns are compiled by the
-@samp{orderless-compile}. Under special circumstances it may be useful to implement a
-custom pattern compiler by advising the @samp{orderless-compile}.
+The default mechanism for turning an input string into a predicate and a list of
+regexps to match against, configured using @samp{orderless-matching-styles}, is
+probably flexible enough for the vast majority of users. The patterns are
+compiled by @samp{orderless-compile}. Under special circumstances it may be useful to
+implement a custom pattern compiler by advising @samp{orderless-compile}.
 
 @node Interactively changing the configuration
 @section Interactively changing the configuration
