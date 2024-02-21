@@ -249,7 +249,7 @@ that specific component, overriding the default matching styles.
 A style dispatcher can either decline to handle the input string or
 component, or it can return which matching styles to use. It can
 also, if desired, additionally return a new string to use in place of
-the given one. Consult the documentation of @samp{orderless-dispatch} for
+the given one. Consult the documentation of @samp{orderless--dispatch} for
 full details.
 
 As an example of writing your own dispatchers, say you wanted the
@@ -369,12 +369,11 @@ completion is the one that ends up being used, of course.
 @node Pattern compiler
 @section Pattern compiler
 
-The default mechanism for turning an input string into a list of regexps to
-match against, configured using @samp{orderless-matching-styles}, is probably
-flexible enough for the vast majority of users. The patterns are compiled by the
-@samp{orderless-pattern-compiler}. Under special circumstances it may be useful to
-implement a custom pattern compiler by advising the
-@samp{orderless-pattern-compiler}.
+The default mechanism for turning an input string into a predicate and a list of
+regexps to match against, configured using @samp{orderless-matching-styles}, is
+probably flexible enough for the vast majority of users. The patterns are
+compiled by @samp{orderless-compile}. Under special circumstances it may be useful to
+implement a custom pattern compiler by advising @samp{orderless-compile}.
 
 @node Interactively changing the configuration
 @section Interactively changing the configuration

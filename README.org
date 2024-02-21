@@ -197,7 +197,7 @@ regexp styles.
  A style dispatcher can either decline to handle the input string or
  component, or it can return which matching styles to use. It can
  also, if desired, additionally return a new string to use in place of
- the given one. Consult the documentation of =orderless-dispatch= for
+ the given one. Consult the documentation of =orderless--dispatch= for
  full details.
 
  As an example of writing your own dispatchers, say you wanted the
@@ -307,12 +307,11 @@ completion is the one that ends up being used, of course.
 
 ** Pattern compiler
 
-The default mechanism for turning an input string into a list of regexps to
-match against, configured using =orderless-matching-styles=, is probably
-flexible enough for the vast majority of users. The patterns are compiled by the
-=orderless-pattern-compiler=. Under special circumstances it may be useful to
-implement a custom pattern compiler by advising the
-=orderless-pattern-compiler=.
+The default mechanism for turning an input string into a predicate and a list of
+regexps to match against, configured using =orderless-matching-styles=, is
+probably flexible enough for the vast majority of users. The patterns are
+compiled by =orderless-compile=. Under special circumstances it may be useful to
+implement a custom pattern compiler by advising =orderless-compile=.
 
 ** Interactively changing the configuration
 
