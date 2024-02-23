@@ -272,11 +272,16 @@ which can invert any predicate or regexp."
                                       string-end)))))
     string-end))
 
+(defsubst orderless--match-p (pred regexp str)
+  "Return t if STR matches PRED and REGEXP."
+  (and str
+       (or (not pred) (funcall pred str))
+       (or (not regexp) (string-match-p regexp str))))
+
 (defun orderless-not (pred regexp)
-  "Match strings that do *not* match PRED or REGEXP."
+  "Match strings that do *not* match PRED and REGEXP."
   (lambda (str)
-    (not (or (and pred (funcall pred str))
-             (and regexp (string-match-p regexp str))))))
+    (not (orderless--match-p pred regexp str))))
 
 (defun orderless-annotation (pred regexp)
   "Match candidates where the annotation matches PRED and REGEXP."
@@ -296,9 +301,7 @@ which can invert any predicate or regexp."
                                                      :affixation-function))))
                         (lambda (cand) (caddr (funcall aff (list cand))))))))
     (lambda (str)
-      (when-let ((ann (funcall fun str)))
-        (and (or (not pred) (funcall pred ann))
-             (or (not regexp) (string-match-p regexp ann)))))))
+      (orderless--match-p pred regexp (funcall fun str)))))
 
 ;;; Highlighting matches
 
