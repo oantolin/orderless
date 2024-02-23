@@ -119,10 +119,11 @@ Protesilaos Stavrou's lovely [[https://gitlab.com/protesilaos/modus-themes][modu
 ** Component matching styles
 
 Each component of a pattern can match in any of several matching
-styles. A matching style is simply a function from strings to regexps,
-so it is easy to define new matching styles. The regexp returned by a
-matching style can be either a string or an s-expression in =rx= syntax.
-The predefined matching styles are:
+styles. A matching style is a function from strings to regexps or
+predicates, so it is easy to define new matching styles. The value
+returned by a matching style can be either a regexp as a string, an
+s-expression in =rx= syntax or a predicate function. The predefined
+matching styles are:
 
 - orderless-regexp :: the component is treated as a regexp that must
   match somewhere in the candidate.
@@ -131,14 +132,6 @@ The predefined matching styles are:
 
 - orderless-literal :: the component is treated as a literal string
   that must occur in the candidate.
-
-- *orderless-without-literal* :: the component is a treated as a literal
-  string that must *not* occur in the candidate.
-
-  Note that nothing is highlighted for this matching style. You
-  probably don't want to use this style directly in
-  =orderless-matching-styles= but with a style dispatcher instead. There
-  is an example in the section on style dispatchers.
 
 - orderless-prefixes :: the component is split at word endings and
   each piece must match at a word boundary in the candidate, occurring
@@ -158,9 +151,30 @@ The predefined matching styles are:
 
   This maps =abc= to =a.*b.*c=.
 
+- *orderless-without-literal* :: the component is a treated as a literal
+  string that must *not* occur in the candidate.
+
+  Nothing is highlighted by this style. This style should not be used
+  directly in =orderless-matching-styles= but with a style dispatcher
+  instead. See also the more general style modifier =orderless-not=.
+
 The variable =orderless-matching-styles= can be set to a list of the
 desired matching styles to use. By default it enables the literal and
 regexp styles.
+
+*** Style modifiers
+
+Style modifiers are functions which take a predicate function and a
+regular expression as a string and return a new predicate function.
+Style modifiers should not be used directly in
+=orderless-matching-styles= but with a style dispatcher instead.
+
+- orderless-annotation :: this style modifier matches the pattern
+  against the annotation string of the candidate, instead of against
+  the candidate string.
+
+- orderless-not :: this style modifier inverts the pattern, such that
+  candidates pass which do not match the pattern.
 
 *** Style dispatchers
 
@@ -172,9 +186,10 @@ regexp styles.
  =orderless-affix-dispatch= which enables a simple syntax based on
  special characters used as either a prefix or suffix:
 
- - =!= makes the rest of the component match using
-   =orderless-without-literal=, that is, both =!bad= and =bad!= will match
-   strings that do /not/ contain the substring =bad=.
+ - =!= modifies the component with =orderless-not=. Both =!bad= and =bad!=
+   will match strings that do /not/ contain the pattern =bad=.
+ - =@= modifies the component with =orderless-annotation=. The pattern
+   will match against the candidate annotation.
  - =,= uses =orderless-initialism=.
  - === uses =orderless-literal=.
  - =~= uses =orderless-flex=.
@@ -223,17 +238,17 @@ regexp styles.
    (defun first-initialism (pattern index _total)
      (if (= index 0) 'orderless-initialism))
 
-   (defun without-if-bang (pattern _index _total)
+   (defun not-if-bang (pattern _index _total)
      (cond
       ((equal "!" pattern)
        '(orderless-literal . ""))
       ((string-prefix-p "!" pattern)
-       `(orderless-without-literal . ,(substring pattern 1)))))
+       `(orderless-not . ,(substring pattern 1)))))
 
    (setq orderless-matching-styles '(orderless-regexp)
          orderless-style-dispatchers '(first-initialism
                                        flex-if-twiddle
-                                       without-if-bang))
+                                       not-if-bang))
  #+end_src
 
 ** Component separator regexp

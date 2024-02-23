@@ -44,6 +44,7 @@ Customization
 
 Component matching styles
 
+* Style modifiers::
 * Style dispatchers::
 
 Integration with other completion UIs
@@ -151,10 +152,11 @@ Bug reports are highly welcome and appreciated!
 @section Component matching styles
 
 Each component of a pattern can match in any of several matching
-styles. A matching style is simply a function from strings to regexps,
-so it is easy to define new matching styles. The regexp returned by a
-matching style can be either a string or an s-expression in @samp{rx} syntax.
-The predefined matching styles are:
+styles. A matching style is a function from strings to regexps or
+predicates, so it is easy to define new matching styles. The value
+returned by a matching style can be either a regexp as a string, an
+s-expression in @samp{rx} syntax or a predicate function. The predefined
+matching styles are:
 
 @table @asis
 @item orderless-regexp
@@ -166,15 +168,6 @@ If the component is not a valid regexp, it is ignored.
 @item orderless-literal
 the component is treated as a literal string
 that must occur in the candidate.
-
-@item @strong{orderless-without-literal}
-the component is a treated as a literal
-string that must @strong{not} occur in the candidate.
-
-Note that nothing is highlighted for this matching style. You
-probably don't want to use this style directly in
-@samp{orderless-matching-styles} but with a style dispatcher instead. There
-is an example in the section on style dispatchers.
 
 @item orderless-prefixes
 the component is split at word endings and
@@ -196,6 +189,14 @@ the characters of the component should appear in
 that order in the candidate, but not necessarily consecutively.
 
 This maps @samp{abc} to @samp{a.*b.*c}.
+
+@item @strong{orderless-without-literal}
+the component is a treated as a literal
+string that must @strong{not} occur in the candidate.
+
+Nothing is highlighted by this style. This style should not be used
+directly in @samp{orderless-matching-styles} but with a style dispatcher
+instead. See also the more general style modifier @samp{orderless-not}.
 @end table
 
 The variable @samp{orderless-matching-styles} can be set to a list of the
@@ -203,8 +204,28 @@ desired matching styles to use. By default it enables the literal and
 regexp styles.
 
 @menu
+* Style modifiers::
 * Style dispatchers::
 @end menu
+
+@node Style modifiers
+@subsection Style modifiers
+
+Style modifiers are functions which take a predicate function and a
+regular expression as a string and return a new predicate function.
+Style modifiers should not be used directly in
+@samp{orderless-matching-styles} but with a style dispatcher instead.
+
+@table @asis
+@item orderless-annotation
+this style modifier matches the pattern
+against the annotation string of the candidate, instead of against
+the candidate string.
+
+@item orderless-not
+this style modifier inverts the pattern, such that
+candidates pass which do not match the pattern.
+@end table
 
 @node Style dispatchers
 @subsection Style dispatchers
@@ -219,9 +240,11 @@ special characters used as either a prefix or suffix:
 
 @itemize
 @item
-@samp{!} makes the rest of the component match using
-@samp{orderless-without-literal}, that is, both @samp{!bad} and @samp{bad!} will match
-strings that do @emph{not} contain the substring @samp{bad}.
+@samp{!} modifies the component with @samp{orderless-not}. Both @samp{!bad} and @samp{bad!}
+will match strings that do @emph{not} contain the pattern @samp{bad}.
+@item
+@samp{@@} modifies the component with @samp{orderless-annotation}. The pattern
+will match against the candidate annotation.
 @item
 @samp{,} uses @samp{orderless-initialism}.
 @item
@@ -281,17 +304,17 @@ You can achieve this with the following configuration:
 (defun first-initialism (pattern index _total)
   (if (= index 0) 'orderless-initialism))
 
-(defun without-if-bang (pattern _index _total)
+(defun not-if-bang (pattern _index _total)
   (cond
    ((equal "!" pattern)
     '(orderless-literal . ""))
    ((string-prefix-p "!" pattern)
-    `(orderless-without-literal . ,(substring pattern 1)))))
+    `(orderless-not . ,(substring pattern 1)))))
 
 (setq orderless-matching-styles '(orderless-regexp)
       orderless-style-dispatchers '(first-initialism
                                     flex-if-twiddle
-                                    without-if-bang))
+                                    not-if-bang))
 @end lisp
 
 @node Component separator regexp
