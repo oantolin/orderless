@@ -240,21 +240,21 @@ special characters used as either a prefix or suffix:
 
 @itemize
 @item
-@samp{!} modifies the component with @samp{orderless-not}. Both @samp{!bad} and @samp{bad!}
-will match strings that do @emph{not} contain the pattern @samp{bad}.
+! modifies the component with @samp{orderless-not}. Both @samp{!bad} and
+@samp{bad!} will match strings that do @emph{not} contain the pattern @samp{bad}.
 @item
-@samp{@@} modifies the component with @samp{orderless-annotation}. The pattern
-will match against the candidate annotation.
+@@ modifies the component with @samp{orderless-annotation}. The pattern
+will match against the candidate's annotation.
 @item
-@samp{,} uses @samp{orderless-initialism}.
+, uses @samp{orderless-initialism}.
 @item
-@samp{=} uses @samp{orderless-literal}.
+= uses @samp{orderless-literal}.
 @item
-@samp{~} uses @samp{orderless-flex}.
+~ uses @samp{orderless-flex}.
 @item
-@samp{%} makes the string match ignoring diacritics and similar
-inflections on characters (it uses the function @samp{char-fold-to-regexp}
-to do this).
+% makes the string match ignoring diacritics and similar
+inflections on characters (it uses the function
+@samp{char-fold-to-regexp} to do this).
 @end itemize
 
 You can add, remove or change this mapping between affix characters

@@ -186,16 +186,16 @@ Style modifiers should not be used directly in
  =orderless-affix-dispatch= which enables a simple syntax based on
  special characters used as either a prefix or suffix:
 
- - =!= modifies the component with =orderless-not=. Both =!bad= and =bad!=
-   will match strings that do /not/ contain the pattern =bad=.
- - =@= modifies the component with =orderless-annotation=. The pattern
-   will match against the candidate annotation.
- - =,= uses =orderless-initialism=.
- - === uses =orderless-literal=.
- - =~= uses =orderless-flex=.
- - =%= makes the string match ignoring diacritics and similar
-   inflections on characters (it uses the function =char-fold-to-regexp=
-   to do this).
+ - ! modifies the component with =orderless-not=. Both =!bad= and
+   =bad!= will match strings that do /not/ contain the pattern =bad=.
+ - @ modifies the component with =orderless-annotation=. The pattern
+   will match against the candidate's annotation.
+ - , uses =orderless-initialism=.
+ - = uses =orderless-literal=.
+ - ~ uses =orderless-flex=.
+ - % makes the string match ignoring diacritics and similar
+   inflections on characters (it uses the function
+   =char-fold-to-regexp= to do this).
 
  You can add, remove or change this mapping between affix characters
  and matching styles by customizing the user option
