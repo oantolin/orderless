@@ -160,19 +160,18 @@ If the COMPONENT starts or ends with one of the characters used
 as a key in `orderless-affix-dispatch-alist', then that character
 is removed and the remainder of the COMPONENT is matched in the
 style associated to the character."
-  (cond
-   ;; Ignore single dispatcher character
-   ((and (= (length component) 1) (alist-get (aref component 0)
-                                             orderless-affix-dispatch-alist))
-    #'ignore)
-   ;; Prefix
-   ((when-let ((style (alist-get (aref component 0)
-                                 orderless-affix-dispatch-alist)))
-      (cons style (substring component 1))))
-   ;; Suffix
-   ((when-let ((style (alist-get (aref component (1- (length component)))
-                                 orderless-affix-dispatch-alist)))
-      (cons style (substring component 0 -1))))))
+  (let ((len (length component))
+        (alist orderless-affix-dispatch-alist))
+    (when (> len 0)
+      (cond
+       ;; Ignore single dispatcher character
+       ((and (= len 1) (alist-get (aref component 0) alist)) #'ignore)
+       ;; Prefix
+       ((when-let ((style (alist-get (aref component 0) alist)))
+          (cons style (substring component 1))))
+       ;; Suffix
+       ((when-let ((style (alist-get (aref component (1- len)) alist)))
+          (cons style (substring component 0 -1))))))))
 
 (defcustom orderless-style-dispatchers (list #'orderless-affix-dispatch)
   "List of style dispatchers.
