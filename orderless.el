@@ -221,6 +221,10 @@ is determined by the values of `completion-ignore-case',
   "Match COMPONENT as a literal string."
   `(literal ,component))
 
+(defun orderless-prefix (component)
+  "Match COMPONENT as a literal prefix string."
+  `(seq bol (literal ,component)))
+
 (defun orderless--separated-by (sep rxs &optional before after)
   "Return a regexp to match the rx-regexps RXS with SEP in between.
 If BEFORE is specified, add it to the beginning of the rx
