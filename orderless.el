@@ -223,7 +223,7 @@ is determined by the values of `completion-ignore-case',
 
 (defun orderless-prefix (component)
   "Match COMPONENT as a literal prefix string."
-  `(seq bol (literal ,component)))
+  `(seq bos (literal ,component)))
 
 (defun orderless--separated-by (sep rxs &optional before after)
   "Return a regexp to match the rx-regexps RXS with SEP in between.
@@ -493,10 +493,10 @@ The predicate PRED is used to constrain the entries in TABLE."
 ;; https://github.com/oantolin/orderless/issues/79#issuecomment-916073526
 (defun orderless--anchored-quoted-regexp (regexp)
   "Determine if REGEXP is a quoted regexp anchored at the beginning.
-If REGEXP is of the form \"\\(?:^q\\)\" for q = (regexp-quote u),
+If REGEXP is of the form \"\\(?:\\`q\\)\" for q = (regexp-quote u),
 then return (cons REGEXP u); else return nil."
-  (when (and (string-prefix-p "\\(?:^" regexp) (string-suffix-p "\\)" regexp))
-    (let ((trimmed (substring regexp 5 -2)))
+  (when (and (string-prefix-p "\\(?:\\`" regexp) (string-suffix-p "\\)" regexp))
+    (let ((trimmed (substring regexp 6 -2)))
       (unless (string-match-p "[$*+.?[\\^]"
                               (replace-regexp-in-string
                                "\\\\[$*+.?[\\^]" "" trimmed
@@ -515,7 +515,7 @@ then return (cons REGEXP u); else return nil."
 (defun orderless--filter (prefix regexps ignore-case table pred)
   "Filter TABLE by PREFIX, REGEXPS and PRED.
 The matching should be case-insensitive if IGNORE-CASE is non-nil."
-  ;; If there is a regexp of the form \(?:^quoted-regexp\) then
+  ;; If there is a regexp of the form \(?:\`quoted-regexp\) then
   ;; remove the first such and add the unquoted form to the prefix.
   (pcase (cl-loop for r in regexps
                   thereis (orderless--anchored-quoted-regexp r))
