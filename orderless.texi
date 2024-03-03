@@ -169,9 +169,9 @@ If the component is not a valid regexp, it is ignored.
 the component is treated as a literal string
 that must occur in the candidate.
 
-@item orderless-prefix
-the component is treated as a literal string
-that must occur as a prefix of a candidate.
+@item orderless-literal-prefix
+the component is treated as a literal
+string that must occur as a prefix of a candidate.
 
 @item orderless-prefixes
 the component is split at word endings and
@@ -253,6 +253,8 @@ will match against the candidate's annotation.
 , uses @samp{orderless-initialism}.
 @item
 = uses @samp{orderless-literal}.
+@item
+^ uses @samp{orderless-literal-prefix}.
 @item
 ~ uses @samp{orderless-flex}.
 @item

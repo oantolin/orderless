@@ -133,8 +133,8 @@ matching styles are:
 - orderless-literal :: the component is treated as a literal string
   that must occur in the candidate.
 
-- orderless-prefix :: the component is treated as a literal string
-  that must occur as a prefix of a candidate.
+- orderless-literal-prefix :: the component is treated as a literal
+  string that must occur as a prefix of a candidate.
 
 - orderless-prefixes :: the component is split at word endings and
   each piece must match at a word boundary in the candidate, occurring
@@ -195,6 +195,7 @@ Style modifiers should not be used directly in
    will match against the candidate's annotation.
  - , uses =orderless-initialism=.
  - = uses =orderless-literal=.
+ - ^ uses =orderless-literal-prefix=.
  - ~ uses =orderless-flex=.
  - % makes the string match ignoring diacritics and similar
    inflections on characters (it uses the function

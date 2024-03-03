@@ -133,6 +133,7 @@ customizing this variable to see a list of them."
     (?@ . ,#'orderless-annotation)
     (?, . ,#'orderless-initialism)
     (?= . ,#'orderless-literal)
+    (?^ . ,#'orderless-literal-prefix)
     (?~ . ,#'orderless-flex))
   "Alist associating characters to matching styles.
 The function `orderless-affix-dispatch' uses this list to
@@ -145,8 +146,9 @@ matched according the style associated to it."
           :value-type (choice
                        (const :tag "Annotation" ,#'orderless-annotation)
                        (const :tag "Literal" ,#'orderless-literal)
-                       (const :tag "Regexp" ,#'orderless-regexp)
                        (const :tag "Without literal" ,#'orderless-without-literal)
+                       (const :tag "Literal prefix" ,#'orderless-literal-prefix)
+                       (const :tag "Regexp" ,#'orderless-regexp)
                        (const :tag "Not" ,#'orderless-not)
                        (const :tag "Flex" ,#'orderless-flex)
                        (const :tag "Initialism" ,#'orderless-initialism)
@@ -221,7 +223,7 @@ is determined by the values of `completion-ignore-case',
   "Match COMPONENT as a literal string."
   `(literal ,component))
 
-(defun orderless-prefix (component)
+(defun orderless-literal-prefix (component)
   "Match COMPONENT as a literal prefix string."
   `(seq bos (literal ,component)))
 
