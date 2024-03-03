@@ -493,7 +493,7 @@ The predicate PRED is used to constrain the entries in TABLE."
 
 ;; Thanks to @jakanakaevangeli for writing a version of this function:
 ;; https://github.com/oantolin/orderless/issues/79#issuecomment-916073526
-(defun orderless--anchored-quoted-regexp (regexp)
+(defun orderless--literal-prefix-p (regexp)
   "Determine if REGEXP is a quoted regexp anchored at the beginning.
 If REGEXP is of the form \"\\(?:\\`q\\)\" for q = (regexp-quote u),
 then return (cons REGEXP u); else return nil."
@@ -520,7 +520,7 @@ The matching should be case-insensitive if IGNORE-CASE is non-nil."
   ;; If there is a regexp of the form \(?:\`quoted-regexp\) then
   ;; remove the first such and add the unquoted form to the prefix.
   (pcase (cl-loop for r in regexps
-                  thereis (orderless--anchored-quoted-regexp r))
+                  thereis (orderless--literal-prefix-p r))
     (`(,regexp . ,literal)
      (setq prefix (concat prefix literal)
            regexps (remove regexp regexps))))
