@@ -287,12 +287,14 @@ which can invert any predicate or regexp."
     (not (orderless--match-p pred regexp str))))
 
 (defun orderless--metadata ()
-  "Return completion metadata."
+  "Return completion metadata iff inside minibuffer."
   (when-let (((minibufferp))
              (table minibuffer-completion-table))
-    (completion-metadata (buffer-substring-no-properties
-                          (minibuffer-prompt-end) (point))
-                         table minibuffer-completion-predicate)))
+    ;; Return non-nil metadata iff inside minibuffer
+    (or (completion-metadata (buffer-substring-no-properties
+                              (minibuffer-prompt-end) (point))
+                             table minibuffer-completion-predicate)
+        '((nil . nil)))))
 
 (defun orderless-annotation (pred regexp)
   "Match candidates where the annotation matches PRED and REGEXP."
