@@ -54,17 +54,17 @@
 (defcustom orderless-kwd-alist
   `((ann ,#'orderless-annotation)
     (pre ,#'orderless-literal-prefix)
-    (mod ,#'orderless-kwd-mode)
-    (con ,#'orderless-kwd-content)
-    (doc ,#'orderless-kwd-documentation)
-    (dir ,#'orderless-kwd-directory)
     (cat ,#'orderless-kwd-category)
+    (con ,#'orderless-kwd-content)
+    (dir ,#'orderless-kwd-directory)
+    (doc ,#'orderless-kwd-documentation)
     (grp ,#'orderless-kwd-group)
+    (mod ,#'orderless-kwd-mode)
     (val ,#'orderless-kwd-value)
+    (dif ,#'orderless-kwd-modified t)
     (key ,#'orderless-kwd-key t)
-    (on  ,#'orderless-kwd-on t)
     (off ,#'orderless-kwd-off t)
-    (dif ,#'orderless-kwd-modified t))
+    (on  ,#'orderless-kwd-on t))
   "Keyword dispatcher alist.
 The list associates a keyword with a matcher function and an
 optional boolean flag.  If the flag is non-nil, the matcher acts
