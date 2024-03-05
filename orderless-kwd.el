@@ -112,12 +112,13 @@
 
 (defun orderless-kwd-key (pred regexp)
   "Match command key binding against PRED and REGEXP."
-  (lambda (str)
-    (when-let ((sym (intern-soft str))
-               ((fboundp sym))
-               (keys (where-is-internal sym)))
-      (cl-loop for key in keys
-               thereis (orderless--match-p pred regexp (key-description key))))))
+  (let ((buf (or (window-buffer (minibuffer-selected-window)))))
+    (lambda (str)
+      (when-let ((sym (intern-soft str))
+                 ((fboundp sym))
+                 (keys (with-current-buffer buf (where-is-internal sym))))
+        (cl-loop for key in keys
+                 thereis (orderless--match-p pred regexp (key-description key)))))))
 
 (defun orderless-kwd-value (pred regexp)
   "Match variable value against PRED and REGEXP."
