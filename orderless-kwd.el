@@ -91,7 +91,8 @@ as a flag and does not require input."
 
 (defun orderless-kwd-group (pred regexp)
   "Match candidate group title against PRED and REGEXP."
-  (when-let ((fun (completion-metadata-get (orderless--metadata) 'group-function)))
+  (when-let ((fun (completion-metadata-get (orderless--metadata)
+                                           'group-function)))
     (lambda (str)
       (orderless--match-p pred regexp (funcall fun str nil)))))
 
@@ -126,8 +127,9 @@ as a flag and does not require input."
       (when-let ((sym (intern-soft str))
                  ((fboundp sym))
                  (keys (with-current-buffer buf (where-is-internal sym))))
-        (cl-loop for key in keys
-                 thereis (orderless--match-p pred regexp (key-description key)))))))
+        (cl-loop
+         for key in keys
+         thereis (orderless--match-p pred regexp (key-description key)))))))
 
 (defun orderless-kwd-value (pred regexp)
   "Match variable value against PRED and REGEXP."
@@ -170,8 +172,9 @@ as a flag and does not require input."
     (when-let ((buf (orderless-kwd--get-buffer str))
                (mode (buffer-local-value 'major-mode buf)))
       (or (orderless--match-p pred regexp (symbol-name mode))
-          (orderless--match-p pred regexp (format-mode-line
-                                           (buffer-local-value 'mode-name buf)))))))
+          (orderless--match-p
+           pred regexp
+           (format-mode-line (buffer-local-value 'mode-name buf)))))))
 
 (defun orderless-kwd-directory (pred regexp)
   "Match `default-directory' against PRED and REGEXP."
@@ -183,10 +186,12 @@ as a flag and does not require input."
 ;;;###autoload
 (defun orderless-kwd-dispatch (component _index _total)
   "Match COMPONENT against the keywords in `orderless-kwd-alist'."
-  (when (and (not (equal component "")) (= (aref component 0) orderless-kwd-prefix))
+  (when (and (not (equal component ""))
+             (= (aref component 0) orderless-kwd-prefix))
     (if-let ((len (length component))
-             (pos (or (string-match-p (rx-to-string `(any ,orderless-kwd-separator))
-                                      component 1)
+             (pos (or (string-match-p
+                       (rx-to-string `(any ,orderless-kwd-separator))
+                       component 1)
                       len))
              (sym (intern-soft (substring component 1 pos)))
              (style (alist-get sym orderless-kwd-alist))
