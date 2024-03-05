@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;; Provide the `orderless-kwd-dispatch' style dispatcher, which
-;; recognizes input of the form `:mode:org' to filter buffers by mode
+;; recognizes input of the form `:mod:org' to filter buffers by mode
 ;; in `switch-to-buffer' or `:on' to only display enabled minor modes
 ;; in M-x.  The list of supported keywords is configured in
 ;; `orderless-kwd-alist'.
@@ -52,19 +52,19 @@
   :group 'orderless)
 
 (defcustom orderless-kwd-alist
-  `((ann     ,#'orderless-annotation)
-    (pre     ,#'orderless-literal-prefix)
-    (mode    ,#'orderless-kwd-mode)
-    (content ,#'orderless-kwd-content)
-    (doc     ,#'orderless-kwd-documentation)
-    (dir     ,#'orderless-kwd-directory)
-    (cat     ,#'orderless-kwd-category)
-    (group   ,#'orderless-kwd-group)
-    (val     ,#'orderless-kwd-value)
-    (key     ,#'orderless-kwd-key t)
-    (on      ,#'orderless-kwd-on t)
-    (off     ,#'orderless-kwd-off t)
-    (mod     ,#'orderless-kwd-modified t))
+  `((ann ,#'orderless-annotation)
+    (pre ,#'orderless-literal-prefix)
+    (mod ,#'orderless-kwd-mode)
+    (con ,#'orderless-kwd-content)
+    (doc ,#'orderless-kwd-documentation)
+    (dir ,#'orderless-kwd-directory)
+    (cat ,#'orderless-kwd-category)
+    (grp ,#'orderless-kwd-group)
+    (val ,#'orderless-kwd-value)
+    (key ,#'orderless-kwd-key t)
+    (on  ,#'orderless-kwd-on t)
+    (off ,#'orderless-kwd-off t)
+    (dif ,#'orderless-kwd-modified t))
   "Keyword dispatcher alist.
 The list associates a keyword with a matcher function and an
 optional boolean flag.  If the flag is non-nil, the matcher acts
