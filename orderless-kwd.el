@@ -70,11 +70,15 @@
                 :value-type (choice (list function) (list function (const t))))
   :group 'orderless)
 
-(defsubst orderless-kwd--buffer (str)
-  "Return buffer from candidate STR."
+(defsubst orderless-kwd--get-buffer (str)
+  "Return buffer from candidate STR taking `multi-category' into account."
   (when-let ((cat (get-text-property 0 'multi-category str)))
     (setq str (and (eq (car cat) 'buffer) (cdr cat))))
   (and str (get-buffer str)))
+
+(defsubst orderless-kwd--orig-buffer ()
+  "Return the original buffer before miniwindow selection."
+  (or (window-buffer (minibuffer-selected-window)) (current-buffer)))
 
 (defun orderless-kwd-category (pred regexp)
   "Match candidate category against PRED and REGEXP."
@@ -91,7 +95,7 @@
 (defun orderless-kwd-content (_pred regexp)
   "Match buffer content against REGEXP."
   (lambda (str)
-    (when-let ((buf (orderless-kwd--buffer str)))
+    (when-let ((buf (orderless-kwd--get-buffer str)))
       (with-current-buffer buf
         (save-excursion
           (save-restriction
@@ -114,7 +118,7 @@
 
 (defun orderless-kwd-key (pred regexp)
   "Match command key binding against PRED and REGEXP."
-  (let ((buf (or (window-buffer (minibuffer-selected-window)) (current-buffer))))
+  (let ((buf (orderless-kwd--orig-buffer)))
     (lambda (str)
       (when-let ((sym (intern-soft str))
                  ((fboundp sym))
@@ -124,7 +128,7 @@
 
 (defun orderless-kwd-value (pred regexp)
   "Match variable value against PRED and REGEXP."
-  (let ((buf (or (window-buffer (minibuffer-selected-window)) (current-buffer))))
+  (let ((buf (orderless-kwd--orig-buffer)))
     (lambda (str)
       (when-let ((sym (intern-soft str))
                  ((boundp sym)))
@@ -135,7 +139,7 @@
 
 (defun orderless-kwd-off (_)
   "Match disabled minor modes."
-  (let ((buf (or (window-buffer (minibuffer-selected-window)) (current-buffer))))
+  (let ((buf (orderless-kwd--orig-buffer)))
     (lambda (str)
       (when-let ((sym (intern-soft str)))
         (and (boundp sym)
@@ -144,7 +148,7 @@
 
 (defun orderless-kwd-on (_)
   "Match enabled minor modes."
-  (let ((buf (or (window-buffer (minibuffer-selected-window)) (current-buffer))))
+  (let ((buf (orderless-kwd--orig-buffer)))
     (lambda (str)
       (when-let ((sym (intern-soft str)))
         (and (boundp sym)
@@ -154,13 +158,13 @@
 (defun orderless-kwd-modified (_)
   "Match modified buffers."
   (lambda (str)
-    (when-let ((buf (orderless-kwd--buffer str)))
+    (when-let ((buf (orderless-kwd--get-buffer str)))
       (buffer-modified-p buf))))
 
 (defun orderless-kwd-mode (pred regexp)
   "Match buffer mode name against PRED and REGEXP."
   (lambda (str)
-    (when-let ((buf (orderless-kwd--buffer str))
+    (when-let ((buf (orderless-kwd--get-buffer str))
                (mode (buffer-local-value 'major-mode buf)))
       (or (orderless--match-p pred regexp (symbol-name mode))
           (orderless--match-p pred regexp (format-mode-line
@@ -169,7 +173,7 @@
 (defun orderless-kwd-directory (pred regexp)
   "Match `default-directory' against PRED and REGEXP."
   (lambda (str)
-    (when-let ((buf (orderless-kwd--buffer str)))
+    (when-let ((buf (orderless-kwd--get-buffer str)))
       (orderless--match-p pred regexp
                           (buffer-local-value 'default-directory buf)))))
 
