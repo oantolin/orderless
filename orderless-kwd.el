@@ -114,7 +114,7 @@
 
 (defun orderless-kwd-key (pred regexp)
   "Match command key binding against PRED and REGEXP."
-  (let ((buf (or (window-buffer (minibuffer-selected-window)))))
+  (let ((buf (or (window-buffer (minibuffer-selected-window)) (current-buffer))))
     (lambda (str)
       (when-let ((sym (intern-soft str))
                  ((fboundp sym))
@@ -124,7 +124,7 @@
 
 (defun orderless-kwd-value (pred regexp)
   "Match variable value against PRED and REGEXP."
-  (let ((buf (or (window-buffer (minibuffer-selected-window)))))
+  (let ((buf (or (window-buffer (minibuffer-selected-window)) (current-buffer))))
     (lambda (str)
       (when-let ((sym (intern-soft str))
                  ((boundp sym)))
@@ -135,7 +135,7 @@
 
 (defun orderless-kwd-off (_)
   "Match disabled minor modes."
-  (let ((buf (or (window-buffer (minibuffer-selected-window)))))
+  (let ((buf (or (window-buffer (minibuffer-selected-window)) (current-buffer))))
     (lambda (str)
       (when-let ((sym (intern-soft str)))
         (and (boundp sym)
@@ -144,7 +144,7 @@
 
 (defun orderless-kwd-on (_)
   "Match enabled minor modes."
-  (let ((buf (or (window-buffer (minibuffer-selected-window)))))
+  (let ((buf (or (window-buffer (minibuffer-selected-window)) (current-buffer))))
     (lambda (str)
       (when-let ((sym (intern-soft str)))
         (and (boundp sym)
