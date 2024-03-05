@@ -65,7 +65,10 @@
     (on      ,#'orderless-kwd-on t)
     (off     ,#'orderless-kwd-off t)
     (mod     ,#'orderless-kwd-modified t))
-  "Keyword dispatcher alist."
+  "Keyword dispatcher alist.
+The list associates a keyword with a matcher function and an
+optional boolean flag.  If the flag is non-nil, the matcher acts
+as a flag and does not require input."
   :type '(alist :key-type symbol
                 :value-type (choice (list function) (list function (const t))))
   :group 'orderless)
