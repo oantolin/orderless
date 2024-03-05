@@ -130,7 +130,7 @@ customizing this variable to see a list of them."
 (defcustom orderless-affix-dispatch-alist
   `((?% . ,#'char-fold-to-regexp)
     (?! . ,#'orderless-not)
-    (?@ . ,#'orderless-annotation)
+    (?& . ,#'orderless-annotation)
     (?, . ,#'orderless-initialism)
     (?= . ,#'orderless-literal)
     (?^ . ,#'orderless-literal-prefix)

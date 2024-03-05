@@ -191,8 +191,9 @@ Style modifiers should not be used directly in
 
  - ! modifies the component with =orderless-not=. Both =!bad= and
    =bad!= will match strings that do /not/ contain the pattern =bad=.
- - @ modifies the component with =orderless-annotation=. The pattern
-   will match against the candidate's annotation.
+ - & modifies the component with =orderless-annotation=. The pattern
+   will match against the candidate's annotation (cheesy mnemonic:
+   andnotation!).
  - , uses =orderless-initialism=.
  - = uses =orderless-literal=.
  - ^ uses =orderless-literal-prefix=.

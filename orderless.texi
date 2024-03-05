@@ -247,8 +247,9 @@ special characters used as either a prefix or suffix:
 ! modifies the component with @samp{orderless-not}. Both @samp{!bad} and
 @samp{bad!} will match strings that do @emph{not} contain the pattern @samp{bad}.
 @item
-@@ modifies the component with @samp{orderless-annotation}. The pattern
-will match against the candidate's annotation.
+& modifies the component with @samp{orderless-annotation}. The pattern
+will match against the candidate's annotation (cheesy mnemonic:
+andnotation!).
 @item
 , uses @samp{orderless-initialism}.
 @item
