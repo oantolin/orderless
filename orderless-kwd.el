@@ -72,7 +72,9 @@
 
 (defsubst orderless-kwd--buffer (str)
   "Return buffer from candidate STR."
-  (get-buffer (or (cdr (get-text-property 0 'multi-category str)) str)))
+  (when-let ((cat (get-text-property 0 'multi-category str)))
+    (setq str (and (eq (car cat) 'buffer) (cdr cat))))
+  (and str (get-buffer str)))
 
 (defun orderless-kwd-category (pred regexp)
   "Match candidate category against PRED and REGEXP."
