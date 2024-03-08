@@ -89,7 +89,7 @@
     (t :foreground "yellow"))
   "Face for matches of components numbered 3 mod 4.")
 
-(defcustom orderless-component-separator " +"
+(defcustom orderless-component-separator #'orderless-escapable-split-on-space
   "Component separators for orderless completion.
 This can either be a string, which is passed to `split-string',
 or a function of a single string argument."
