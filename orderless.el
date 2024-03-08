@@ -627,17 +627,17 @@ This function delegates to `orderless-%s'.
 The orderless configuration is locally modified
 specifically for the %s style.")
          (fn-doc (lambda (fn) (format doc-fmt fn name fn name name))))
-  `(progn
-     (defun ,try-completion (string table pred point)
-       ,(funcall fn-doc "try-completion")
-       (let ,configuration
-         (orderless-try-completion string table pred point)))
-     (defun ,all-completions (string table pred point)
-       ,(funcall fn-doc "all-completions")
-       (let ,configuration
-         (orderless-all-completions string table pred point)))
-     (add-to-list 'completion-styles-alist
-                  '(,name ,try-completion ,all-completions ,docstring)))))
+    `(progn
+       (defun ,try-completion (string table pred point)
+         ,(funcall fn-doc "try-completion")
+         (let ,configuration
+           (orderless-try-completion string table pred point)))
+       (defun ,all-completions (string table pred point)
+         ,(funcall fn-doc "all-completions")
+         (let ,configuration
+           (orderless-all-completions string table pred point)))
+       (add-to-list 'completion-styles-alist
+                    '(,name ,try-completion ,all-completions ,docstring)))))
 
 ;;; Ivy integration
 
