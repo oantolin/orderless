@@ -221,7 +221,11 @@ is determined by the values of `completion-ignore-case',
 
 (defun orderless-literal (component)
   "Match COMPONENT as a literal string."
-  `(literal ,component))
+  ;; Do not use (literal component) here, such that `delete-dups' in
+  ;; `orderless--compile-component' has a chance to delete duplicates for
+  ;; literal input. The default configuration of `orderless-matching-styles'
+  ;; with `orderless-regexp' and `orderless-literal' leads to duplicates.
+  (regexp-quote component))
 
 (defun orderless-literal-prefix (component)
   "Match COMPONENT as a literal prefix string."
