@@ -416,7 +416,7 @@ DEFAULT as the list of styles."
    else if res collect (if (stringp res) `(regexp ,res) res) into regexps
    finally return
    (when (or pred regexps)
-     (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps))))))))
+     (cons pred (and regexps (rx-to-string `(or ,@(delete-dups regexps)) t))))))
 
 (defun orderless-compile (pattern &optional styles dispatchers)
   "Build regexps to match the components of PATTERN.
@@ -495,10 +495,10 @@ The predicate PRED is used to constrain the entries in TABLE."
 ;; https://github.com/oantolin/orderless/issues/79#issuecomment-916073526
 (defun orderless--literal-prefix-p (regexp)
   "Determine if REGEXP is a quoted regexp anchored at the beginning.
-If REGEXP is of the form \"\\(?:\\`q\\)\" for q = (regexp-quote u),
+If REGEXP is of the form \"\\`q\" for q = (regexp-quote u),
 then return (cons REGEXP u); else return nil."
-  (when (and (string-prefix-p "\\(?:\\`" regexp) (string-suffix-p "\\)" regexp))
-    (let ((trimmed (substring regexp 6 -2)))
+  (when (string-prefix-p "\\`" regexp)
+    (let ((trimmed (substring regexp 2)))
       (unless (string-match-p "[$*+.?[\\^]"
                               (replace-regexp-in-string
                                "\\\\[$*+.?[\\^]" "" trimmed
@@ -517,7 +517,7 @@ then return (cons REGEXP u); else return nil."
 (defun orderless--filter (prefix regexps ignore-case table pred)
   "Filter TABLE by PREFIX, REGEXPS and PRED.
 The matching should be case-insensitive if IGNORE-CASE is non-nil."
-  ;; If there is a regexp of the form \(?:\`quoted-regexp\) then
+  ;; If there is a regexp of the form \`quoted-regexp then
   ;; remove the first such and add the unquoted form to the prefix.
   (pcase (cl-loop for r in regexps
                   thereis (orderless--literal-prefix-p r))
