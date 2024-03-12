@@ -497,15 +497,14 @@ The predicate PRED is used to constrain the entries in TABLE."
   "Determine if REGEXP is a quoted regexp anchored at the beginning.
 If REGEXP is of the form \"\\`q\" for q = (regexp-quote u),
 then return (cons REGEXP u); else return nil."
-  (when (string-prefix-p "\\`" regexp)
-    (let ((trimmed (substring regexp 2)))
-      (unless (string-match-p "[$*+.?[\\^]"
-                              (replace-regexp-in-string
-                               "\\\\[$*+.?[\\^]" "" trimmed
-                               'fixedcase 'literal))
-        (cons regexp
-              (replace-regexp-in-string "\\\\\\([$*+.?[\\^]\\)" "\\1"
-                                        trimmed 'fixedcase))))))
+  (when (and (string-prefix-p "\\`" regexp)
+             (not (string-match-p "[$*+.?[\\^]"
+                                  (replace-regexp-in-string
+                                   "\\\\[$*+.?[\\^]" "" regexp
+                                   'fixedcase 'literal nil 2))))
+    (cons regexp
+          (replace-regexp-in-string "\\\\\\([$*+.?[\\^]\\)" "\\1"
+                                    regexp 'fixedcase nil nil 2))))
 
 (defun orderless--ignore-case-p (regexps)
   "Return non-nil if case should be ignored for REGEXPS."
