@@ -41,10 +41,13 @@ from [[https://github.com/minad/consult][Consult]].
 
 To use a completion style with any of the above mentioned completion
 UIs simply add it as an entry in the variables =completion-styles= and
-=completion-category-overrides= (see their documentation). You may also
-want to modify the =completion-category-defaults= variable, which serves
-as a default value for =completion-category-overrides=: if you want to
-use =orderless= exclusively, set both variables to =nil=.
+=completion-category-overrides= and =completion-category-defaults= (see
+their documentation).
+
+The =completion-category-defaults= variable serves as a default value
+for =completion-category-overrides=. If you want to use =orderless=
+exclusively, set both variables to =nil=, but be aware that
+=completion-category-defaults= is modified by packages at load time.
 
 With a bit of effort, it might still be possible to use =orderless= with
 other completion UIs, even if those UIs don't support the standard

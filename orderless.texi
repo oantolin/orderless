@@ -91,10 +91,13 @@ from @uref{https://github.com/minad/consult, Consult}.
 
 To use a completion style with any of the above mentioned completion
 UIs simply add it as an entry in the variables @samp{completion-styles} and
-@samp{completion-category-overrides} (see their documentation). You may also
-want to modify the @samp{completion-category-defaults} variable, which serves
-as a default value for @samp{completion-category-overrides}: if you want to
-use @samp{orderless} exclusively, set both variables to @samp{nil}.
+@samp{completion-category-overrides} and @samp{completion-category-defaults} (see
+their documentation).
+
+The @samp{completion-category-defaults} variable serves as a default value
+for @samp{completion-category-overrides}. If you want to use @samp{orderless}
+exclusively, set both variables to @samp{nil}, but be aware that
+@samp{completion-category-defaults} is modified by packages at load time.
 
 With a bit of effort, it might still be possible to use @samp{orderless} with
 other completion UIs, even if those UIs don't support the standard
