@@ -285,7 +285,9 @@ which can invert any predicate or regexp."
   "Return t if STR matches PRED and REGEXP."
   (and str
        (or (not pred) (funcall pred str))
-       (or (not regexp) (string-match-p regexp str))))
+       (or (not regexp)
+           (let ((case-fold-search completion-ignore-case))
+             (string-match-p regexp str)))))
 
 (defun orderless-not (pred regexp)
   "Match strings that do *not* match PRED and REGEXP."
