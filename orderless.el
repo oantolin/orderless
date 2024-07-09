@@ -315,7 +315,7 @@ which can invert any predicate or regexp."
                                            metadata 'affixation-function)
                                           (plist-get completion-extra-properties
                                                      :affixation-function))))
-                        (lambda (cand) (caddr (funcall aff (list cand))))))))
+                        (lambda (cand) (caddar (funcall aff (list cand))))))))
     (lambda (str)
       (orderless--match-p pred regexp (funcall fun str)))))
 
