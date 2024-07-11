@@ -306,18 +306,17 @@ which can invert any predicate or regexp."
 
 (defun orderless-annotation (pred regexp)
   "Match candidates where the annotation matches PRED and REGEXP."
-  (when-let ((metadata (orderless--metadata))
-             (fun (or (completion-metadata-get
-                       metadata 'annotation-function)
+  (let ((md (orderless--metadata)))
+    (if-let ((fun (or (completion-metadata-get md 'affixation-function)
                       (plist-get completion-extra-properties
-                                 :annotation-function)
-                      (when-let ((aff (or (completion-metadata-get
-                                           metadata 'affixation-function)
-                                          (plist-get completion-extra-properties
-                                                     :affixation-function))))
-                        (lambda (cand) (caddar (funcall aff (list cand))))))))
-    (lambda (str)
-      (orderless--match-p pred regexp (funcall fun str)))))
+                                 :affixation-function))))
+        (lambda (str)
+          (cl-loop for s in (cdar (funcall fun (list str)))
+                   thereis (orderless--match-p pred regexp s)))
+      (when-let ((fun (or (completion-metadata-get md 'annotation-function)
+                          (plist-get completion-extra-properties
+                                     :annotation-function))))
+          (lambda (str) (orderless--match-p pred regexp (funcall fun str)))))))
 
 ;;; Highlighting matches
 
