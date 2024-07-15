@@ -92,8 +92,8 @@ as a flag and does not require input."
 
 (defun orderless-kwd-group (pred regexp)
   "Match candidate group title against PRED and REGEXP."
-  (when-let ((fun (completion-metadata-get (orderless--metadata)
-                                           'group-function)))
+  (when-let ((fun (compat-call completion-metadata-get
+                               (orderless--metadata) 'group-function)))
     (lambda (str)
       (orderless--match-p pred regexp (funcall fun str nil)))))
 

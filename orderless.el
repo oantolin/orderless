@@ -7,7 +7,7 @@
 ;; Keywords: extensions
 ;; Version: 1.1
 ;; Homepage: https://github.com/oantolin/orderless
-;; Package-Requires: ((emacs "27.1"))
+;; Package-Requires: ((emacs "27.1") (compat "30"))
 
 ;; This file is part of GNU Emacs.
 
@@ -55,6 +55,7 @@
 
 ;;; Code:
 
+(require 'compat)
 (eval-when-compile (require 'cl-lib))
 
 (defgroup orderless nil
@@ -307,15 +308,11 @@ which can invert any predicate or regexp."
 (defun orderless-annotation (pred regexp)
   "Match candidates where the annotation matches PRED and REGEXP."
   (let ((md (orderless--metadata)))
-    (if-let ((fun (or (completion-metadata-get md 'affixation-function)
-                      (plist-get completion-extra-properties
-                                 :affixation-function))))
+    (if-let ((fun (compat-call completion-metadata-get md 'affixation-function)))
         (lambda (str)
           (cl-loop for s in (cdar (funcall fun (list str)))
                    thereis (orderless--match-p pred regexp s)))
-      (when-let ((fun (or (completion-metadata-get md 'annotation-function)
-                          (plist-get completion-extra-properties
-                                     :annotation-function))))
+      (when-let ((fun (compat-call completion-metadata-get md 'annotation-function)))
           (lambda (str) (orderless--match-p pred regexp (funcall fun str)))))))
 
 ;;; Highlighting matches
@@ -545,11 +542,10 @@ The predicate PRED is used to constrain the entries in TABLE."
 The predicate PRED is used to constrain the entries in TABLE.  The
 matching portions of each candidate are highlighted.
 This function is part of the `orderless' completion style."
-  (defvar completion-lazy-hilit-fn)
   (pcase-let ((`(,prefix ,regexps ,ignore-case ,pred)
                (orderless--compile string table pred)))
     (when-let ((completions (orderless--filter prefix regexps ignore-case table pred)))
-      (if (bound-and-true-p completion-lazy-hilit)
+      (if completion-lazy-hilit
           (setq completion-lazy-hilit-fn
                 (apply-partially #'orderless--highlight regexps ignore-case))
         (cl-loop for str in-ref completions do
