@@ -357,7 +357,6 @@ converted to a list of regexps according to the value of
                   string 'fixedcase 'literal)
                  " +" t)))
 
-(define-obsolete-function-alias 'orderless-dispatch 'orderless--dispatch "1.0")
 (defun orderless--dispatch (dispatchers default string index total)
   "Run DISPATCHERS to compute matching styles for STRING.
 
@@ -453,12 +452,6 @@ string as argument."
    when regexp collect regexp into regexps
    when pred do (cl-callf orderless--predicate-and predicate pred)
    finally return (cons predicate regexps)))
-
-(defun orderless-pattern-compiler (pattern &optional styles dispatchers)
-  "Obsolete function, use `orderless-compile' instead.
-See `orderless-compile' for the arguments PATTERN, STYLES and DISPATCHERS."
-  (cdr (orderless-compile pattern styles dispatchers)))
-(make-obsolete 'orderless-pattern-compiler 'orderless-compile "1.0")
 
 ;;; Completion style implementation
 
