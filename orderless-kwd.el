@@ -57,6 +57,7 @@
     (cat ,#'orderless-kwd-category)
     (con ,#'orderless-kwd-content)
     (dir ,#'orderless-kwd-directory)
+    (fil ,#'orderless-kwd-file)
     (doc ,#'orderless-kwd-documentation)
     (grp ,#'orderless-kwd-group)
     (mod ,#'orderless-kwd-mode)
@@ -200,6 +201,13 @@ as a flag and does not require input."
     (when-let ((buf (orderless-kwd--get-buffer str)))
       (orderless--match-p pred regexp
                           (buffer-local-value 'default-directory buf)))))
+
+(defun orderless-kwd-file (pred regexp)
+  "Match `buffer-file-truename' against PRED and REGEXP."
+  (lambda (str)
+    (when-let ((buf (orderless-kwd--get-buffer str)))
+      (orderless--match-p pred regexp
+                          (buffer-local-value 'buffer-file-truename buf)))))
 
 ;;;###autoload
 (defun orderless-kwd-dispatch (component _index _total)
