@@ -6,7 +6,7 @@
 ;; Maintainer: Omar Antolín Camarena <omar@matem.unam.mx>, Daniel Mendler <mail@daniel-mendler.de>
 ;; Keywords: extensions
 ;; Version: 1.2
-;; Homepage: https://github.com/oantolin/orderless
+;; URL: https://github.com/oantolin/orderless
 ;; Package-Requires: ((emacs "27.1") (compat "30"))
 
 ;; This file is part of GNU Emacs.
@@ -60,6 +60,9 @@
 
 (defgroup orderless nil
   "Completion method that matches space-separated regexps in any order."
+  :link '(info-link :tag "Info Manual" "(orderless)")
+  :link '(url-link :tag "Homepage" "https://github.com/oantolin/orderless")
+  :link '(emacs-library-link :tag "Library Source" "orderless.el")
   :group 'minibuffer)
 
 (defface orderless-match-face-0
