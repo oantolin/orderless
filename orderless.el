@@ -61,7 +61,7 @@
 (defgroup orderless nil
   "Completion method that matches space-separated regexps in any order."
   :link '(info-link :tag "Info Manual" "(orderless)")
-  :link '(url-link :tag "Homepage" "https://github.com/oantolin/orderless")
+  :link '(url-link :tag "Website" "https://github.com/oantolin/orderless")
   :link '(emacs-library-link :tag "Library Source" "orderless.el")
   :group 'minibuffer)
 
