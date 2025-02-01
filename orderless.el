@@ -498,7 +498,7 @@ The predicate PRED is used to constrain the entries in TABLE."
                (prefix (substring string 0 limit))
                (pattern (substring string limit))
                (`(,fun . ,regexps) (orderless-compile pattern)))
-    (list prefix regexps (orderless--ignore-case-p regexps)
+    (list prefix regexps (orderless--ignore-case-p pattern)
           (orderless--predicate-normalized-and pred fun))))
 
 ;; Thanks to @jakanakaevangeli for writing a version of this function:
@@ -519,7 +519,7 @@ then return (cons REGEXP u); else return nil."
 (defun orderless--ignore-case-p (regexps)
   "Return non-nil if case should be ignored for REGEXPS."
   (if orderless-smart-case
-      (cl-loop for regexp in regexps
+      (cl-loop for regexp in (ensure-list regexps)
                always (isearch-no-upper-case-p regexp t))
     completion-ignore-case))
 
