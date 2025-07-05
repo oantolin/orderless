@@ -112,7 +112,8 @@ as a flag and does not require input."
 (defun orderless-kwd-documentation (pred regexp)
   "Match documentation against PRED and REGEXP."
   (lambda (str)
-    (when-let ((sym (intern-soft str)))
+    (when-let ((sym (or (get-text-property 0 'embark-command str)
+                        (intern-soft str))))
       (orderless--match-p
        pred regexp
        (or (ignore-errors (documentation sym))
