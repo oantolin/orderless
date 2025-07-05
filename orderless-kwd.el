@@ -75,6 +75,13 @@ as a flag and does not require input."
                 :value-type (choice (list function) (list function (const t))))
   :group 'orderless)
 
+(defsubst orderless-kwd--get-symbol (str)
+  "Return symbol from candidate STR taking `embark-command' into account."
+  (let ((sym (get-text-property 0 'embark-command str)))
+    (if (and sym (symbolp sym))
+        sym
+      (intern-soft str))))
+
 (defsubst orderless-kwd--get-buffer (str)
   "Return buffer from candidate STR taking `multi-category' into account."
   (when-let ((cat (get-text-property 0 'multi-category str)))
@@ -112,8 +119,7 @@ as a flag and does not require input."
 (defun orderless-kwd-documentation (pred regexp)
   "Match documentation against PRED and REGEXP."
   (lambda (str)
-    (when-let ((sym (or (get-text-property 0 'embark-command str)
-                        (intern-soft str))))
+    (when-let ((sym (orderless-kwd--get-symbol str)))
       (orderless--match-p
        pred regexp
        (or (ignore-errors (documentation sym))
@@ -127,7 +133,7 @@ as a flag and does not require input."
   "Match command key binding against PRED and REGEXP."
   (let ((buf (orderless-kwd--orig-buffer)))
     (lambda (str)
-      (when-let ((sym (intern-soft str))
+      (when-let ((sym (orderless-kwd--get-symbol str))
                  ((fboundp sym))
                  (keys (with-current-buffer buf (where-is-internal sym))))
         (cl-loop
@@ -149,7 +155,7 @@ as a flag and does not require input."
   "Match disabled minor modes."
   (let ((buf (orderless-kwd--orig-buffer)))
     (lambda (str)
-      (when-let ((sym (intern-soft str)))
+      (when-let ((sym (orderless-kwd--get-symbol str)))
         (and (boundp sym)
              (memq sym minor-mode-list)
              (not (buffer-local-value sym buf)))))))
@@ -158,7 +164,7 @@ as a flag and does not require input."
   "Match enabled minor modes."
   (let ((buf (orderless-kwd--orig-buffer)))
     (lambda (str)
-      (when-let ((sym (intern-soft str)))
+      (when-let ((sym (orderless-kwd--get-symbol str)))
         (and (boundp sym)
              (memq sym minor-mode-list)
              (buffer-local-value sym buf))))))
