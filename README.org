@@ -5,8 +5,8 @@
 #+TEXINFO_DIR_TITLE: Orderless: (orderless).
 #+TEXINFO_DIR_DESC: Completion style for matching regexps in any order
 
-#+html: <a href="http://elpa.gnu.org/packages/orderless.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/orderless.svg"/></a>
-#+html: <a href="http://elpa.gnu.org/devel/orderless.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/orderless.svg"/></a>
+#+html: <a href="https://elpa.gnu.org/packages/orderless.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/orderless.svg"/></a>
+#+html: <a href="https://elpa.gnu.org/devel/orderless.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/orderless.svg"/></a>
 #+html: <a href="https://melpa.org/#/orderless"><img alt="MELPA" src="https://melpa.org/packages/orderless-badge.svg"/></a>
 #+html: <a href="https://stable.melpa.org/#/orderless"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/orderless-badge.svg"/></a>
 
