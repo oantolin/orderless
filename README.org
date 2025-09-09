@@ -64,7 +64,7 @@ If you use ELPA or MELPA, the easiest way to install =orderless= is via
     :ensure t
     :custom
     (completion-styles '(orderless basic))
-    (completion-category-overrides '((file (styles basic partial-completion)))))
+    (completion-category-overrides '((file (styles partial-completion)))))
 #+end_src
 
 Alternatively, put =orderless.el= somewhere on your =load-path=, and use
@@ -73,7 +73,7 @@ the following configuration:
 #+begin_src emacs-lisp
   (require 'orderless)
   (setq completion-styles '(orderless basic)
-        completion-category-overrides '((file (styles basic partial-completion))))
+        completion-category-overrides '((file (styles partial-completion))))
 #+end_src
 
 The =basic= completion style is specified as fallback in addition to
