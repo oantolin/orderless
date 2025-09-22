@@ -124,7 +124,7 @@ The returned regexps can be either strings or s-expressions in
 the entire match is highlighted, otherwise just the captured
 groups are.  Several are provided with this package: try
 customizing this variable to see a list of them."
-  :type 'hook
+  :type '(repeat function)
   :options (list #'orderless-regexp
                  #'orderless-literal
                  #'orderless-initialism
@@ -199,7 +199,7 @@ the component in the `orderless-flex' style.  See
 `orderless-affix-dispatch' and `orderless-affix-dispatch-alist'
 for such a configuration.  For more information on how this
 variable is used, see `orderless-compile'."
-  :type 'hook)
+  :type '(repeat function))
 
 (defcustom orderless-smart-case t
   "Whether to use smart case.
