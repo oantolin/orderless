@@ -370,7 +370,7 @@ converted to a list of regexps according to the value of
                   "\\\\\\\\\\|\\\\ "
                   (lambda (x) (if (equal x "\\ ") (string 0) x))
                   string 'fixedcase 'literal)
-                 " +" t)))
+                 " +")))
 
 (defun orderless--dispatch (dispatchers default string index total)
   "Run DISPATCHERS to compute matching styles for STRING.
@@ -457,9 +457,10 @@ string as argument."
   (unless dispatchers (setq dispatchers orderless-style-dispatchers))
   (cl-loop
    with predicate = nil
-   with components = (if (functionp orderless-component-separator)
-                         (funcall orderless-component-separator pattern)
-                       (split-string pattern orderless-component-separator t))
+   with temp = (if (functionp orderless-component-separator)
+                   (funcall orderless-component-separator pattern)
+                 (split-string pattern orderless-component-separator))
+   with components = (if (equal (car (last temp)) "") (nbutlast temp) temp)
    with total = (length components)
    for comp in components and index from 0
    for (pred . regexp) = (orderless--compile-component
