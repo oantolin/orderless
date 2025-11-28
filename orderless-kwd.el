@@ -52,8 +52,9 @@
   :group 'orderless)
 
 (defcustom orderless-kwd-alist
-  `((ann ,#'orderless-annotation)
+  `((not ,#'orderless-without-literal)
     (pre ,#'orderless-literal-prefix)
+    (ann ,#'orderless-annotation)
     (cat ,#'orderless-kwd-category)
     (con ,#'orderless-kwd-content)
     (dir ,#'orderless-kwd-directory)
