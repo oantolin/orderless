@@ -39,7 +39,9 @@
 ;;; Code:
 
 (require 'orderless)
-(eval-when-compile (require 'cl-lib))
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'subr-x))
 
 (defcustom orderless-kwd-prefix ?:
   "Keyword dispatcher prefix character."
@@ -85,7 +87,7 @@ as a flag and does not require input."
 
 (defsubst orderless-kwd--get-buffer (str)
   "Return buffer from candidate STR taking `multi-category' into account."
-  (when-let ((cat (get-text-property 0 'multi-category str)))
+  (when-let* ((cat (get-text-property 0 'multi-category str)))
     (setq str (and (eq (car cat) 'buffer) (cdr cat))))
   (and str (get-buffer str)))
 
@@ -96,20 +98,20 @@ as a flag and does not require input."
 (defun orderless-kwd-category (pred regexp)
   "Match candidate category against PRED and REGEXP."
   (lambda (str)
-    (when-let ((cat (car (get-text-property 0 'multi-category str))))
+    (when-let* ((cat (car (get-text-property 0 'multi-category str))))
       (orderless--match-p pred regexp (symbol-name cat)))))
 
 (defun orderless-kwd-group (pred regexp)
   "Match candidate group title against PRED and REGEXP."
-  (when-let ((fun (compat-call completion-metadata-get
-                               (orderless--metadata) 'group-function)))
+  (when-let* ((fun (compat-call completion-metadata-get
+                                (orderless--metadata) 'group-function)))
     (lambda (str)
       (orderless--match-p pred regexp (funcall fun str nil)))))
 
 (defun orderless-kwd-content (_pred regexp)
   "Match buffer content against REGEXP."
   (lambda (str)
-    (when-let ((buf (orderless-kwd--get-buffer str)))
+    (when-let* ((buf (orderless-kwd--get-buffer str)))
       (with-current-buffer buf
         (save-excursion
           (save-restriction
@@ -120,7 +122,7 @@ as a flag and does not require input."
 (defun orderless-kwd-documentation (pred regexp)
   "Match documentation against PRED and REGEXP."
   (lambda (str)
-    (when-let ((sym (orderless-kwd--get-symbol str)))
+    (when-let* ((sym (orderless-kwd--get-symbol str)))
       (orderless--match-p
        pred regexp
        (or (ignore-errors (documentation sym))
@@ -134,9 +136,9 @@ as a flag and does not require input."
   "Match command key binding against PRED and REGEXP."
   (let ((buf (orderless-kwd--orig-buffer)))
     (lambda (str)
-      (when-let ((sym (orderless-kwd--get-symbol str))
-                 ((fboundp sym))
-                 (keys (with-current-buffer buf (where-is-internal sym))))
+      (when-let* ((sym (orderless-kwd--get-symbol str))
+                  ((fboundp sym))
+                  (keys (with-current-buffer buf (where-is-internal sym))))
         (cl-loop
          for key in keys
          thereis (orderless--match-p pred regexp (key-description key)))))))
@@ -145,18 +147,18 @@ as a flag and does not require input."
   "Match variable value against PRED and REGEXP."
   (let ((buf (orderless-kwd--orig-buffer)))
     (lambda (str)
-      (when-let ((sym (intern-soft str))
-                 ((boundp sym)))
-        (let ((print-level 10)
-              (print-length 1000))
-          (orderless--match-p
-           pred regexp (prin1-to-string (buffer-local-value sym buf))))))))
+      (when-let* ((sym (intern-soft str))
+                  ((boundp sym))
+                  (print-level 10)
+                  (print-length 1000))
+        (orderless--match-p
+         pred regexp (prin1-to-string (buffer-local-value sym buf)))))))
 
 (defun orderless-kwd-off (_)
   "Match disabled minor modes."
   (let ((buf (orderless-kwd--orig-buffer)))
     (lambda (str)
-      (when-let ((sym (orderless-kwd--get-symbol str)))
+      (when-let* ((sym (orderless-kwd--get-symbol str)))
         (and (boundp sym)
              (memq sym minor-mode-list)
              (not (buffer-local-value sym buf)))))))
@@ -165,7 +167,7 @@ as a flag and does not require input."
   "Match enabled minor modes."
   (let ((buf (orderless-kwd--orig-buffer)))
     (lambda (str)
-      (when-let ((sym (orderless-kwd--get-symbol str)))
+      (when-let* ((sym (orderless-kwd--get-symbol str)))
         (and (boundp sym)
              (memq sym minor-mode-list)
              (buffer-local-value sym buf))))))
@@ -173,32 +175,32 @@ as a flag and does not require input."
 (defun orderless-kwd-modified (_)
   "Match modified buffers."
   (lambda (str)
-    (when-let ((buf (orderless-kwd--get-buffer str)))
+    (when-let* ((buf (orderless-kwd--get-buffer str)))
       (buffer-modified-p buf))))
 
 (defun orderless-kwd-read-only (_)
   "Match read-only buffers."
   (lambda (str)
-    (when-let ((buf (orderless-kwd--get-buffer str)))
+    (when-let* ((buf (orderless-kwd--get-buffer str)))
       (buffer-local-value 'buffer-read-only buf))))
 
 (defun orderless-kwd-mode (pred regexp)
   "Match buffer mode or bookmark type against PRED and REGEXP."
   (declare-function bookmark-prop-get "bookmark")
   (lambda (str)
-    (if-let ((buf (orderless-kwd--get-buffer str)))
-        (when-let ((mode (buffer-local-value 'major-mode buf)))
+    (if-let* ((buf (orderless-kwd--get-buffer str)))
+        (when-let* ((mode (buffer-local-value 'major-mode buf)))
           (or (orderless--match-p pred regexp (symbol-name mode))
               (orderless--match-p pred regexp
                                   (format-mode-line
                                    (buffer-local-value 'mode-name buf)))))
-      (when-let ((name (if-let ((cat (get-text-property 0 'multi-category str)))
+      (when-let* ((name (if-let* ((cat (get-text-property 0 'multi-category str)))
                            (and (eq (car cat) 'bookmark) (cdr cat))
                          str))
-                 (bm (assoc name (bound-and-true-p bookmark-alist)))
-                 (handler (or (bookmark-prop-get bm 'handler)
-                              'bookmark-default-handler))
-                 ((symbolp handler)))
+                  (bm (assoc name (bound-and-true-p bookmark-alist)))
+                  (handler (or (bookmark-prop-get bm 'handler)
+                               'bookmark-default-handler))
+                  ((symbolp handler)))
         (orderless--match-p pred regexp
                             (or (get handler 'bookmark-handler-type)
                                 (symbol-name handler)))))))
@@ -206,14 +208,14 @@ as a flag and does not require input."
 (defun orderless-kwd-directory (pred regexp)
   "Match `default-directory' against PRED and REGEXP."
   (lambda (str)
-    (when-let ((buf (orderless-kwd--get-buffer str)))
+    (when-let* ((buf (orderless-kwd--get-buffer str)))
       (orderless--match-p pred regexp
                           (buffer-local-value 'default-directory buf)))))
 
 (defun orderless-kwd-file (pred regexp)
   "Match `buffer-file-truename' against PRED and REGEXP."
   (lambda (str)
-    (when-let ((buf (orderless-kwd--get-buffer str)))
+    (when-let* ((buf (orderless-kwd--get-buffer str)))
       (orderless--match-p pred regexp
                           (buffer-local-value 'buffer-file-truename buf)))))
 
@@ -222,14 +224,14 @@ as a flag and does not require input."
   "Match COMPONENT against the keywords in `orderless-kwd-alist'."
   (when (and (not (equal component ""))
              (= (aref component 0) orderless-kwd-prefix))
-    (if-let ((len (length component))
-             (pos (or (string-match-p
-                       (rx-to-string `(any ,orderless-kwd-separator))
-                       component 1)
-                      len))
-             (sym (intern-soft (substring component 1 pos)))
-             (style (alist-get sym orderless-kwd-alist))
-             ((or (< (1+ pos) len) (cadr style))))
+    (if-let* ((len (length component))
+              (pos (or (string-match-p
+                        (rx-to-string `(any ,orderless-kwd-separator))
+                        component 1)
+                       len))
+              (sym (intern-soft (substring component 1 pos)))
+              (style (alist-get sym orderless-kwd-alist))
+              ((or (< (1+ pos) len) (cadr style))))
         (cons (car style) (substring component (min (1+ pos) len)))
       #'ignore)))
 
