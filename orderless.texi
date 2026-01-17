@@ -77,9 +77,8 @@ front-end that provides a completion UI@. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
 tab completion)@comma{} with the built-in Icomplete package (which is similar
 to the more well-known Ido Mode)@comma{} the icomplete-vertical variant from
-Emacs 28 (see the external @uref{https://github.com/oantolin/icomplete-vertical, icomplete-vertical} package to get that
-functionality on earlier versions of Emacs)@comma{} or with some third party
-minibuffer completion frameworks such as @uref{https://gitlab.com/protesilaos/mct, Mct} or @uref{https://github.com/minad/vertico, Vertico}.
+Emacs 28@comma{} or with minibuffer completion frameworks such as @uref{https://gitlab.com/protesilaos/mct, Mct} or
+@uref{https://github.com/minad/vertico, Vertico}.
 
 All the completion UIs just mentioned are for minibuffer completion@comma{}
 used when Emacs commands prompt the user in the minibuffer for some
@@ -101,10 +100,10 @@ exclusively@comma{} set both variables to @samp{nil}@comma{} but be aware that
 
 With a bit of effort@comma{} it might still be possible to use @samp{orderless} with
 other completion UIs@comma{} even if those UIs don't support the standard
-Emacs completion styles. Currently there is support for @uref{https://github.com/abo-abo/swiper, Ivy} (see
-below). Also@comma{} while Company does support completion styles directly@comma{}
-pressing @samp{SPC} takes you out of completion@comma{} so comfortably using
-@samp{orderless} with it takes a bit of configuration (see below).
+Emacs completion styles. Currently there is support for @uref{https://github.com/abo-abo/swiper, Ivy}@comma{} as
+documented below. Also@comma{} while Company does support completion styles
+directly@comma{} pressing @samp{SPC} takes you out of completion@comma{} so comfortably
+using @samp{orderless} with it takes a bit of configuration (see below).
 
 If you use ELPA or MELPA@comma{} the easiest way to install @samp{orderless} is via
 @samp{package-install}. If you use @samp{use-package}@comma{} you can use:

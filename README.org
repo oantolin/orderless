@@ -27,9 +27,8 @@ front-end that provides a completion UI. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
 tab completion), with the built-in Icomplete package (which is similar
 to the more well-known Ido Mode), the icomplete-vertical variant from
-Emacs 28 (see the external [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]] package to get that
-functionality on earlier versions of Emacs), or with some third party
-minibuffer completion frameworks such as [[https://gitlab.com/protesilaos/mct][Mct]] or [[https://github.com/minad/vertico][Vertico]].
+Emacs 28, or with minibuffer completion frameworks such as [[https://gitlab.com/protesilaos/mct][Mct]] or
+[[https://github.com/minad/vertico][Vertico]].
 
 All the completion UIs just mentioned are for minibuffer completion,
 used when Emacs commands prompt the user in the minibuffer for some
@@ -51,10 +50,10 @@ exclusively, set both variables to =nil=, but be aware that
 
 With a bit of effort, it might still be possible to use =orderless= with
 other completion UIs, even if those UIs don't support the standard
-Emacs completion styles. Currently there is support for [[https://github.com/abo-abo/swiper][Ivy]] (see
-below). Also, while Company does support completion styles directly,
-pressing =SPC= takes you out of completion, so comfortably using
-=orderless= with it takes a bit of configuration (see below).
+Emacs completion styles. Currently there is support for [[https://github.com/abo-abo/swiper][Ivy]], as
+documented below. Also, while Company does support completion styles
+directly, pressing =SPC= takes you out of completion, so comfortably
+using =orderless= with it takes a bit of configuration (see below).
 
 If you use ELPA or MELPA, the easiest way to install =orderless= is via
 =package-install=. If you use =use-package=, you can use:
