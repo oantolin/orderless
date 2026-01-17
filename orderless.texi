@@ -57,7 +57,7 @@ Related packages
 
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
+* Restricting to current matches in Icicles@comma{} Ido and Ivy::
 
 @end detailmenu
 @end menu
@@ -66,27 +66,27 @@ Related packages
 @chapter Overview
 
 This package provides an @samp{orderless} @emph{completion style} that divides the
-pattern into space-separated components, and matches candidates that
+pattern into space-separated components@comma{} and matches candidates that
 match all of the components in any order. Each component can match in
-any one of several ways: literally, as a regexp, as an initialism, in
-the flex style, or as multiple word prefixes. By default, regexp and
+any one of several ways: literally@comma{} as a regexp@comma{} as an initialism@comma{} in
+the flex style@comma{} or as multiple word prefixes. By default@comma{} regexp and
 literal matches are enabled.
 
 A completion style is a back-end for completion and is used from a
 front-end that provides a completion UI@. Any completion style can be
 used with the default Emacs completion UI (sometimes called minibuffer
-tab completion), with the built-in Icomplete package (which is similar
-to the more well-known Ido Mode), the icomplete-vertical variant from
+tab completion)@comma{} with the built-in Icomplete package (which is similar
+to the more well-known Ido Mode)@comma{} the icomplete-vertical variant from
 Emacs 28 (see the external @uref{https://github.com/oantolin/icomplete-vertical, icomplete-vertical} package to get that
-functionality on earlier versions of Emacs), or with some third party
+functionality on earlier versions of Emacs)@comma{} or with some third party
 minibuffer completion frameworks such as @uref{https://gitlab.com/protesilaos/mct, Mct} or @uref{https://github.com/minad/vertico, Vertico}.
 
-All the completion UIs just mentioned are for minibuffer completion,
+All the completion UIs just mentioned are for minibuffer completion@comma{}
 used when Emacs commands prompt the user in the minibuffer for some
-input, but there is also completion at point in normal buffers,
+input@comma{} but there is also completion at point in normal buffers@comma{}
 typically used for identifiers in programming languages. Completion
 styles can also be used for that purpose by completion at point UIs
-such as @uref{https://github.com/minad/corfu, Corfu}, @uref{https://company-mode.github.io/, Company} or the function @samp{consult-completion-in-region}
+such as @uref{https://github.com/minad/corfu, Corfu}@comma{} @uref{https://company-mode.github.io/, Company} or the function @samp{consult-completion-in-region}
 from @uref{https://github.com/minad/consult, Consult}.
 
 To use a completion style with any of the above mentioned completion
@@ -96,45 +96,47 @@ their documentation).
 
 The @samp{completion-category-defaults} variable serves as a default value
 for @samp{completion-category-overrides}. If you want to use @samp{orderless}
-exclusively, set both variables to @samp{nil}, but be aware that
+exclusively@comma{} set both variables to @samp{nil}@comma{} but be aware that
 @samp{completion-category-defaults} is modified by packages at load time.
 
-With a bit of effort, it might still be possible to use @samp{orderless} with
-other completion UIs, even if those UIs don't support the standard
+With a bit of effort@comma{} it might still be possible to use @samp{orderless} with
+other completion UIs@comma{} even if those UIs don't support the standard
 Emacs completion styles. Currently there is support for @uref{https://github.com/abo-abo/swiper, Ivy} (see
-below). Also, while Company does support completion styles directly,
-pressing @samp{SPC} takes you out of completion, so comfortably using
+below). Also@comma{} while Company does support completion styles directly@comma{}
+pressing @samp{SPC} takes you out of completion@comma{} so comfortably using
 @samp{orderless} with it takes a bit of configuration (see below).
 
-If you use ELPA or MELPA, the easiest way to install @samp{orderless} is via
-@samp{package-install}. If you use @samp{use-package}, you can use:
+If you use ELPA or MELPA@comma{} the easiest way to install @samp{orderless} is via
+@samp{package-install}. If you use @samp{use-package}@comma{} you can use:
 
 @lisp
 (use-package orderless
   :ensure t
   :custom
   (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
 @end lisp
 
-Alternatively, put @samp{orderless.el} somewhere on your @samp{load-path}, and use
+Alternatively@comma{} put @samp{orderless.el} somewhere on your @samp{load-path}@comma{} and use
 the following configuration:
 
 @lisp
 (require 'orderless)
 (setq completion-styles '(orderless basic)
-      completion-category-overrides '((file (styles basic partial-completion))))
+      completion-category-overrides '((file (styles partial-completion)))
+      completion-pcm-leading-wildcard t) ;; Emacs 31: partial-completion behaves like substring
 @end lisp
 
 The @samp{basic} completion style is specified as fallback in addition to
 @samp{orderless} in order to ensure that completion commands which rely on
-dynamic completion tables, e.g., @code{completion-table-dynamic} or
-@code{completion-table-in-turn}, work correctly. Furthermore the @samp{basic}
+dynamic completion tables@comma{} e.g.@comma{} @code{completion-table-dynamic} or
+@code{completion-table-in-turn}@comma{} work correctly. Furthermore the @samp{basic}
 completion style needs to be tried @emph{first} (not as a fallback) for TRAMP
-hostname completion to work. In order to achieve that, we add an entry
+hostname completion to work. In order to achieve that@comma{} we add an entry
 for the @samp{file} completion category in the @samp{completion-category-overrides}
-variable. In addition, the @samp{partial-completion} style allows you to use
-wildcards for file completion and partial paths, e.g., @code{/u/s/l} for
+variable. In addition@comma{} the @samp{partial-completion} style allows you to use
+wildcards for file completion and partial paths@comma{} e.g.@comma{} @code{/u/s/l} for
 @code{/usr/share/local}.
 
 Bug reports are highly welcome and appreciated!
@@ -156,8 +158,8 @@ Bug reports are highly welcome and appreciated!
 
 Each component of a pattern can match in any of several matching
 styles. A matching style is a function from strings to regexps or
-predicates, so it is easy to define new matching styles. The value
-returned by a matching style can be either a regexp as a string, an
+predicates@comma{} so it is easy to define new matching styles. The value
+returned by a matching style can be either a regexp as a string@comma{} an
 s-expression in @samp{rx} syntax or a predicate function. The predefined
 matching styles are:
 
@@ -166,7 +168,7 @@ matching styles are:
 the component is treated as a regexp that must
 match somewhere in the candidate.
 
-If the component is not a valid regexp, it is ignored.
+If the component is not a valid regexp@comma{} it is ignored.
 
 @item orderless-literal
 the component is treated as a literal string
@@ -178,22 +180,22 @@ string that must occur as a prefix of a candidate.
 
 @item orderless-prefixes
 the component is split at word endings and
-each piece must match at a word boundary in the candidate, occurring
+each piece must match at a word boundary in the candidate@comma{} occurring
 in that order.
 
 This is similar to the built-in @samp{partial-completion} completion-style.
-For example, @samp{re-re} matches @samp{query-replace-regexp}, @samp{recode-region} and
+For example@comma{} @samp{re-re} matches @samp{query-replace-regexp}@comma{} @samp{recode-region} and
 @samp{magit-remote-list-refs}; @samp{f-d.t} matches @samp{final-draft.txt}.
 
 @item orderless-initialism
 each character of the component should appear
-as the beginning of a word in the candidate, in order.
+as the beginning of a word in the candidate@comma{} in order.
 
 This maps @samp{abc} to @samp{\<a.*\<b.*\c}.
 
 @item orderless-flex
 the characters of the component should appear in
-that order in the candidate, but not necessarily consecutively.
+that order in the candidate@comma{} but not necessarily consecutively.
 
 This maps @samp{abc} to @samp{a.*b.*c}.
 
@@ -226,11 +228,11 @@ Style modifiers should not be used directly in
 @table @asis
 @item orderless-annotation
 this style modifier matches the pattern
-against the annotation string of the candidate, instead of against
+against the annotation string of the candidate@comma{} instead of against
 the candidate string.
 
 @item orderless-not
-this style modifier inverts the pattern, such that
+this style modifier inverts the pattern@comma{} such that
 candidates pass which do not match the pattern.
 @end table
 
@@ -238,9 +240,9 @@ candidates pass which do not match the pattern.
 @subsection Style dispatchers
 
 For more fine-grained control on which matching styles to use for
-each component of the input string, you can customize the variable
+each component of the input string@comma{} you can customize the variable
 @samp{orderless-style-dispatchers}. You can use this feature to define your
-own ``query syntax''. For example, the default value of
+own ``query syntax''. For example@comma{} the default value of
 @samp{orderless-style-dispatchers} lists a single dispatcher called
 @samp{orderless-affix-dispatch} which enables a simple syntax based on
 special characters used as either a prefix or suffix:
@@ -254,7 +256,7 @@ special characters used as either a prefix or suffix:
 will match against the candidate's annotation (cheesy mnemonic:
 andnotation!).
 @item
-, uses @samp{orderless-initialism}.
+@comma{} uses @samp{orderless-initialism}.
 @item
 = uses @samp{orderless-literal}.
 @item
@@ -267,37 +269,37 @@ inflections on characters (it uses the function
 @samp{char-fold-to-regexp} to do this).
 @end itemize
 
-You can add, remove or change this mapping between affix characters
+You can add@comma{} remove or change this mapping between affix characters
 and matching styles by customizing the user option
 @samp{orderless-affix-dispatch-alist}. Most users will probably find this
-type of customization sufficient for their query syntax needs, but
+type of customization sufficient for their query syntax needs@comma{} but
 for those desiring further control the rest of this section explains
 how to implement your own style dispatchers.
 
-Style dispatchers are functions which take a component, its index in
-the list of components (starting from 0), and the total number of
-components, and are used to determine the matching styles used for
-that specific component, overriding the default matching styles.
+Style dispatchers are functions which take a component@comma{} its index in
+the list of components (starting from 0)@comma{} and the total number of
+components@comma{} and are used to determine the matching styles used for
+that specific component@comma{} overriding the default matching styles.
 
 A style dispatcher can either decline to handle the input string or
-component, or it can return which matching styles to use. It can
-also, if desired, additionally return a new string to use in place of
+component@comma{} or it can return which matching styles to use. It can
+also@comma{} if desired@comma{} additionally return a new string to use in place of
 the given one. Consult the documentation of @samp{orderless--dispatch} for
 full details.
 
-As an example of writing your own dispatchers, say you wanted the
+As an example of writing your own dispatchers@comma{} say you wanted the
 following setup:
 
 @itemize
 @item
-you normally want components to match as regexps,
+you normally want components to match as regexps@comma{}
 @item
-except for the first component, which should always match as an
-initialism ---this is pretty useful for, say,
-@samp{execute-extended-command} (@samp{M-x}) or @samp{describe-function} (@samp{C-h f}),
+except for the first component@comma{} which should always match as an
+initialism ---this is pretty useful for@comma{} say@comma{}
+@samp{execute-extended-command} (@samp{M-x}) or @samp{describe-function} (@samp{C-h f})@comma{}
 @item
 later components ending in @samp{~} should match (the characters
-other than the final @samp{~}) in the flex style, and
+other than the final @samp{~}) in the flex style@comma{} and
 @item
 later components starting with @samp{!} should indicate the rest of the
 component is a literal string not contained in the candidate (this
@@ -309,7 +311,7 @@ You can achieve this with the following configuration:
 @lisp
 (defun flex-if-twiddle (pattern _index _total)
   (when (string-suffix-p "~" pattern)
-    `(orderless-flex . ,(substring pattern 0 -1))))
+    `(orderless-flex . @comma{}(substring pattern 0 -1))))
 
 (defun first-initialism (pattern index _total)
   (if (= index 0) 'orderless-initialism))
@@ -319,7 +321,7 @@ You can achieve this with the following configuration:
    ((equal "!" pattern)
     #'ignore)
    ((string-prefix-p "!" pattern)
-    `(orderless-not . ,(substring pattern 1)))))
+    `(orderless-not . @comma{}(substring pattern 1)))))
 
 (setq orderless-matching-styles '(orderless-regexp)
       orderless-style-dispatchers '(first-initialism
@@ -331,22 +333,22 @@ You can achieve this with the following configuration:
 @section Component separator regexp
 
 The pattern components are space-separated by default: this is
-controlled by the variable @samp{orderless-component-separator}, which should
+controlled by the variable @samp{orderless-component-separator}@comma{} which should
 be set either to a regexp that matches the desired component
-separator, or to a function that takes a string and returns the list
+separator@comma{} or to a function that takes a string and returns the list
 of components. The default value is a regexp matches a non-empty
 sequence of spaces. It may be useful to add hyphens or slashes (or
-both), to match symbols or file paths, respectively.
+both)@comma{} to match symbols or file paths@comma{} respectively.
 
  Even if you want to split on spaces you might want to be able to
 escape those spaces or to enclose space in double quotes (as in shell
 argument parsing). For backslash-escaped spaces set
 @samp{orderless-component-separator} to the function
 @samp{orderless-escapable-split-on-space}; for shell-like double-quotable
-space, set it to the standard Emacs function @samp{split-string-and-unquote}.
+space@comma{} set it to the standard Emacs function @samp{split-string-and-unquote}.
 
 If you are implementing a command for which you know you want a
-different separator for the components, bind
+different separator for the components@comma{} bind
 @samp{orderless-component-separator} in a @samp{let} form.
 
 @node Defining custom orderless styles
@@ -354,12 +356,12 @@ different separator for the components, bind
 
 Orderless allows the definition of custom completion styles using the
 @code{orderless-define-completion-style} macro. Any Orderless configuration
-variable can be adjusted locally for the new style, e.g.,
+variable can be adjusted locally for the new style@comma{} e.g.@comma{}
 @code{orderless-matching-styles}.
 
 By default Orderless only enables the regexp and literal matching
 styles. In the following example an @code{orderless+initialism} style is
-defined, which additionally enables initialism matching. This completion
+defined@comma{} which additionally enables initialism matching. This completion
 style can then used when matching candidates of the symbol or command
 completion category.
 
@@ -375,13 +377,13 @@ completion category.
 @end lisp
 
 Note that in order for the @samp{orderless+initialism} style to kick-in with
-the above configuration, you'd need to use commands whose metadata
+the above configuration@comma{} you'd need to use commands whose metadata
 indicates that the completion candidates are commands or symbols. In
-Emacs 28, @samp{execute-extended-command} has metadata indicating you are
-selecting a command, but earlier versions of Emacs lack this metadata.
+Emacs 28@comma{} @samp{execute-extended-command} has metadata indicating you are
+selecting a command@comma{} but earlier versions of Emacs lack this metadata.
 Activating @samp{marginalia-mode} from the @uref{https://github.com/minad/marginalia, Marginalia} package provides this
 metadata automatically for many built-in commands and is recommended
-if you use the above example configuration, or other similarly
+if you use the above example configuration@comma{} or other similarly
 fine-grained control of completion styles according to completion
 category.
 
@@ -389,21 +391,21 @@ category.
 @section Faces for component matches
 
 The portions of a candidate matching each component get highlighted in
-one of four faces, @samp{orderless-match-face-?} where @samp{?} is a number from 0
-to 3. If the pattern has more than four components, the faces get
+one of four faces@comma{} @samp{orderless-match-face-?} where @samp{?} is a number from 0
+to 3. If the pattern has more than four components@comma{} the faces get
 reused cyclically.
 
 If your @samp{completion-styles} (or @samp{completion-category-overrides} for some
-particular category) has more than one entry, remember than Emacs
+particular category) has more than one entry@comma{} remember than Emacs
 tries each completion style in turn and uses the first one returning
 matches. You will only see these particular faces when the @samp{orderless}
-completion is the one that ends up being used, of course.
+completion is the one that ends up being used@comma{} of course.
 
 @node Pattern compiler
 @section Pattern compiler
 
 The default mechanism for turning an input string into a predicate and a list of
-regexps to match against, configured using @samp{orderless-matching-styles}, is
+regexps to match against@comma{} configured using @samp{orderless-matching-styles}@comma{} is
 probably flexible enough for the vast majority of users. The patterns are
 compiled by @samp{orderless-compile}. Under special circumstances it may be useful to
 implement a custom pattern compiler by advising @samp{orderless-compile}.
@@ -414,14 +416,14 @@ implement a custom pattern compiler by advising @samp{orderless-compile}.
 You might want to change the separator or the matching style
 configuration on the fly while matching. There many possible user
 interfaces for this: you could toggle between two chosen
-configurations, cycle among several, have a keymap where each key sets
-a different configurations, have a set of named configurations and be
-prompted (with completion) for one of them, popup a @uref{https://github.com/abo-abo/hydra, hydra} to choose a
-configuration, etc. Since there are so many possible UIs and which to
-use is mostly a matter of taste, @samp{orderless} does not provide any such
+configurations@comma{} cycle among several@comma{} have a keymap where each key sets
+a different configurations@comma{} have a set of named configurations and be
+prompted (with completion) for one of them@comma{} popup a @uref{https://github.com/abo-abo/hydra, hydra} to choose a
+configuration@comma{} etc. Since there are so many possible UIs and which to
+use is mostly a matter of taste@comma{} @samp{orderless} does not provide any such
 commands. But it's easy to write your own!
 
-For example, say you want to use the keybinding @samp{C-l} to make all
+For example@comma{} say you want to use the keybinding @samp{C-l} to make all
 components match literally. You could use the following code:
 
 @lisp
@@ -442,13 +444,13 @@ values are only used for that minibuffer completion session.
 @chapter Integration with other completion UIs
 
 Several excellent completion UIs exist for Emacs in third party
-packages. They do have a tendency to forsake standard Emacs APIs, so
+packages. They do have a tendency to forsake standard Emacs APIs@comma{} so
 integration with them must be done on a case by case basis.
 
-If you manage to use @samp{orderless} with a completion UI not listed here,
+If you manage to use @samp{orderless} with a completion UI not listed here@comma{}
 please file an issue or make a pull request so others can benefit from
-your effort. The functions @samp{orderless-filter},
-@samp{orderless-highlight-matches}, @samp{orderless--highlight} and
+your effort. The functions @samp{orderless-filter}@comma{}
+@samp{orderless-highlight-matches}@comma{} @samp{orderless--highlight} and
 @samp{orderless--component-regexps} are likely to help with the
 integration.
 
@@ -471,7 +473,7 @@ To use @samp{orderless} from Ivy add this to your Ivy configuration:
 @node Helm
 @section Helm
 
-To use @samp{orderless} from Helm, simply configure @samp{orderless} as you would
+To use @samp{orderless} from Helm@comma{} simply configure @samp{orderless} as you would
 for completion UIs that use Emacs completion styles and add this to
 your Helm configuration:
 
@@ -483,18 +485,18 @@ your Helm configuration:
 @section Company
 
 Company comes with a @samp{company-capf} backend that uses the
-completion-at-point functions, which in turn use completion styles.
+completion-at-point functions@comma{} which in turn use completion styles.
 This means that the @samp{company-capf} backend will automatically use
-@samp{orderless}, no configuration necessary!
+@samp{orderless}@comma{} no configuration necessary!
 
 But there are a couple of points of discomfort:
 
 @enumerate
 @item
-Pressing SPC takes you out of completion, so with the default
-separator you are limited to one component, which is no fun. To fix
-this add a separator that is allowed to occur in identifiers, for
-example, for Emacs Lisp code you could use an ampersand:
+Pressing SPC takes you out of completion@comma{} so with the default
+separator you are limited to one component@comma{} which is no fun. To fix
+this add a separator that is allowed to occur in identifiers@comma{} for
+example@comma{} for Emacs Lisp code you could use an ampersand:
 
 @lisp
 (setq orderless-component-separator "[ &]")
@@ -503,10 +505,10 @@ example, for Emacs Lisp code you could use an ampersand:
 @item
 The matching portions of candidates aren't highlighted. That's
 because @samp{company-capf} is hard-coded to look for the
-@samp{completions-common-part} face, and it only use one face,
+@samp{completions-common-part} face@comma{} and it only use one face@comma{}
 @samp{company-echo-common} to highlight candidates.
 
-So, while you can't get different faces for different components,
+So@comma{} while you can't get different faces for different components@comma{}
 you can at least get the matches highlighted in the sole available
 face with this configuration:
 
@@ -521,7 +523,7 @@ face with this configuration:
 (Aren't dynamically scoped variables and the advice system nifty?)
 @end enumerate
 
-If you would like to use different @samp{completion-styles} with @samp{company-capf} instead, you
+If you would like to use different @samp{completion-styles} with @samp{company-capf} instead@comma{} you
 can add this to your configuration:
 
 @lisp
@@ -540,7 +542,7 @@ can add this to your configuration:
 @menu
 * Ivy and Helm::
 * Prescient::
-* Restricting to current matches in Icicles, Ido and Ivy: Restricting to current matches in Icicles Ido and Ivy. 
+* Restricting to current matches in Icicles@comma{} Ido and Ivy::
 @end menu
 
 @node Ivy and Helm
@@ -548,19 +550,19 @@ can add this to your configuration:
 
 The well-known and hugely powerful completion frameworks @uref{https://github.com/abo-abo/swiper, Ivy} and @uref{https://github.com/emacs-helm/helm, Helm}
 also provide for matching space-separated component regexps in any
-order. In Ivy, this is done with the @samp{ivy--regex-ignore-order} matcher.
-In Helm, it is the default, called ``multi pattern matching''.
+order. In Ivy@comma{} this is done with the @samp{ivy--regex-ignore-order} matcher.
+In Helm@comma{} it is the default@comma{} called ``multi pattern matching''.
 
 This package is significantly smaller than either of those because it
-solely defines a completion style, meant to be used with any
+solely defines a completion style@comma{} meant to be used with any
 completion UI supporting completion styles while both of those provide
 their own completion UI (and many other cool features!).
 
 It is worth pointing out that Helm does provide its multi pattern
 matching as a completion style which could be used with default tab
-completion, Icomplete or other UIs supporting completion styles! (Ivy
-does not provide a completion style to my knowledge.) So, for example,
-Icomplete users could, instead of using this package, install Helm and
+completion@comma{} Icomplete or other UIs supporting completion styles! (Ivy
+does not provide a completion style to my knowledge.) So@comma{} for example@comma{}
+Icomplete users could@comma{} instead of using this package@comma{} install Helm and
 configure Icomplete to use it as follows:
 
 @lisp
@@ -569,7 +571,7 @@ configure Icomplete to use it as follows:
 (icomplete-mode)
 @end lisp
 
-(Of course, if you install Helm, you might as well use the Helm UI in
+(Of course@comma{} if you install Helm@comma{} you might as well use the Helm UI in
 @samp{helm-mode} rather than Icomplete.)
 
 @node Prescient
@@ -577,33 +579,33 @@ configure Icomplete to use it as follows:
 
 The @uref{https://github.com/radian-software/prescient.el, prescient.el} library also provides matching of space-separated
 components in any order. It offers a completion-style that can be used
-with Emacs' default completion UI, Mct, Vertico or with Icomplete.
-Furthermore Ivy is supported. The components can be matched literally,
-as regexps, as initialisms or in the flex style (called ``fuzzy'' in
+with Emacs' default completion UI@comma{} Mct@comma{} Vertico or with Icomplete.
+Furthermore Ivy is supported. The components can be matched literally@comma{}
+as regexps@comma{} as initialisms or in the flex style (called ``fuzzy'' in
 prescient). Prescient does not offer the same flexibility as Orderless
-with its style dispatchers. However in addition to matching, Prescient
-supports sorting of candidates, while Orderless leaves that up to the
+with its style dispatchers. However in addition to matching@comma{} Prescient
+supports sorting of candidates@comma{} while Orderless leaves that up to the
 candidate source and the completion UI@.
 
-@node Restricting to current matches in Icicles Ido and Ivy
-@section Restricting to current matches in Icicles, Ido and Ivy
+@node Restricting to current matches in Icicles@comma{} Ido and Ivy
+@section Restricting to current matches in Icicles@comma{} Ido and Ivy
 
 An effect equivalent to matching multiple components in any order can
 be achieved in completion frameworks that provide a way to restrict
 further matching to the current list of candidates. If you use the
-keybinding for restriction instead of @samp{SPC} to separate your components,
+keybinding for restriction instead of @samp{SPC} to separate your components@comma{}
 you get out of order matching!
 
 @itemize
 @item
 @uref{https://www.emacswiki.org/emacs/Icicles, Icicles} calls this @emph{progressive completion} and uses the
-@samp{icicle-apropos-complete-and-narrow} command, bound to @samp{S-SPC}, to do it.
+@samp{icicle-apropos-complete-and-narrow} command@comma{} bound to @samp{S-SPC}@comma{} to do it.
 
 @item
 Ido has @samp{ido-restrict-to-matches} and binds it to @samp{C-SPC}.
 
 @item
-Ivy has @samp{ivy-restrict-to-matches}, bound to @samp{S-SPC}, so you can get the
+Ivy has @samp{ivy-restrict-to-matches}@comma{} bound to @samp{S-SPC}@comma{} so you can get the
 effect of out of order matching without using @samp{ivy--regex-ignore-order}.
 @end itemize
 
