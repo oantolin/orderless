@@ -113,7 +113,7 @@ Bug reports are highly welcome and appreciated!
 This is what it looks like to use =describe-function= (bound by default
 to =C-h f=) to match =eis ff=. Notice that in this particular case =eis=
 matched as an initialism, and =ff= matched as a regexp. The completion
-UI in the screenshot is [[https://github.com/oantolin/icomplete-vertical][icomplete-vertical]] and the theme is
+UI in the screenshot is icomplete-vertical and the theme is
 Protesilaos Stavrou's lovely [[https://gitlab.com/protesilaos/modus-themes][modus-operandi]].
 
 [[https://github.com/oantolin/orderless/blob/dispatcher/images/describe-function-eis-ff.png?raw=true]]
