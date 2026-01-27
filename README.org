@@ -1,4 +1,5 @@
 #+TITLE: Orderless
+#+AUTHOR: Omar Antolín Camarena
 #+OPTIONS: d:nil
 #+EXPORT_FILE_NAME: orderless.texi
 #+TEXINFO_DIR_CATEGORY: Emacs misc features
