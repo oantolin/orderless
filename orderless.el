@@ -93,17 +93,21 @@
     (t :foreground "yellow"))
   "Face for matches of components numbered 3 mod 4.")
 
-(defcustom orderless-component-separator #'orderless-escapable-split-on-space
+(defcustom orderless-component-separator #'orderless-escapable-split
   "Component separators for orderless completion.
 This can either be a string, which is passed to `split-string',
 or a function of a single string argument."
   :type `(choice (const :tag "Spaces" " +")
                  (const :tag "Spaces, hyphen or slash" " +\\|[-/]")
-                 (const :tag "Escapable space"
-                        ,#'orderless-escapable-split-on-space)
+                 (const :tag "Escapable character" ,#'orderless-escapable-split)
                  (const :tag "Quotable spaces" ,#'split-string-and-unquote)
                  (regexp :tag "Custom regexp")
                  (function :tag "Custom function")))
+
+(defcustom orderless-escapable-separator ?\ ; space character
+  "Character to be used as component separator by `orderless-escapable-split'."
+  :type 'character
+  :safe #'characterp)
 
 (defcustom orderless-match-faces
   [orderless-match-face-0
@@ -362,15 +366,20 @@ converted to a list of regexps according to the value of
 
 ;;; Compiling patterns to lists of regexps
 
-(defun orderless-escapable-split-on-space (string)
-  "Split STRING on spaces, which can be escaped with backslash."
-  (mapcar
-   (lambda (piece) (replace-regexp-in-string (string 0) " " piece))
-   (split-string (replace-regexp-in-string
-                  "\\\\\\\\\\|\\\\ "
-                  (lambda (x) (if (equal x "\\ ") (string 0) x))
-                  string 'fixedcase 'literal)
-                 " +")))
+(defun orderless-escapable-split (string)
+  "Split STRING on `orderless-escapable-separator' characters,
+which can be escaped with backslash."
+  (let* ((separator (string orderless-escapable-separator))
+         (encoded-string
+          (string-replace
+           (concat "\\" separator)
+           (string 0) string))
+         (encoded-components
+          (split-string encoded-string separator t)))
+    (mapcar
+     (lambda (component)
+       (string-replace (string 0) separator component))
+     encoded-components)))
 
 (defun orderless--dispatch (dispatchers default string index total)
   "Run DISPATCHERS to compute matching styles for STRING.
