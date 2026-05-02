@@ -7,7 +7,7 @@
 ;; Keywords: matching, completion
 ;; Version: 1.6
 ;; URL: https://github.com/oantolin/orderless
-;; Package-Requires: ((emacs "27.1") (compat "30"))
+;; Package-Requires: ((emacs "27.1") (compat "31"))
 
 ;; This file is part of GNU Emacs.
 
