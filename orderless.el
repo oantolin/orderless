@@ -369,13 +369,12 @@ converted to a list of regexps according to the value of
   "Split STRING on SEP character, which can be escaped with backslash.
 SEP defaults to space."
   (let* ((sep (string (or sep ?\s)))
-         (quo (regexp-quote sep))
-         (nul (string 0)))
+         (quo (regexp-quote sep)))
     (mapcar
-     (lambda (x) (string-replace nul sep x))
+     (lambda (x) (string-replace "\0" sep x))
      (split-string (replace-regexp-in-string
                     (concat "\\\\\\\\\\|\\\\" quo)
-                    (lambda (x) (if (equal x "\\\\") x nul))
+                    (lambda (x) (if (equal x "\\\\") x "\0"))
                     string 'fixedcase 'literal)
                    quo t))))
 
