@@ -343,7 +343,7 @@ both)@comma{} to match symbols or file paths@comma{} respectively.
 escape those spaces or to enclose space in double quotes (as in shell
 argument parsing). For backslash-escaped spaces set
 @samp{orderless-component-separator} to the function
-@samp{orderless-escapable-split-on-space}; for shell-like double-quotable
+@samp{orderless-escapable-split}; for shell-like double-quotable
 space@comma{} set it to the standard Emacs function @samp{split-string-and-unquote}.
 
 If you are implementing a command for which you know you want a

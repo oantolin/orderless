@@ -93,16 +93,16 @@
     (t :foreground "yellow"))
   "Face for matches of components numbered 3 mod 4.")
 
-(defcustom orderless-component-separator #'orderless-escapable-split-on-space
+(defcustom orderless-component-separator #'orderless-escapable-split
   "Component separators for orderless completion.
 This can either be a string, which is passed to `split-string',
 or a function of a single string argument."
   :type `(choice (const :tag "Spaces" " +")
                  (const :tag "Spaces, hyphen or slash" " +\\|[-/]")
                  (const :tag "Escapable space"
-                        ,#'orderless-escapable-split-on-space)
+                        ,#'orderless-escapable-split)
                  (const :tag "Escapable hyphen"
-                        (,#'orderless-escapable-split-on-space ?-))
+                        (,#'orderless-escapable-split ?-))
                  (const :tag "Quotable spaces" ,#'split-string-and-unquote)
                  (regexp :tag "Custom regexp")
                  (function :tag "Custom function")
@@ -365,7 +365,7 @@ converted to a list of regexps according to the value of
 
 ;;; Compiling patterns to lists of regexps
 
-(defun orderless-escapable-split-on-space (string &optional sep)
+(defun orderless-escapable-split (string &optional sep)
   "Split STRING on SEP character, which can be escaped with backslash.
 SEP defaults to space."
   (let* ((sep (string (or sep ?\s)))
@@ -377,6 +377,9 @@ SEP defaults to space."
                     (lambda (x) (if (equal x "\\\\") x "\0"))
                     string 'fixedcase 'literal)
                    quo t))))
+
+(define-obsolete-function-alias 'orderless-escapable-split-on-space
+  #'orderless-escapable-split "1.6")
 
 (defun orderless--dispatch (dispatchers default string index total)
   "Run DISPATCHERS to compute matching styles for STRING.
