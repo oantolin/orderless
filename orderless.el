@@ -102,7 +102,7 @@ or a function of a single string argument."
                  (const :tag "Escapable space"
                         ,#'orderless-escapable-split-on-space)
                  (const :tag "Escapable hyphen"
-                        ,(list #'orderless-escapable-split-on-space ?-))
+                        (,#'orderless-escapable-split-on-space ?-))
                  (const :tag "Quotable spaces" ,#'split-string-and-unquote)
                  (regexp :tag "Custom regexp")
                  (function :tag "Custom function")
