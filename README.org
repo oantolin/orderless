@@ -8,8 +8,8 @@
 
 #+html: <a href="https://elpa.gnu.org/packages/orderless.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/orderless.svg"/></a>
 #+html: <a href="https://elpa.gnu.org/devel/orderless.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/orderless.svg"/></a>
-#+html: <a href="https://melpa.org/#/orderless"><img alt="MELPA" src="https://melpa.org/packages/orderless-badge.svg"/></a>
-#+html: <a href="https://stable.melpa.org/#/orderless"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/orderless-badge.svg"/></a>
+#+html: <a href="https://releases.melpa.org/#/orderless"><img alt="MELPA Releases" src="https://releases.melpa.org/packages/orderless-badge.svg"/></a>
+#+html: <a href="https://snapshots.melpa.org/#/orderless"><img alt="MELPA Snapshots" src="https://snapshots.melpa.org/packages/orderless-badge.svg"/></a>
 
 * Overview
 :PROPERTIES:
