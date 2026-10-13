@@ -592,7 +592,9 @@ This function is part of the `orderless' completion style."
    (pcase orderless-expand-substring
      ('nil nil)
      ('prefix (completion-emacs21-try-completion string table pred point))
-     (_ (completion-substring-try-completion string table pred point)))
+     (_ (pcase (completion-substring-try-completion string table pred point)
+          (`(,str . ,pt) (cons (substring str 0 pt) pt))
+          (res res))))
    (catch 'orderless--many
      (pcase-let ((`(,prefix ,regexps ,ignore-case ,pred)
                   (orderless--compile string table pred))
